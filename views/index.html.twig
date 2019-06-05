@@ -1,0 +1,49 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col"></div>
+                <div class="jumbotron col-10">
+                    <h1>AMNet Birse</h1>
+                    <p class="lead">Gestion des accès internets et du parc informatique - Arts et Métiers Lille - Association des élèves</p>
+                    <hr class="my-4" />
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-header">Accès internet</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Un accès internet Low-Cost pour tous les PG...<br/>Et même les washs !</h5>
+                                <p class="card-text">Notre mission principale est de fournir un accès internet à haute fiabilité à tous ceux qui le demandent. Ethernet ou Wifi, nous faisons de notre mieux pour permettre l'accès où que l'on soit dans la résidence</p>
+                                <a href="#" class="container-fluid btn btn-outline-primary">Demander un accès internet</a>
+                            </div>
+                        </div>
+        
+                        <div class="col">
+                            <div class="card-header">Parc informatique</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Fourniture de babasses pour les CVis et les activités de prom'ss</h5>
+                                <p class="card-text">L'AMNet est en capacité de fournir gratuitement et rapidement des babasses pour l'ouverture de nouveaux CVis mais aussi pour les évènements exceptionnels, sur simple demande des élèves.</p>
+                                <a href="#" class="container-fluid btn btn-outline-primary">Formuler une demande</a>
+                            </div>
+                        </div>
+        
+                        <div class="col">
+                            <div class="card-header">Services</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Mise à disposition de serveurs et de VPN</h5>
+                                <p class="card-text">En plus de ses missions de base, l'AMNet propose divers services, allant de la fourniture de VPN pour le streaming/téléchargement en toute sécurité (et dans le respect de la charte informatique signée) jusqu'a la mise à disposition d'espaces de stockage gratuits</p>
+                                <a href="#" class="container-fluid btn btn-outline-primary">Découvrir nos services</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>

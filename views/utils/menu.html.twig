@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">AMNet - Birse</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Internet</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/internet/access-request/">Demander un accès</a>
+                    <a class="dropdown-item" href="/internet/policy/">Consulter la charte</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matériel</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/material/request/">Formuler une demande</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Services</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/services/vpn/">VPN</a>
+                    <a class="dropdown-item" href="/services/storage/">Espaces de stockage</a>
+                </div>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="/problems/">Signaler un problème</a></li>
+            {% if not data.logged_in %}
+                <li class="nav-item"><a class="btn btn-outline-success" href="/access/login/">Connexion</a></li>
+                &nbsp;
+                <li class="nav-item"><a class="btn btn-outline-warning" href="/access/signin/">Inscription</a></li>
+            {% else %}
+                <li class="nav-item"><a class="btn btn-outline-danger" href="/access/disconnect/">Déconnexion</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
