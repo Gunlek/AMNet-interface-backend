@@ -1,16 +1,19 @@
 var express = require('express');
+let session = require('express-session');
 
 var app = express();
 
-var data = {logged_in: false};
+app.use(session({
+    secret: "amnet-interface"
+}));
 
-require('./access')(app, data);
-require('./internet')(app, data);
+require('./access')(app);
+require('./internet')(app);
 
 app.use(express.static('statics'));
 
 app.get('/', (req, res) => {
-    res.render('index.html.twig', {data: data});
+    res.render('index.html.twig', {data: req.session});
 });
 
 app.listen(8080);

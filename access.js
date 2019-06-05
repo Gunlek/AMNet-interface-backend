@@ -2,6 +2,7 @@ let mysql = require('mysql');
 let md5 = require('md5');
 let bodyParser = require('body-parser');
 let urlencodedParser = bodyParser.urlencoded({ extended: false});
+let session = require('express-session');
 
 let connection = mysql.createConnection({
     host    :   'localhost',
@@ -12,24 +13,30 @@ let connection = mysql.createConnection({
 
 connection.connect();
 
-module.exports = (app, data) => {
+module.exports = (app) => {
+
+    app.use(session({
+        secret: "amnet-interface"
+    }));
 
     app.get('/access/login/', (req, res) => {
         let login_failed = false;
         if(req.query.state != null && req.query.state === "failed")
             login_failed = true;
-        res.render('access/login.html.twig', {data: data, login_failed: login_failed});
+        res.render('access/login.html.twig', {data: req.session, login_failed: login_failed});
     });
 
     app.get('/access/signin/', (req, res) => {
         let signin_failed = false;
         if(req.query.state != null && req.query.state === "failed")
             signin_failed = true;
-        res.render('access/signin.html.twig', {data: data, signin_failed: signin_failed});
+        res.render('access/signin.html.twig', {data: req.session, signin_failed: signin_failed});
     });
 
     app.get('/access/disconnect/', (req, res) => {
-        data.logged_in = false;
+        req.session['logged_in'] = false;
+        req.session['user_id'] = -1;
+        req.session['user_name'] = "";
         res.redirect('/');
     });
 
@@ -37,7 +44,9 @@ module.exports = (app, data) => {
         connection.query('SELECT * FROM users WHERE user_name=? AND user_password=?', [req.body.username, md5(req.body.password)], (error, results, fields) => {
             if(results.length > 0)
             {
-                data.logged_in = true;
+                req.session['logged_in'] = true;
+                req.session['user_id'] = results[0][0];
+                req.session['user_name'] = req.body.username;
                 res.redirect('/');
             }
             else
