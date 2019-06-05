@@ -12,16 +12,22 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Internet</a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/internet/access-request/">Demander un accès</a>
+                    {% if data.logged_in %}
+                        <a class="dropdown-item" href="/internet/access-request/">Demander un accès</a>
+                        <a class="dropdown-item" href="/internet/list-access/">Consulter mes accès</a>
+                    {% endif %}
                     <a class="dropdown-item" href="/internet/policy/">Consulter la charte</a>
                 </div>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matériel</a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/material/request/">Formuler une demande</a>
-                </div>
-            </li>
+            {% if data.logged_in %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Matériel</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/material/request/">Formuler une demande</a>
+                        <a class="dropdown-item" href="/material/list-requests/">Consulter mes demandes</a>
+                    </div>
+                </li>
+            {% endif %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Services</a>
                 <div class="dropdown-menu">
@@ -29,13 +35,21 @@
                     <a class="dropdown-item" href="/services/storage/">Espaces de stockage</a>
                 </div>
             </li>
-            <li class="nav-item"><a class="nav-link" href="/problems/">Signaler un problème</a></li>
-            {% if not data.logged_in %}
+            {% if data.logged_in %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Problèmes</a>
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="/problems/open-ticket">Signaler un problème</a>
+                        <a class="nav-link" href="/problems/track-tickets">Suivi des tickets</a>
+                    </div>
+                </li>
+            {% endif %}
+                {% if not data.logged_in %}
                 <li class="nav-item"><a class="btn btn-outline-success" href="/access/login/">Connexion</a></li>
                 &nbsp;
                 <li class="nav-item"><a class="btn btn-outline-warning" href="/access/signin/">Inscription</a></li>
             {% else %}
-                <li class="nav-item"><a class="btn btn-outline-danger" href="/access/disconnect/">Déconnexion</a></li>
+                <li class="nav-item"><a class="btn btn-outline-danger" href="/access/disconnect/">Déconnexion [{{ data.user_name }}]</a></li>
             {% endif %}
         </ul>
     </div>
