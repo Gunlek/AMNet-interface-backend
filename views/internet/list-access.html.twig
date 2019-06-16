@@ -1,0 +1,63 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/js_imports.html.twig' %}
+        <script type="text/javascript">
+            let mysql = require('mysql');
+
+            let connection = mysql.createConnection({
+                host    :   'localhost',
+                user    :   'root',
+                password:   '',
+                database:   'amnet_birse'
+            });
+
+            connection.connect();
+
+            function delete_access(index, access_id, user_id){
+                connection.query('SELECT * FROM access WHERE access_id = ? AND access_user = ?', [access_id, user_id], function(errors, results, fields){
+                    if(results.length > 0){
+                        connection.query('DELETE FROM access WHERE access_id = ?', [access_id]);
+                        $("#"+index).fadeOut();
+                    }
+                });
+            }
+        </script>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                    <div class="container">
+                        <br/>
+                        <h4 style="display: inline;">Vous souhaitez effectuer une demande d'accès ? </h4> <a href="/internet/request-access/" class="btn btn-outline-primary">Cliquez ici !</a>
+                        <br/><br/>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Désignation</th>
+                                    <th>Adresse MAC</th>
+                                    <th>Adresse IP</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            {% for access in access_list %}
+                                <tr id="{{ loop.index }}">
+                                    <td>#{{ loop.index }}</td>
+                                    <td>{{ access.access_description }}</td>
+                                    <td>{{ access.access_mac }}</td>
+                                    <td>{{ access.access_ip }}</td>
+                                    <td><a id="delete" href="/internet/delete-access/?access_id={{ access.access_id }}&user_id={{ data.user_id }})" class="btn btn-danger btn-sm">Supprimer</a></td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+    </body>
+</html>
