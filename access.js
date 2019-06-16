@@ -45,8 +45,9 @@ module.exports = (app) => {
             if(results.length > 0)
             {
                 req.session['logged_in'] = true;
-                req.session['user_id'] = results[0][0];
+                req.session['user_id'] = results[0]['user_name'];
                 req.session['user_name'] = req.body.username;
+                req.session['user_rank'] = results[0]['user_rank'];
                 res.redirect('/');
             }
             else
