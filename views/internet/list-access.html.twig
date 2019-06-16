@@ -2,28 +2,6 @@
     {% include '/utils/headers.html.twig' %}
 
     <body>
-        {% include '/utils/js_imports.html.twig' %}
-        <script type="text/javascript">
-            let mysql = require('mysql');
-
-            let connection = mysql.createConnection({
-                host    :   'localhost',
-                user    :   'root',
-                password:   '',
-                database:   'amnet_birse'
-            });
-
-            connection.connect();
-
-            function delete_access(index, access_id, user_id){
-                connection.query('SELECT * FROM access WHERE access_id = ? AND access_user = ?', [access_id, user_id], function(errors, results, fields){
-                    if(results.length > 0){
-                        connection.query('DELETE FROM access WHERE access_id = ?', [access_id]);
-                        $("#"+index).fadeOut();
-                    }
-                });
-            }
-        </script>
         {% include '/utils/menu.html.twig' %}
 
         <div class="container-fluid h-100">
@@ -41,6 +19,7 @@
                                     <th>Désignation</th>
                                     <th>Adresse MAC</th>
                                     <th>Adresse IP</th>
+                                    <th>Etat</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -50,6 +29,15 @@
                                     <td>{{ access.access_description }}</td>
                                     <td>{{ access.access_mac }}</td>
                                     <td>{{ access.access_ip }}</td>
+                                    <td>
+                                        {% if access.access_state == "pending" %}
+                                            <span class="badge badge-warning">En cours</span>
+                                        {% elseif access.access_state == "suspended" %}
+                                            <span class="badge badge-danger">Suspendu</span>
+                                        {% else %}
+                                            <span class="badge badge-success">Activé</span>
+                                        {% endif %}
+                                    </td>
                                     <td><a id="delete" href="/internet/delete-access/?access_id={{ access.access_id }}&user_id={{ data.user_id }})" class="btn btn-danger btn-sm">Supprimer</a></td>
                                 </tr>
                             {% endfor %}
@@ -59,5 +47,7 @@
                 <div class="col"></div>
             </div>
         </div>
+
+        {% include '/utils/js_imports.html.twig' %}
     </body>
 </html>
