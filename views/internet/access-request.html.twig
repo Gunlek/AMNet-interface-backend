@@ -1,0 +1,47 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                    <div class="container">
+                        <br/><br/>
+                        <div class="row">
+                            <div class="col"></div>
+                            <div class="col-10 card">
+                                <h4>Formuler une demande d'accès internet</h4>
+                                <p>Vous devez avoir payé votre cotisation afin d'avoir accès à internet, autrement elle vous sera demandé avant l'activation de votre ligne</p>
+                                <br/>
+                                <form class="card-body" method="POST" action="/internet/add-request/">
+                                    <input type="hidden" name="user_id" value="{{ data.user_id }}" />
+            
+                                    <div class="form-group">
+                                        <label>Adresse MAC de l'équipement</label>
+                                        <input type="text" class="form-control" name="mac_addr" required="required" placeholder="Par exemple: 5E:FF:56:A2:AF:15"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                            <label>Description de l'équipement</label>
+                                            <input type="text" class="form-control" required="required" name="description"/>
+                                        </div>
+                                    <br/>
+                                    <div class="form-group">
+                                        <input type="submit" value="Envoyer la demande" class="container-fluid btn btn-primary" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col"></div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>

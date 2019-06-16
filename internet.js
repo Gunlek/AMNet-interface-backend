@@ -36,12 +36,32 @@ module.exports = (app) => {
     app.get('/internet/delete-access/', (req, res) => {
         connection.query('SELECT * FROM access WHERE access_id = ? AND access_user = ?', [req.query.access_id, req.query.user_id], function(errors, results, fields){
             if(results.length > 0){
+                connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("delete-access", ?, ?)', [req.query.user_id, results[0]['access_mac']]);
                 connection.query('DELETE FROM access WHERE access_id = ?', [req.query.access_id]);
                 res.redirect('/internet/list-access');
             }
             else {
                 res.redirect('/access/login/');
             }
+        });
+    });
+
+    app.get('/internet/access-request/', (req, res) => {
+        if(!req.session['logged_in'])
+            res.redirect('/access/login/');
+        else {
+            res.render('internet/access-request.html.twig', {data: req.session});
+        }
+    });
+
+    app.post('/internet/add-request/', urlencodedParser, (req, res) => {
+        let mac_addr = req.body.mac_addr;
+        let description = req.body.description;
+        let user_id = req.body.user_id;
+
+        connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("add-access", ?, ?)', [user_id, "mac_addr="+mac_addr+";description="+description]);
+        connection.query('INSERT INTO access(access_description, access_mac, access_ip, access_user) VALUES(?, ?, ?, ?)', [description, mac_addr, "", user_id], () => {
+            res.redirect('/internet/list-access/');
         });
     });
 }
