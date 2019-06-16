@@ -1,0 +1,47 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                    <div class="container">
+                        <br/>
+                        <h4 style="display: inline;">Vous souhaitez effectuer une demande de matériel ? </h4> <a href="/material/material-request/" class="btn btn-outline-primary">Cliquez ici !</a>
+                        <br/><br/>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Description</th>
+                                    <th>Etat</th>
+                                </tr>
+                            </thead>
+                            {% for request in requests_list %}
+                                <tr id="{{ loop.index }}">
+                                    <td>#{{ loop.index }}</td>
+                                    <td>{{ request.material_description }}</td>
+                                    <td>
+                                        {% if request.material_state == "pending" %}
+                                            <span class="badge badge-warning">En cours</span>
+                                        {% elseif request.material_state == "suspended" %}
+                                            <span class="badge badge-danger">Refusée</span>
+                                        {% else %}
+                                            <span class="badge badge-success">Accordée</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>

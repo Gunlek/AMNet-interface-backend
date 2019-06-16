@@ -9,6 +9,7 @@ app.use(session({
 
 require('./access')(app);
 require('./internet')(app);
+require('./material')(app);
 
 app.use(express.static('statics'));
 
