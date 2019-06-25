@@ -29,7 +29,7 @@
                         <a class="dropdown-item" href="/material/material-request/">Formuler une demande</a>
                         <a class="dropdown-item" href="/material/list-requests/">Consulter mes demandes</a>
                         {% if data.user_rank == 'admin' %}
-                            <a class="dropdown-item" href="/internet/admin-requests/">Administrer les demandes</a>
+                            <a class="dropdown-item" href="/material/admin-requests/">Administrer les demandes</a>
                         {% endif %}
                     </div>
                 </li>
@@ -45,10 +45,10 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Problèmes</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/problems/open-ticket">Signaler un problème</a>
-                        <a class="dropdown-item" href="/problems/track-tickets">Suivi des tickets</a>
+                        <a class="dropdown-item" href="/tickets/open-ticket/">Signaler un problème</a>
+                        <a class="dropdown-item" href="/tickets/track-tickets/">Suivi des tickets</a>
                         {% if data.user_rank == 'admin' %}
-                            <a class="dropdown-item" href="/internet/admin-tickets/">Administrer les tickets</a>
+                            <a class="dropdown-item" href="/tickets/admin-tickets/">Administrer les tickets</a>
                         {% endif %}
                     </div>
                 </li>
