@@ -10,6 +10,7 @@ app.use(session({
 require('./access')(app);
 require('./internet')(app);
 require('./material')(app);
+require('./tickets')(app);
 
 app.use(express.static('statics'));
 

@@ -1,0 +1,47 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                    <div class="container">
+                        <br/><br/>
+                        <div class="row">
+                            <div class="col"></div>
+                            <div class="col-10 card">
+                                <h4>Ouvrir un ticket d'intervention</h4>
+                                <p>Signalez un problème et obtenez une réponse de la part d'un membre de l'équipe AMNet</p>
+                                <br/>
+                                <form class="card-body" method="POST" action="/tickets/add-ticket/">
+                                    <input type="hidden" name="user_id" value="{{ data.user_id }}" />
+            
+                                    <div class="form-group">
+                                        <label>Sujet du ticket:</label>
+                                        <input type="text" class="form-control" name="subject" required="required" placeholder="Par exemple: Prise ethernet non fonctionelle"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                            <label>Description du problème:</label>
+                                            <textarea required="required" name="content" class="form-control"></textarea>
+                                        </div>
+                                    <br/>
+                                    <div class="form-group">
+                                        <input type="submit" value="Envoyer le ticket" class="container-fluid btn btn-primary" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col"></div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>
