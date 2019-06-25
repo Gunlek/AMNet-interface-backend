@@ -19,8 +19,10 @@ module.exports = (app) => {
     }));
 
     app.get('/material/list-requests/', (req, res) => {
-        if(!req.session['logged_in'])
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/material/list-requests/';
             res.redirect('/access/login/');
+        }
         else {
             connection.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
                 res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
@@ -29,8 +31,10 @@ module.exports = (app) => {
     })
 
     app.get('/material/material-request/', (req, res) => {
-        if(!req.session['logged_in'])
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/material/material-request/';
             res.redirect('/access/login/');
+        }
         else {
             res.render('material/request-material.html.twig', {data: req.session});
         }

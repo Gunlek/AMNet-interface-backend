@@ -48,7 +48,10 @@ module.exports = (app) => {
                 req.session['user_id'] = parseInt(results[0]['user_id']);
                 req.session['user_name'] = req.body.username;
                 req.session['user_rank'] = results[0]['user_rank'];
-                res.redirect('/');
+                let returnURL = "/";
+                if(req.session.returnTo != null)
+                    returnURL = req.session.returnTo;
+                res.redirect(returnURL);
             }
             else
                 res.redirect('/access/login/?state=failed');

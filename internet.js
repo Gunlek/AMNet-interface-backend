@@ -19,8 +19,10 @@ module.exports = (app) => {
     }));
 
     app.get('/internet/list-access/', (req, res) => {
-        if(!req.session['logged_in'])
+        if(!req.session['logged_in']) {
+            req.session.returnTo = '/internet/list-access/';
             res.redirect('/access/login/');
+        }
         else {
             let access_list = [];
             connection.query('SELECT * FROM access WHERE access_user = ?', [1], function(error, results, fields){
@@ -47,8 +49,10 @@ module.exports = (app) => {
     });
 
     app.get('/internet/access-request/', (req, res) => {
-        if(!req.session['logged_in'])
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/access-request/';
             res.redirect('/access/login/');
+        }
         else {
             res.render('internet/access-request.html.twig', {data: req.session});
         }
