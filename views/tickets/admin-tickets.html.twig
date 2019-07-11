@@ -25,20 +25,22 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th>Sujet</th>
-                                            <th>Etat</th>
+                                            <th>Adresse MAC</th>
+                                            <th>Description</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    {% for ticket in opened_tickets %}
-                                        <tr id="{{ loop.index }}">
-                                            <td>#{{ loop.index }}</td>
-                                            <td>{{ ticket.ticket_subject }}</td>
-                                            <td>{% if ticket.ticket_state == 0 %}<span class="badge badge-success">Ouvert</span>{% else %}<span class="badge badge-danger">Fermé</span>{% endif %}</td>
-                                            <td>
-                                                <a href="/tickets/view-ticket/?ticket_id={{ticket.ticket_id}}" class="btn btn-sm btn-primary"><i class="fas fa-comments"></i> Accéder</a>
-                                            </td>
-                                        </tr>
+                                    {% for request in requests %}
+                                        {% if request.request_state == "pending" %}
+                                            <tr id="{{ loop.index }}">
+                                                <td>#{{ loop.index }}</td>
+                                                <td>{{ ticket.ticket_subject }}</td>
+                                                <td>{% if ticket.ticket_state == 0 %}<span class="badge badge-success">Ouvert</span>{% else %}<span class="badge badge-danger">Fermé</span>{% endif %}</td>
+                                                <td>
+                                                    <a href="/tickets/view-ticket/?ticket_id={{ticket.ticket_id}}" class="btn btn-sm btn-primary"><i class="fas fa-comments"></i> Accéder</a>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
                                     {% endfor %}
                                 </table>
                             </div>
