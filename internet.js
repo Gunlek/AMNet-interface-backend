@@ -69,4 +69,71 @@ module.exports = (app) => {
             res.redirect('/internet/list-access/');
         });
     });
+
+    app.get('/internet/admin-access/', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/admin-access/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                req.session.returnTo = '/access/admin-access/';
+                connection.query('SELECT * FROM access', (errors, requests, fields) => {
+                    connection.query('SELECT * FROM users', (errors, users, fields) => {
+                        let user_list = {};
+                        for(let k = 0; k < users.length; k++){
+                            let user = users[k];
+                            user_list[user['user_id']] = {user_id: user['user_id'], user_name: user['user_name'], user_bucque: user['user_bucque'], user_fams: user['user_fams'], user_proms: user['user_proms'], user_rank: user['user_rank']}
+                            if(k == users.length - 1)
+                                res.render('internet/admin-access.html.twig', {data: req.session, requests: requests, user_list: user_list});
+                        }
+                    });
+                });
+            }
+        }
+    });
+
+    app.get('/internet/allow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/admin-access/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                console.log(access_id);
+                connection.query('UPDATE access SET access_state = "active" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/internet/admin-access');
+                });
+            }
+        }
+    });
+
+    app.get('/internet/disallow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/admin-access/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                console.log(access_id);
+                connection.query('UPDATE access SET access_state = "suspended" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/internet/admin-access');
+                });
+            }
+        }
+    });
 }
