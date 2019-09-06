@@ -60,7 +60,7 @@ module.exports = (app) => {
     });
 
     app.post('/internet/add-request/', urlencodedParser, (req, res) => {
-        let mac_addr = req.body.mac_addr.replace('-', ':');
+        let mac_addr = req.body.mac_addr.replace(/-/g, ':');
         let description = req.body.description;
         let user_id = req.body.user_id;
 
