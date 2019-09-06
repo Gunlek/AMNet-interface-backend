@@ -18,7 +18,6 @@
                                     <th>#</th>
                                     <th>Désignation</th>
                                     <th>Adresse MAC</th>
-                                    <th>Adresse IP</th>
                                     <th>Etat</th>
                                     <th>Action</th>
                                 </tr>
@@ -28,7 +27,6 @@
                                     <td>#{{ loop.index }}</td>
                                     <td>{{ access.access_description }}</td>
                                     <td>{{ access.access_mac }}</td>
-                                    <td>{{ access.access_ip }}</td>
                                     <td>
                                         {% if access.access_state == "pending" %}
                                             <span class="badge badge-warning">En cours</span>
