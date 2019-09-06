@@ -109,7 +109,6 @@ module.exports = (app) => {
             }
             else {
                 let access_id = parseInt(req.params.access_id);
-                console.log(access_id);
                 connection.query('UPDATE access SET access_state = "active" WHERE access_id = ?', [access_id], () => {
                     res.redirect('/internet/admin-access');
                 });
@@ -129,7 +128,6 @@ module.exports = (app) => {
             }
             else {
                 let access_id = parseInt(req.params.access_id);
-                console.log(access_id);
                 connection.query('UPDATE access SET access_state = "suspended" WHERE access_id = ?', [access_id], () => {
                     res.redirect('/internet/admin-access');
                 });
