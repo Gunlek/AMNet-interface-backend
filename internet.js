@@ -60,13 +60,12 @@ module.exports = (app) => {
     });
 
     app.post('/internet/add-request/', urlencodedParser, (req, res) => {
-        let mac_addr = req.body.mac_addr;
+        let mac_addr = req.body.mac_addr.replace('-', ':');
         let description = req.body.description;
         let user_id = req.body.user_id;
 
         connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("add-access", ?, ?)', [user_id, "mac_addr="+mac_addr+";description="+description]);
         connection.query('INSERT INTO access(access_description, access_mac, access_user) VALUES(?, ?, ?)', [description, mac_addr, user_id], () => {
-            console.log("TEST");
             res.redirect('/internet/list-access/');
         });
     });
