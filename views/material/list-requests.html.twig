@@ -27,7 +27,7 @@
                                     <td>
                                         {% if request.material_state == "pending" %}
                                             <span class="badge badge-warning">En cours</span>
-                                        {% elseif request.material_state == "suspended" %}
+                                        {% elseif request.material_state == "declined" %}
                                             <span class="badge badge-danger">Refusée</span>
                                         {% else %}
                                             <span class="badge badge-success">Accordée</span>
