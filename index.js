@@ -18,4 +18,8 @@ app.get('/', (req, res) => {
     res.render('index.html.twig', {data: req.session});
 });
 
+app.use(function(req, res, next){
+    res.status(404).render('errors/404.html.twig');
+});
+
 app.listen(8080);
