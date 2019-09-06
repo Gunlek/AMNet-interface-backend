@@ -1,0 +1,139 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                        <br/>
+                        <div class="container">
+                            <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <a class="nav-item nav-link active" id="nav-pending-tab" data-toggle="tab" href="#nav-pending" role="tab" aria-controls="nav-home" aria-selected="true">En cours</a>
+                                    <a class="nav-item nav-link" id="nav-allowed-tab" data-toggle="tab" href="#nav-allowed" role="tab" aria-controls="nav-profile" aria-selected="false">Accordés</a>
+                                    <a class="nav-item nav-link" id="nav-suspended-tab" data-toggle="tab" href="#nav-suspended" role="tab" aria-controls="nav-profile" aria-selected="false">Refusés</a>
+                                </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent">
+                                <div class="tab-pane fade show active" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
+                                    <br/>
+                                    <h4>Demandes en cours</h4>
+                                    <br/><br/>
+                                    <table class="table table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Description</th>
+                                                <th>Demandeur</th>
+                                                <th>Etat</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% for material in requests %}
+                                            {% if material.material_state == "pending" %}
+                                                <tr id="{{ loop.index }}">
+                                                    <td>#{{ loop.index }}</td>
+                                                    <td>{{ material.material_description }}</td>
+                                                    <td>{{ user_list[material.material_user].user_name }}</td>
+                                                    <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
+                                                    <td>
+                                                        {% if material.material_state == "active" %}
+                                                            <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                        {% elseif material.material_state == "suspended" %}
+                                                            <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                        {% else %}
+                                                            <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                            <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" id="nav-allowed" role="tabpanel" aria-labelledby="nav-allowed-tab">
+                                        <br/>
+                                        <h4>Accès accordés</h4>
+                                        <br/><br/>
+                                        <table class="table table-striped">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Description</th>
+                                                    <th>Demandeur</th>
+                                                    <th>Etat</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            {% for material in requests %}
+                                                {% if material.material_state == "granted" %}
+                                                    <tr id="{{ loop.index }}">
+                                                        <td>#{{ loop.index }}</td>
+                                                        <td>{{ material.material_description }}</td>
+                                                        <td>{{ user_list[material.material_user].user_name }}</td>
+                                                        <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
+                                                        <td>
+                                                            {% if material.material_state == "active" %}
+                                                                <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                            {% elseif material.material_state == "suspended" %}
+                                                                <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                            {% else %}
+                                                                <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                                <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                <div class="tab-pane fade" id="nav-suspended" role="tabpanel" aria-labelledby="nav-suspended-tab">
+                                    <br/>
+                                    <h4>Accès suspendus</h4>
+                                    <br/><br/>
+                                    <table class="table table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Description</th>
+                                                <th>Demandeur</th>
+                                                <th>Etat</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% for material in requests %}
+                                            {% if material.material_state == "declined" %}
+                                                <tr id="{{ loop.index }}">
+                                                    <td>#{{ loop.index }}</td>
+                                                    <td>{{ material.material_description }}</td>
+                                                    <td>{{ user_list[material.material_user].user_name }}</td>
+                                                    <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
+                                                    <td>
+                                                        {% if material.material_state == "active" %}
+                                                            <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                        {% elseif material.material_state == "suspended" %}
+                                                            <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                        {% else %}
+                                                            <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                                            <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>
