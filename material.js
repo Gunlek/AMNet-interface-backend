@@ -115,4 +115,23 @@ module.exports = (app) => {
             }
         }
     });
+
+    app.get('/material/delete/:material_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/material/admin-requests/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let material_id = parseInt(req.params.material_id);
+                connection.query('DELETE FROM materials WHERE material_id = ?', [material_id], () => {
+                    res.redirect('/material/admin-requests/');
+                });
+            }
+        }
+    });
 }

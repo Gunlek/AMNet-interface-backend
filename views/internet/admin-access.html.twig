@@ -39,7 +39,7 @@
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ access.access_description }}</td>
                                                     <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
-                                                    <td>{{ access.access_mac }}</td>
+                                                    <td id="mac_addr">{{ access.access_mac }}</td>
                                                     <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
                                                     <td>
                                                         {% if access.access_state == "active" %}
@@ -50,6 +50,8 @@
                                                             <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
                                                             <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                         {% endif %}
+                                                        &nbsp;&nbsp;
+                                                        <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                     </td>
                                                 </tr>
                                             {% endif %}
@@ -76,8 +78,8 @@
                                                     <tr id="{{ loop.index }}">
                                                         <td>#{{ loop.index }}</td>
                                                         <td>{{ access.access_description }}</td>
-                                                        <td>{{ user_list[access.access_user].user_name }}</td>
-                                                        <td>{{ access.access_mac }}</td>
+                                                        <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                                                        <td id="mac_addr">{{ access.access_mac }}</td>
                                                         <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
                                                         <td>
                                                             {% if access.access_state == "active" %}
@@ -88,6 +90,8 @@
                                                                 <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
                                                                 <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                             {% endif %}
+                                                            &nbsp;&nbsp;
+                                                            <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                         </td>
                                                     </tr>
                                                 {% endif %}
@@ -114,8 +118,8 @@
                                                 <tr id="{{ loop.index }}">
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ access.access_description }}</td>
-                                                    <td>{{ user_list[access.access_user].user_name }}</td>
-                                                    <td>{{ access.access_mac }}</td>
+                                                    <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                                                    <td id="mac_addr">{{ access.access_mac }}</td>
                                                     <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
                                                     <td>
                                                         {% if access.access_state == "active" %}
@@ -126,6 +130,8 @@
                                                             <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
                                                             <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                         {% endif %}
+                                                        &nbsp;&nbsp;
+                                                        <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                     </td>
                                                 </tr>
                                             {% endif %}

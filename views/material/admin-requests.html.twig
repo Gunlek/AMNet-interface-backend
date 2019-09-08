@@ -37,7 +37,7 @@
                                                 <tr id="{{ loop.index }}">
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ material.material_description }}</td>
-                                                    <td>{{ user_list[material.material_user].user_name }}</td>
+                                                    <td><a href="/user/profile/{{ user_list[material.material_user].user_id }}">{{ user_list[material.material_user].user_name }}</a></td>
                                                     <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
                                                     <td>
                                                         {% if material.material_state == "active" %}
@@ -48,6 +48,8 @@
                                                             <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
                                                             <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                         {% endif %}
+                                                        &nbsp;&nbsp;
+                                                        <a href="/material/delete/{{material.material_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                     </td>
                                                 </tr>
                                             {% endif %}
@@ -73,7 +75,7 @@
                                                     <tr id="{{ loop.index }}">
                                                         <td>#{{ loop.index }}</td>
                                                         <td>{{ material.material_description }}</td>
-                                                        <td>{{ user_list[material.material_user].user_name }}</td>
+                                                        <td><a href="/user/profile/{{ user_list[material.material_user].user_id }}">{{ user_list[material.material_user].user_name }}</a></td>
                                                         <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
                                                         <td>
                                                             {% if material.material_state == "active" %}
@@ -84,6 +86,8 @@
                                                                 <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
                                                                 <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                             {% endif %}
+                                                            &nbsp;&nbsp;
+                                                            <a href="/material/delete/{{material.material_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                         </td>
                                                     </tr>
                                                 {% endif %}
@@ -109,7 +113,7 @@
                                                 <tr id="{{ loop.index }}">
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ material.material_description }}</td>
-                                                    <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                                                    <td><a href="/user/profile/{{ user_list[material.material_user].user_id }}">{{ user_list[material.material_user].user_name }}</a></td>
                                                     <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
                                                     <td>
                                                         {% if material.material_state == "active" %}
@@ -120,6 +124,8 @@
                                                             <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
                                                             <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
                                                         {% endif %}
+                                                        &nbsp;&nbsp;
+                                                        <a href="/material/delete/{{material.material_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                     </td>
                                                 </tr>
                                             {% endif %}

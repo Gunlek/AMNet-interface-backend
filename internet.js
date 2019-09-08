@@ -134,4 +134,23 @@ module.exports = (app) => {
             }
         }
     });
+
+    app.get('/internet/delete/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/admin-access/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('DELETE FROM access WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/internet/admin-access');
+                });
+            }
+        }
+    });
 }
