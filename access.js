@@ -61,17 +61,19 @@ module.exports = (app) => {
 
     app.post('/access/process_signin/', urlencodedParser, (req, res) => {
         let username = req.body.username;
+        let firstname = req.body.firstname;
+        let lastname = req.body.lastname;
+        let email = req.body.email;
         let bucque = req.body.bucque;
         let fams = req.body.fams;
         let proms = req.body.proms;
-        let email = req.body.email;
         let password = md5(req.body.password);
         let password_conf = md5(req.body.password_confirmation);
 
         if((username != "" && bucque != "" && fams != "" && proms != "" && email!="") && password == password_conf){
             connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                 if(results.length == 0){
-                    connection.query('INSERT INTO users(user_name, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?)', [username, password, bucque, fams, proms]);
+                    connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, password, bucque, fams, proms]);
                     res.redirect('/access/login/');
                 }
                 else
@@ -80,6 +82,27 @@ module.exports = (app) => {
         }
         else
             res.redirect('/access/signin/?state=failed');
+    });
+
+    app.get('/user/profile/:user_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/internet/admin-access/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                if(req.params.user_id != ""){
+                    connection.query('SELECT * FROM users WHERE user_id = ?', [parseInt(req.params.user_id)], (errors, results, fields) => {
+                        if(results.length > 0)
+                            res.render('access/profile.html.twig', {data: req.session, user_data: results[0]})
+                    });
+                }
+            }
+        }
     });
 
 }
