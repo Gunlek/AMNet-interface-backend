@@ -38,7 +38,7 @@
                                                 <tr id="{{ loop.index }}">
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ access.access_description }}</td>
-                                                    <td>{{ user_list[access.access_user].user_name }}</td>
+                                                    <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
                                                     <td>{{ access.access_mac }}</td>
                                                     <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
                                                     <td>
@@ -135,8 +135,8 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col"></div>
                 </div>
-                <div class="col"></div>
             </div>
         </div>
 
