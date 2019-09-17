@@ -3,7 +3,19 @@ let md5 = require('md5');
 let bodyParser = require('body-parser');
 let urlencodedParser = bodyParser.urlencoded({ extended: false});
 let session = require('express-session');
+let nodemailer = require('nodemailer');
+let replace = require("stream-replace");
+let fs = require("fs");
+
 require('dotenv').config();
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: "presidentamnet@gmail.com",
+        pass: "Amnet@birse#1"
+    }
+})
 
 let connection = mysql.createConnection({
     host    :   process.env.DB_HOST,
@@ -19,6 +31,68 @@ module.exports = (app) => {
     app.use(session({
         secret: "amnet-interface"
     }));
+
+    app.get('/access/lost_password/', (req, res) => {
+        res.render('access/lost-password.html.twig', {data: req.session});
+    });
+
+    app.post('/access/process_lost_password/', urlencodedParser, (req, res) => {
+        let email = req.body.email;
+        let token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        connection.query('SELECT user_id FROM users WHERE user_email = ?', [email], (error, results, fields) => {
+            if(results.length > 0){
+                let user_id = results[0]['user_id'];
+                connection.query('INSERT INTO reset_token(token_user, token_value) VALUES(?, ?)', [user_id, token_value]);
+            }
+        });
+        let reset_link = "";
+        if(process.env.DEBUG == "true")
+            reset_link = "http://localhost:8080/access/change_password/"+token_value;
+        else
+            reset_link = "http://89.92.31.117/access/change_password/"+token_value;
+        console.log(reset_link);
+        var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link));
+        let mailOptions = {
+            from: 'presidentamnet@gmail.com',
+            to: email,
+            subject: 'Réinitialisation de mot de passe',
+            html: htmlstream
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if(error){
+                htmlstream.close();
+            }
+        });
+        res.redirect('/access/login/');
+    });
+
+    app.get('/access/change_password/:token', (req, res ) => {
+        let token = req.params.token;
+        let password_change_failed = false;
+        if(req.query.state != null && req.query.state === "failed")
+            password_change_failed = true;
+        res.render('access/change_password.html.twig', {data: req.session, token: token, password_change_failed: password_change_failed});
+    });
+
+    app.post('/access/update_password', urlencodedParser, (req, res) => {
+        let password = md5(req.body.password);
+        let conf_password = md5(req.body.conf_password);
+        let token = req.body.token;
+        if(password === conf_password){
+            connection.query("SELECT token_user FROM reset_token WHERE token_value=?", [token], (errors, results, fields) => {
+                if(results.length > 0){
+                    connection.query("UPDATE users SET user_password = ? WHERE user_id = ?", [password, results[0]["token_user"]], () => {
+                        connection.query("DELETE FROM reset_token WHERE token_value = ?", [token], () => {
+                            res.redirect('/access/login');
+                        });
+                    });
+                }
+            });
+        }
+        else{
+            res.redirect('/access/change_password/'+token+'?state=failed');
+        }
+    });
 
     app.get('/access/login/', (req, res) => {
         let login_failed = false;
