@@ -26,6 +26,8 @@ let connection = mysql.createConnection({
 
 connection.connect();
 
+// In all renderers, data corresponds to the data saved in the current session
+
 module.exports = (app) => {
 
     app.use(session({
@@ -215,6 +217,50 @@ module.exports = (app) => {
                             res.render('access/profile.html.twig', {data: req.session, user_data: results[0]})
                     });
                 }
+            }
+        }
+    });
+
+    /*
+     * Displays the list of all the users registered in the system
+     * Displays all their attributes and the number of registered
+     * MAC address per account
+     */
+    app.get('/access/list-users/', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/access/list-users/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('SELECT *, COUNT(access_id) AS mac_count FROM `users` LEFT JOIN `access` ON users.user_id=access.access_user GROUP BY user_id', (errors, results, fields) => {
+                    res.render('access/list_users.html.twig', {data: req.session, user_list: results});
+                });
+            }
+        }
+    });
+
+    /*
+     * Delete a user from users table based on its user_id (passed over GET)
+     */
+    app.get('/access/delete-user/:user_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/access/list-users/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('DELETE FROM users WHERE user_id = ?', [req.params.user_id], () => {
+                    res.redirect('/access/list-users/');
+                });
             }
         }
     });

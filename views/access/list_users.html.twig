@@ -1,0 +1,55 @@
+<html>
+    {% include '/utils/headers.html.twig' %}
+
+    <body>
+        {% include '/utils/menu.html.twig' %}
+
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col"></div>
+                <div class="h-100 col-10 main-content-bg">
+                    <div class="container">
+                        <br/>
+                        <h4 style="display: inline;">Liste des utilisateurs du service AMNet</h4>
+                        <br/><br/>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nom d'utilisateur</th>
+                                    <th>Prénom</th>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Bucque</th>
+                                    <th>Fam'ss</th>
+                                    <th>Prom'ss</th>
+                                    <th>MAC enregistrées</th>
+                                    <th>Rang</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            {% for user in user_list %}
+                                <tr id="{{ loop.index }}">
+                                    <td>#{{ loop.index }}</td>
+                                    <td>{{ user.user_name }}</td>
+                                    <td>{{ user.user_firstname }}</td>
+                                    <td>{{ user.user_lastname }}</td>
+                                    <td>{{ user.user_email }}</td>
+                                    <td>{{ user.user_bucque }}</td>
+                                    <td>{{ user.user_fams }}</td>
+                                    <td>{{ user.user_proms }}</td>
+                                    <td>{{ user.mac_count }}</td>
+                                    <td>{{ user.user_rank }}</td>
+                                    <td><a id="delete" href="/access/delete-user/{{ user.user_id }}" class="btn btn-danger btn-sm">Supprimer</a></td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+
+        {% include '/utils/js_imports.html.twig' %}
+    </body>
+</html>

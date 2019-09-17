@@ -52,6 +52,9 @@
                         {% endif %}
                     </div>
                 </li>
+                {% if data.user_rank == 'admin' %}
+                    <li class="nav-item"><a class="nav-link" href="/access/list-users/">Liste des utilisateurs</a></li>
+                {% endif %}
             {% endif %}
                 {% if not data.logged_in %}
                 <li class="nav-item"><a class="btn btn-outline-success" href="/access/login/">Connexion</a></li>
