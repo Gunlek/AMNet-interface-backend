@@ -31,7 +31,7 @@
                             {% for user in user_list %}
                                 <tr id="{{ loop.index }}">
                                     <td>#{{ loop.index }}</td>
-                                    <td>{{ user.user_name }}</td>
+                                    <td><a href="/user/profile/{{ user.user_id }}">{{ user.user_name }}</a></td>
                                     <td>{{ user.user_firstname }}</td>
                                     <td>{{ user.user_lastname }}</td>
                                     <td>{{ user.user_email }}</td>
