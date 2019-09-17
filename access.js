@@ -32,10 +32,19 @@ module.exports = (app) => {
         secret: "amnet-interface"
     }));
 
+    /*
+     * Displays lost-password page
+     */
     app.get('/access/lost_password/', (req, res) => {
         res.render('access/lost-password.html.twig', {data: req.session});
     });
 
+    /*
+     * Handle post request from lost-password form
+     * Get email address from form, generate a unique token that corresponds
+     * to the resetting request and send an email to this address using
+     * the specified GMail account containing the address to the specific token
+     */
     app.post('/access/process_lost_password/', urlencodedParser, (req, res) => {
         let email = req.body.email;
         let token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -65,6 +74,10 @@ module.exports = (app) => {
         res.redirect('/access/login/');
     });
 
+    /*
+     * Displays the reset-password page that correspond to the specified
+     * token (via GET)
+     */
     app.get('/access/change_password/:token', (req, res ) => {
         let token = req.params.token;
         let password_change_failed = false;
@@ -73,6 +86,11 @@ module.exports = (app) => {
         res.render('access/change_password.html.twig', {data: req.session, token: token, password_change_failed: password_change_failed});
     });
 
+    /*
+     * Handle POST request from reset-password page
+     * Reset the password in SQL, gathering corresponding user (linked via token) and
+     * update its account password
+     */
     app.post('/access/update_password', urlencodedParser, (req, res) => {
         let password = md5(req.body.password);
         let conf_password = md5(req.body.conf_password);
@@ -93,13 +111,19 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Displays the log-in page
+     */
     app.get('/access/login/', (req, res) => {
         let login_failed = false;
         if(req.query.state != null && req.query.state === "failed")
             login_failed = true;
         res.render('access/login.html.twig', {data: req.session, login_failed: login_failed});
     });
-
+    
+    /*
+     * Displays the sign-in page
+     */
     app.get('/access/signin/', (req, res) => {
         let signin_failed = false;
         if(req.query.state != null && req.query.state === "failed")
@@ -107,6 +131,9 @@ module.exports = (app) => {
         res.render('access/signin.html.twig', {data: req.session, signin_failed: signin_failed});
     });
 
+    /*
+     * Handle disconnection requests and redirect user to index
+     */
     app.get('/access/disconnect/', (req, res) => {
         req.session['logged_in'] = false;
         req.session['user_id'] = -1;
@@ -114,6 +141,10 @@ module.exports = (app) => {
         res.redirect('/');
     });
 
+    /*
+     * Handle POST request from log-in page
+     * Check if they are registered in the database and if username/password corresponds
+     */
     app.post('/access/process_login/', urlencodedParser, (req, res) => {
         connection.query('SELECT * FROM users WHERE user_name=? AND user_password=?', [req.body.username, md5(req.body.password)], (error, results, fields) => {
             if(results.length > 0)
@@ -132,6 +163,12 @@ module.exports = (app) => {
         });
     });
 
+    /*
+     * Handle POST request from sign-in page
+     * Gather username, firstname, lastname, email, bucque, fams, proms and password from
+     * form and check if password and conf_password corresponds
+     * then register the newly created user to the database and redirect to log-in
+     */
     app.post('/access/process_signin/', urlencodedParser, (req, res) => {
         let username = req.body.username;
         let firstname = req.body.firstname;
@@ -157,6 +194,10 @@ module.exports = (app) => {
             res.redirect('/access/signin/?state=failed');
     });
 
+    /*
+     * Displays the specific profile page
+     * Allows admin to check a specific profile from tables
+     */
     app.get('/user/profile/:user_id', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/internet/admin-access/';
