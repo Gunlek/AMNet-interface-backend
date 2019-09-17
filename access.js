@@ -202,7 +202,7 @@ module.exports = (app) => {
      */
     app.get('/user/profile/:user_id', (req, res) => {
         if(!req.session['logged_in']){
-            req.session.returnTo = '/internet/admin-access/';
+            req.session.returnTo = '/user/profile/'+req.params.user_id;
             res.redirect('/access/login/');
         }
         else {
