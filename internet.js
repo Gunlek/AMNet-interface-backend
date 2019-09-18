@@ -13,12 +13,18 @@ let connection = mysql.createConnection({
 
 connection.connect();
 
+// In all renderers, data corresponds to the data saved in the current session
+
 module.exports = (app) => {
 
     app.use(session({
         secret: "amnet-interface"
     }));
 
+    /*
+     * Displays the list of all the requested access for the currently logged-in
+     * user
+     */
     app.get('/internet/list-access/', (req, res) => {
         if(!req.session['logged_in']) {
             req.session.returnTo = '/internet/list-access/';
@@ -26,7 +32,7 @@ module.exports = (app) => {
         }
         else {
             let access_list = [];
-            connection.query('SELECT * FROM access WHERE access_user = ?', [1], function(error, results, fields){
+            connection.query('SELECT * FROM access WHERE access_user = ?', [req.session.user_id], function(error, results, fields){
                 res.render('internet/list-access.html.twig', {data: req.session, access_list: results});
             });
         }
