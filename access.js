@@ -265,4 +265,24 @@ module.exports = (app) => {
         }
     });
 
+    app.get('/access/grant-user/:user_id/:user_rank', (req, res) => {
+        let user_rank = req.params.user_rank;
+        let user_id = req.params.user_id;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/access/list-users/';
+            res.redirect('/access/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_rank = ? WHERE user_id = ?', [user_rank, user_id], () => {
+                    res.redirect('/access/list-users/');
+                });
+            }
+        }
+    });
+
 }
