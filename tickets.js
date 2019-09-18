@@ -29,6 +29,18 @@ module.exports = (app) => {
         }
     });
 
+    app.get('/tickets/close-ticket/:ticket_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/tickets/open-ticket/';
+            res.redirect('/access/login/');
+        }
+        else {
+            connection.query('UPDATE tickets SET ticket_state=1 WHERE ticket_id=?', [req.params.ticket_id], () => {
+                res.redirect('/tickets/track-tickets/');
+            })
+        }
+    });
+
     app.post('/tickets/add-ticket/', urlencodedParser, (req, res) => {
         let subject = req.body.subject;
         let content = req.body.content;
