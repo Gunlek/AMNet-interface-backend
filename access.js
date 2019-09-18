@@ -265,6 +265,11 @@ module.exports = (app) => {
         }
     });
 
+    /* 
+     * Allow granting operation on users
+     * To make them admin or downgrade them back to user
+     * data (user_id and new user_rank) are passed over GET request
+     */
     app.get('/access/grant-user/:user_id/:user_rank', (req, res) => {
         let user_rank = req.params.user_rank;
         let user_id = req.params.user_id;

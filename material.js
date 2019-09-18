@@ -19,6 +19,10 @@ module.exports = (app) => {
         secret: "amnet-interface"
     }));
 
+    /*
+     * Displays the list of all the requested hardware for the currently logged-in
+     * user
+     */
     app.get('/material/list-requests/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/list-requests/';
@@ -29,8 +33,12 @@ module.exports = (app) => {
                 res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
             });
         }
-    })
+    });
 
+    /*
+     * Displays a form to allow user to request new
+     * material
+     */
     app.get('/material/material-request/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/material-request/';
@@ -41,6 +49,9 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Handle request adding, gathering data from access-request form
+     */
     app.post('/material/add-request/', urlencodedParser, (req, res) => {
         let description = req.body.description;
         let user_id = req.body.user_id;
@@ -51,6 +62,10 @@ module.exports = (app) => {
         });
     });
 
+    /*
+     * Gather all the currently saved requests of hardware and display them
+     * in tables to allow easier management from administrators
+     */
     app.get('/material/admin-requests/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/admin-requests/';
@@ -82,6 +97,9 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Allows an administrator to mark a hardware request as "agreed"
+     */
     app.get('/material/allow/:material_id', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/admin-requests/';
@@ -101,6 +119,9 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Allows an administrator to mark a hardware request as "declined"
+     */
     app.get('/material/disallow/:material_id', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/admin-requests/';
@@ -120,6 +141,10 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Delete a hardware request created by user
+     * Only possible for administrators
+     */
     app.get('/material/delete/:material_id', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/material/admin-requests/';
