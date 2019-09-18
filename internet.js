@@ -82,15 +82,19 @@ module.exports = (app) => {
             }
             else {
                 req.session.returnTo = '/access/admin-access/';
-                connection.query('SELECT * FROM access', (errors, requests, fields) => {
-                    connection.query('SELECT * FROM users', (errors, users, fields) => {
-                        let user_list = {};
-                        for(let k = 0; k < users.length; k++){
-                            let user = users[k];
-                            user_list[user['user_id']] = {user_id: user['user_id'], user_name: user['user_name'], user_bucque: user['user_bucque'], user_fams: user['user_fams'], user_proms: user['user_proms'], user_rank: user['user_rank']}
-                            if(k == users.length - 1)
-                                res.render('internet/admin-access.html.twig', {data: req.session, requests: requests, user_list: user_list});
-                        }
+                connection.query('SELECT * FROM access WHERE access_state="pending"', (errors, pending_access, fields) => {
+                    connection.query('SELECT * FROM access WHERE access_state="active"', (errors, active_access, fields) => {
+                        connection.query('SELECT * FROM access WHERE access_state="suspended"', (errors, suspended_access, fields) => {
+                            connection.query('SELECT * FROM users', (errors, users, fields) => {
+                                let user_list = {};
+                                for(let k = 0; k < users.length; k++){
+                                    let user = users[k];
+                                    user_list[user['user_id']] = {user_id: user['user_id'], user_name: user['user_name'], user_bucque: user['user_bucque'], user_fams: user['user_fams'], user_proms: user['user_proms'], user_rank: user['user_rank']}
+                                    if(k == users.length - 1)
+                                        res.render('internet/admin-access.html.twig', {data: req.session, pending_requests: pending_access, active_requests: active_access, suspended_requests: suspended_access, user_list: user_list});
+                                }
+                            });
+                        });
                     });
                 });
             }

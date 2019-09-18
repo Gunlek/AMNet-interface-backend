@@ -33,28 +33,26 @@
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
-                                        {% for access in requests %}
-                                            {% if access.access_state == "pending" %}
-                                                <tr id="{{ loop.index }}">
-                                                    <td>#{{ loop.index }}</td>
-                                                    <td>{{ access.access_description }}</td>
-                                                    <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
-                                                    <td id="mac_addr">{{ access.access_mac }}</td>
-                                                    <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
-                                                    <td>
-                                                        {% if access.access_state == "active" %}
-                                                            <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
-                                                        {% elseif access.access_state == "suspended" %}
-                                                            <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
-                                                        {% else %}
-                                                            <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
-                                                            <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
-                                                        {% endif %}
-                                                        &nbsp;&nbsp;
-                                                        <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
-                                                    </td>
-                                                </tr>
-                                            {% endif %}
+                                        {% for access in pending_requests %}
+                                            <tr id="{{ loop.index }}">
+                                                <td>#{{ loop.index }}</td>
+                                                <td>{{ access.access_description }}</td>
+                                                <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                                                <td id="mac_addr">{{ access.access_mac }}</td>
+                                                <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
+                                                <td>
+                                                    {% if access.access_state == "active" %}
+                                                        <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                                                    {% elseif access.access_state == "suspended" %}
+                                                        <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                    {% else %}
+                                                        <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                                                        <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                    {% endif %}
+                                                    &nbsp;&nbsp;
+                                                    <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                                                </td>
+                                            </tr>
                                         {% endfor %}
                                     </table>
                                 </div>
@@ -73,48 +71,7 @@
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
-                                            {% for access in requests %}
-                                                {% if access.access_state == "active" %}
-                                                    <tr id="{{ loop.index }}">
-                                                        <td>#{{ loop.index }}</td>
-                                                        <td>{{ access.access_description }}</td>
-                                                        <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
-                                                        <td id="mac_addr">{{ access.access_mac }}</td>
-                                                        <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
-                                                        <td>
-                                                            {% if access.access_state == "active" %}
-                                                                <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
-                                                            {% elseif access.access_state == "suspended" %}
-                                                                <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
-                                                            {% else %}
-                                                                <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
-                                                                <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
-                                                            {% endif %}
-                                                            &nbsp;&nbsp;
-                                                            <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
-                                                        </td>
-                                                    </tr>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-                                <div class="tab-pane fade" id="nav-suspended" role="tabpanel" aria-labelledby="nav-suspended-tab">
-                                    <br/>
-                                    <h4>Accès suspendus</h4>
-                                    <br/><br/>
-                                    <table class="table table-striped">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Description</th>
-                                                <th>Demandeur</th>
-                                                <th>@ MAC</th>
-                                                <th>Etat</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        {% for access in requests %}
-                                            {% if access.access_state == "suspended" %}
+                                            {% for access in active_requests %}
                                                 <tr id="{{ loop.index }}">
                                                     <td>#{{ loop.index }}</td>
                                                     <td>{{ access.access_description }}</td>
@@ -134,7 +91,44 @@
                                                         <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                                                     </td>
                                                 </tr>
-                                            {% endif %}
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                <div class="tab-pane fade" id="nav-suspended" role="tabpanel" aria-labelledby="nav-suspended-tab">
+                                    <br/>
+                                    <h4>Accès suspendus</h4>
+                                    <br/><br/>
+                                    <table class="table table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Description</th>
+                                                <th>Demandeur</th>
+                                                <th>@ MAC</th>
+                                                <th>Etat</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% for access in suspended_requests %}
+                                            <tr id="{{ loop.index }}">
+                                                <td>#{{ loop.index }}</td>
+                                                <td>{{ access.access_description }}</td>
+                                                <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                                                <td id="mac_addr">{{ access.access_mac }}</td>
+                                                <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
+                                                <td>
+                                                    {% if access.access_state == "active" %}
+                                                        <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                                                    {% elseif access.access_state == "suspended" %}
+                                                        <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                    {% else %}
+                                                        <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                                                        <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                                    {% endif %}
+                                                    &nbsp;&nbsp;
+                                                    <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                                                </td>
+                                            </tr>
                                         {% endfor %}
                                     </table>
                                 </div>
