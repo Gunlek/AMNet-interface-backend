@@ -10,6 +10,16 @@
                 <div class="h-100 col-10 main-content-bg">
                     <div class="container">
                         <br/><br/>
+                        {% if no_charte %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <h4 class="alert-heading">Attention</h4>
+                                <hr/>
+                                <p>Vous devez accepter la charte pour valider votre inscription</p>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endif %}
                         <div class="row">
                             <div class="col"></div>
                             <div class="col-10 card">
@@ -62,6 +72,12 @@
                                     <div class="form-group">
                                         <label>Confirmez votre mot de passe</label>
                                         <input type="password" class="form-control" required="required"  name="password_confirmation" />
+                                    </div>
+
+                                    <div class"form-group">
+                                        <label>Vous devez accepter la charte AMNet pour vous inscrire: <a href="/docs/charte.pdf">Télécharger la charte</a></label>&nbsp;&nbsp;
+                                        <input type="radio" name="check_charte" value="true"/>Accepter&nbsp;&nbsp;
+                                        <input type="radio" name="check_charte" value="false" checked="checked"/>Refuser
                                     </div>
 
                                     <br/>

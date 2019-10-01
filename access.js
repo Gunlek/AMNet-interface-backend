@@ -128,9 +128,12 @@ module.exports = (app) => {
      */
     app.get('/access/signin/', (req, res) => {
         let signin_failed = false;
-        if(req.query.state != null && req.query.state === "failed")
+        let no_charte = false;
+        if(req.query.state != null && req.query.state === "signin_failed")
             signin_failed = true;
-        res.render('access/signin.html.twig', {data: req.session, signin_failed: signin_failed});
+        if(req.query.state != null && req.query.state === "no_charte")
+            no_charte = true;
+        res.render('access/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte});
     });
 
     /*
@@ -181,19 +184,24 @@ module.exports = (app) => {
         let proms = req.body.proms;
         let password = md5(req.body.password);
         let password_conf = md5(req.body.password_confirmation);
-
+        let charte = req.body.check_charte;
+        
         if((username != "" && bucque != "" && fams != "" && proms != "" && email!="") && password == password_conf){
-            connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
-                if(results.length == 0){
-                    connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, password, bucque, fams, proms]);
-                    res.redirect('/access/login/');
-                }
-                else
-                    res.redirect('/access/signin/?state=failed');
-            });
+            if(charte=="true"){
+                connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
+                    if(results.length == 0){
+                        connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, password, bucque, fams, proms]);
+                        res.redirect('/access/login/');
+                    }
+                    else
+                        res.redirect('/access/signin/?state=signin_failed');
+                });
+            }
+            else
+                res.redirect('/access/signin/?state=no_charte');
         }
         else
-            res.redirect('/access/signin/?state=failed');
+            res.redirect('/access/signin/?state=signin_failed');
     });
 
     /*
