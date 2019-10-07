@@ -1,0 +1,43 @@
+{% for i in 0..pending_requests|length//8 %}
+    <table class="table table-striped pending-page col" page="{{i}}" style="visibility: collapse;">
+        <thead class="thead-dark" style="width:100%;">
+            <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Demandeur</th>
+                <th>Etat</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k in 0..7 %}
+                {% if i*8 + k < pending_requests|length %}
+                    {% set material = pending_requests[i*8 + k] %}
+                    <tr id="{{ i*8 + k }}">
+                            <td>#{{ i*8 + k }}</td>
+                            <td>{{ material.material_description }}</td>
+                            <td><a href="/user/profile/{{ user_list[material.material_user].user_id }}">{{ user_list[material.material_user].user_name }}</a></td>
+                            <td>{% if material.material_state == "granted" %}<span class="badge badge-success">Accordé</span>{% elseif material.material_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Refusé</span>{% endif %}</td>
+                            <td>
+                                {% if material.material_state == "active" %}
+                                    <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                {% elseif material.material_state == "suspended" %}
+                                    <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                {% else %}
+                                    <a href="/material/disallow/{{material.material_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Refuser</a>
+                                    <a href="/material/allow/{{material.material_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                                {% endif %}
+                                &nbsp;&nbsp;
+                                <a href="/material/delete/{{material.material_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                            </td>
+                        </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+<ul class="pagination" id="pending">
+    {% for i in 0..pending_requests|length//8 %}
+        <li class="page-item" id="{{i+1}}"><a class="page-link pagination-link" href="#" id="pending?{{i+1}}">{{i+1}}</a></li>
+    {% endfor %}
+</ul>
