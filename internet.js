@@ -110,7 +110,7 @@ module.exports = (app) => {
                 res.redirect('/');
             }
             else {
-                req.session.returnTo = '/access/admin-access/';
+                req.session.returnTo = '/internet/admin-access/';
                 connection.query('SELECT * FROM access WHERE access_state="pending"', (errors, pending_access, fields) => {
                     connection.query('SELECT * FROM access WHERE access_state="active"', (errors, active_access, fields) => {
                         connection.query('SELECT * FROM access WHERE access_state="suspended"', (errors, suspended_access, fields) => {
