@@ -1,0 +1,45 @@
+{% for i in 0..pending_requests|length//8 %}
+    <table class="table table-striped pending-page col" page="{{i}}" style="visibility: collapse;">
+        <thead class="thead-dark" style="width:100%;">
+            <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Demandeur</th>
+                <th>@ MAC</th>
+                <th>Etat</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k in 0..7 %}
+                {% if i*8 + k < pending_requests|length %}
+                    {% set access = pending_requests[i*8 + k] %}
+                    <tr id="{{ i*8 + k }}">
+                        <td>#{{ i*8 + k }}</td>
+                        <td>{{ access.access_description }}</td>
+                        <td><a href="/user/profile/{{ user_list[access.access_user].user_id }}">{{ user_list[access.access_user].user_name }}</a></td>
+                        <td id="mac_addr">{{ access.access_mac }}</td>
+                        <td>{% if access.access_state == "active" %}<span class="badge badge-success">Accordé</span>{% elseif access.access_state == "pending" %}<span class="badge badge-warning">En attente</span>{% else %}<span class="badge badge-danger">Suspendu</span>{% endif %}</td>
+                        <td>
+                            {% if access.access_state == "active" %}
+                                <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                            {% elseif access.access_state == "suspended" %}
+                                <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                            {% else %}
+                                <a href="/internet/disallow/{{access.access_id}}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Révoquer</a>
+                                <a href="/internet/allow/{{access.access_id}}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Accorder</a>
+                            {% endif %}
+                            &nbsp;&nbsp;
+                            <a href="/internet/delete/{{access.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+<ul class="pagination" id="pending">
+    {% for i in 0..pending_requests|length//8 %}
+        <li class="page-item" id="{{i+1}}"><a class="page-link pagination-link" href="#" id="pending?{{i+1}}">{{i+1}}</a></li>
+    {% endfor %}
+</ul>
