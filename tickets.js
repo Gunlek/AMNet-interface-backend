@@ -18,7 +18,10 @@ module.exports = (app) => {
     app.use(session({
         secret: "amnet-interface"
     }));
-
+    
+    /*
+     * Displays a form, enabling logged-in user to open a ticket
+     */
     app.get('/tickets/open-ticket/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/tickets/open-ticket/';
@@ -29,6 +32,10 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Allows logged-in user to close a ticket
+     * FIXME: Any user can close a random ticket...
+     */
     app.get('/tickets/close-ticket/:ticket_id', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/tickets/open-ticket/';
@@ -40,7 +47,11 @@ module.exports = (app) => {
             })
         }
     });
-
+    
+    /*
+     * Handle "open ticket" form submitting and register the new ticket
+     * in the database
+     */
     app.post('/tickets/add-ticket/', urlencodedParser, (req, res) => {
         let subject = req.body.subject;
         let content = req.body.content;
@@ -55,6 +66,9 @@ module.exports = (app) => {
         });
     });
 
+    /*
+     * Allows user to list all active tickets for him
+     */
     app.get('/tickets/track-tickets/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/tickets/track-tickets/';
@@ -67,6 +81,10 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Displays a specific ticket discussion, execute various SQL
+     * requests and transmit data to the view template
+     */
     app.get('/tickets/view-ticket/', (req, res) => {
         if(!req.session['logged_in']){
             if(req.query.ticket_id != null)
@@ -99,6 +117,10 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Handle response sending, register any new response to the ticket
+     * on the SQL database
+     */
     app.post('/tickets/send-response/', urlencodedParser, (req, res) => {
         let ticket_id = req.body.ticket_id;
         let message = req.body.msg_content;
@@ -115,6 +137,9 @@ module.exports = (app) => {
         });
     });
 
+    /*
+     * Allows admin to list all tickets and managing them easily
+     */
     app.get('/tickets/admin-tickets/', (req, res) => {
         if(!req.session['logged_in']){
             req.session.returnTo = '/tickets/admin-tickets/';
