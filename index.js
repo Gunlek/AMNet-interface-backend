@@ -15,7 +15,7 @@ require('./tickets')(app);          // Handle management of tickets and user-req
 app.use(express.static('statics'));
 
 app.get('/', (req, res) => {
-    res.render('index.html.twig', {data: req.session});
+    res.render('users/login.html.twig');
 });
 
 app.use(function(req, res, next){
