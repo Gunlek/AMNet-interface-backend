@@ -79,8 +79,9 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 }
 
 .btn {
-  border-radius: 2px;
-  height: 50px !important;
+  height: 35px;
+  text-decoration: none;
+  text-align: center;
 }
 .btn:hover {
   cursor: pointer;
@@ -99,7 +100,21 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   transition: background-color 0.2s;
 }
 
+.btn-blue {
+  background-color: #3498db;
+  border: 2px solid #2980b9;
+  color: #fff;
+  font-weight: 500;
+  font-size: 25px;
+  transition: background-color 0.2s;
+}
+.btn-blue:hover {
+  background-color: #2980b9;
+  transition: background-color 0.2s;
+}
+
 footer {
+  z-index: -1;
   position: absolute;
   left: 0;
   bottom: 0;
@@ -119,12 +134,144 @@ footer .right-footer {
   right: 0;
 }
 
+.slide-nav {
+  z-index: 999;
+  position: fixed;
+  padding: 10px 20px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  color: #fff;
+  background-color: #096a09;
+  display: none;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.slide-nav .branding {
+  color: #fff;
+  font-weight: 650;
+}
+.slide-nav .nav-links {
+  list-style: none;
+  font-size: 30px;
+  margin: 0 0;
+  padding: 0 0;
+  font-weight: 500;
+}
+.slide-nav .nav-links li {
+  margin: 30px 0;
+  padding: 0 0;
+}
+.slide-nav .nav-links li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  transition: color 0.2s;
+}
+.slide-nav .nav-links li a:hover, .slide-nav .nav-links li a:hover i {
+  color: #aaa;
+  transition: color 0.2s;
+}
+.slide-nav .nav-links li a i {
+  color: #fff;
+  font-size: 50px;
+  margin-right: 20px;
+  transition: color 0.2s;
+}
+.slide-nav .bottom {
+  position: absolute;
+  bottom: 0;
+  font-size: 30px;
+  padding: 10px 0;
+}
+.slide-nav .bottom a {
+  text-decoration: none;
+  color: #fff;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.slide-nav .bottom a:hover, .slide-nav .bottom a:hover i {
+  color: #aaa;
+  transition: color 0.2s;
+}
+.slide-nav .bottom a i {
+  font-size: 50px;
+  color: #fff;
+  margin-right: 20px;
+  transition: color 0.2s;
+}
+
+.left-nav {
+  text-align: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  background-color: #096A09;
+}
+.left-nav i {
+  font-size: 50px;
+  margin: 10px 0;
+  color: #fff;
+}
+.left-nav .branding {
+  width: 100%;
+  position: absolute;
+  top: 0;
+}
+.left-nav .bottom {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.card {
+  margin: 20px 40px;
+  border: 1px solid #707070;
+  padding: 10px;
+  position: relative;
+}
+.card hr {
+  border: 1px solid rgba(112, 112, 112, 0.4);
+}
+.card .card-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+}
+
+main .page-title {
+  padding: 20px 40px;
+  font-weight: 600;
+}
+
+.offset-main {
+  position: absolute;
+  top: 0;
+  left: 80px;
+  right: 0;
+}
+
 .spacer {
   display: block;
 }
 
-.vertical-100 {
+.vertical-200 {
   min-height: 200px;
+}
+
+.vertical-100 {
+  min-height: 100px;
+}
+
+.vertical-50 {
+  min-height: 50px;
 }
 
 .row {

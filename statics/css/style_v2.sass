@@ -1,7 +1,7 @@
 *
     font-family: segoe UI
     color: #707070
-    
+
 html, body
     min-height: 100%
     margin: 0 0
@@ -46,7 +46,7 @@ h2
 
 form
     width: 100%
-    
+
     .form-group
         width: 100%
         margin: 20px 0
@@ -57,7 +57,7 @@ form
         input
             width: 100%
             height: 30px
-        
+
         input[type="text"], input[type="password"]
             background-color: #fff
             border-radius: 5px
@@ -69,12 +69,13 @@ form
                 box-shadow: 0 0 10px #3498db
 
 .btn
-    border-radius: 2px
-    height: 50px !important
+    // border-radius: 2px
+    height: 35px
+    text-decoration: none
+    text-align: center
 
     &:hover
         cursor: pointer
-
 
 .btn-birse
     background-color: #1B5C17
@@ -88,7 +89,20 @@ form
         background-color: #164813
         transition: background-color 0.2s
 
+.btn-blue
+    background-color: #3498db
+    border: 2px solid #2980b9
+    color: #fff
+    font-weight: 500
+    font-size: 25px
+    transition: background-color 0.2s
+
+    &:hover
+        background-color: #2980b9
+        transition: background-color 0.2s
+
 footer
+    z-index: -1
     position: absolute
     left: 0
     bottom: 0
@@ -101,26 +115,150 @@ footer
         padding: 0 0
         display: inline
         line-height: 30px
-    
+
     .right-footer
         position: absolute
         padding-right: 20px
         right: 0
 
+.slide-nav
+    z-index: 999
+    position: fixed
+    padding: 10px 20px
+    left: 0
+    top: 0
+    bottom: 0
+    color: #fff
+    background-color: #096a09
+    display: none
+    overflow: hidden
+    white-space: nowrap
+
+    .branding
+        color: #fff
+        font-weight: 650
+
+    .nav-links
+        list-style: none
+        font-size: 30px
+        margin: 0 0
+        padding: 0 0
+        font-weight: 500
+
+        li
+            margin: 30px 0
+            padding: 0 0
+
+            a   
+                display: flex
+                align-items: center
+                text-decoration: none
+                color: #fff
+                transition: color 0.2s
+
+                &:hover, &:hover i
+                    color: #aaa
+                    transition: color 0.2s
+
+                i
+                    color: #fff
+                    font-size: 50px
+                    margin-right: 20px
+                    transition: color 0.2s
+
+    .bottom
+        position: absolute
+        bottom: 0
+        font-size: 30px
+        padding: 10px 0
+
+        a
+            text-decoration: none
+            color: #fff
+            vertical-align: middle
+            display: flex
+            align-items: center
+            transition: color 0.2s
+
+            &:hover, &:hover i
+                color: #aaa
+                transition: color 0.2s
+
+            i
+                font-size: 50px
+                color: #fff
+                margin-right: 20px
+                transition: color 0.2s
+
+.left-nav
+    text-align: center
+    position: fixed
+    left: 0
+    top: 0
+    bottom: 0
+    width: 80px
+    background-color: #096A09
+
+    i
+        font-size: 50px
+        margin: 10px 0
+        color: #fff
+
+    .branding
+        width: 100%
+        position: absolute
+        top: 0
+
+    .bottom
+        width: 100%
+        position: absolute
+        bottom: 0
+
+.card
+    margin: 20px 40px
+    border: 1px solid #707070
+    padding: 10px
+    position: relative
+
+    hr
+        border: 1px solid rgba(112, 112, 112, 0.4)
+
+    .card-bottom
+        position: absolute
+        bottom: 0
+        left: 0
+        right: 0
+        padding: 10px
+
+main
+    .page-title
+        padding: 20px 40px
+        font-weight: 600
+
+.offset-main
+    position: absolute
+    top: 0
+    left: 80px
+    right: 0
+
 .spacer
     display: block
-.vertical-100
+.vertical-200
     min-height: 200px
+.vertical-100
+    min-height: 100px
+.vertical-50
+    min-height: 50px
 
 .row
     display: grid
     grid-template-columns: repeat(12, 1fr)
     grid-auto-rows: auto
-    
+
     .col-2
         grid-column-end: span 6
         grid-row: 1
-    
+
     .col-3
         grid-column-end: span 4
         grid-row: 1
@@ -128,11 +266,11 @@ footer
     .col-4
         grid-column-end: span 3
         grid-row: 1
-    
+
     .col-6
         grid-column-end: span 2
         grid-row: 1
-    
+
     .col-12
         grid-column-end: span 1
         grid-row: 1

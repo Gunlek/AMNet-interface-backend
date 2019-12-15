@@ -1,49 +1,159 @@
+<!DOCTYPE html>
 <html>
-    {% include '/utils/headers.html.twig' %}
+	<head>
+		<link rel="stylesheet" href="/css/style_v2.css"/>
+		<link rel="stylesheet" href="/css/all.css"/>
+	</head>
 
-    <body>
-        {% include '/utils/menu.html.twig' %}
+	<body>
+		<header>
+			<nav class="slide-nav">
+				<h1 class="branding">AMNet - Birse</h1>
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col"></div>
-                <div class="jumbotron col-10">
-                    <h1>AMNet Birse</h1>
-                    <p class="lead">Gestion des accès internets et du parc informatique - Arts et Métiers Lille - Association des élèves</p>
-                    <hr class="my-4" />
-                    <div class="row">
-                        <div class="col">
-                            <div class="card-header">Accès internet</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Un accès internet Low-Cost pour tous les PG...<br/>Et même les washs !</h5>
-                                <p class="card-text">Notre mission principale est de fournir un accès internet à haute fiabilité à tous ceux qui le demandent. Ethernet ou Wifi, nous faisons de notre mieux pour permettre l'accès où que l'on soit dans la résidence</p>
-                                <a href="/internet/access-request/" class="container-fluid btn btn-outline-primary">Demander un accès internet</a>
-                            </div>
-                        </div>
-        
-                        <div class="col">
-                            <div class="card-header">Parc informatique</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Fourniture de babasses pour les CVis et les activités de prom'ss</h5>
-                                <p class="card-text">L'AMNet est en capacité de fournir gratuitement et rapidement des babasses pour l'ouverture de nouveaux CVis mais aussi pour les évènements exceptionnels, sur simple demande des élèves.</p>
-                                <a href="/material/material-request/" class="container-fluid btn btn-outline-primary">Formuler une demande</a>
-                            </div>
-                        </div>
-        
-                        <div class="col">
-                            <div class="card-header">Services</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Mise à disposition de serveurs et de VPN</h5>
-                                <p class="card-text">En plus de ses missions de base, l'AMNet propose divers services, allant de la fourniture de VPN pour le streaming/téléchargement en toute sécurité (et dans le respect de la charte informatique signée) jusqu'a la mise à disposition d'espaces de stockage gratuits</p>
-                                <a href="#" class="container-fluid btn btn-outline-primary">Découvrir nos services</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col"></div>
-            </div>
-        </div>
+				<ul class="nav-links">
+					<li>
+						<a href="#">
+							<i class="fas fa-user"></i>
+							Profil
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<i class="fas fa-tools"></i>
+							Administration
+						</a>
+					</li>
+				</ul>
 
-        {% include '/utils/js_imports.html.twig' %}
-    </body>
+				<div class="bottom">
+					<a href="#">
+						<i class="fas fa-sign-out-alt"></i>
+						Déconnexion
+					</a>
+				</div>
+			</nav>
+			<nav class="left-nav">
+				<div class="branding">
+					<a href="#toggle-slide">
+						<i class="fas fa-bars"></i>
+					</a>
+				</div>
+
+				<div class="bottom">
+					<a href="#">
+						<i class="fas fa-sign-out-alt"></i>
+					</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="offset-main">
+			<h1 class="page-title">Mon espace AMNet</h1>
+			<div class="row">
+				<div class="col-4 card">
+					<h3 class="card-title">Accès internet</h3>
+					<hr>
+					<p>Administrez vos demandes d'accès internet pour vos équipements</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+
+				<div class="col-4 card">
+					<h3 class="card-title">Matériel</h3>
+					<hr>
+					<p>Gérez vos demandes de matériel pour un C-Vis, une soirée ou évènement</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+
+				<div class="col-4 card">
+					<h3 class="card-title">Stockage</h3>
+					<hr>
+					<p>Accédez à vos espaces de stockage</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+
+				<div class="col-4 card">
+					<h3 class="card-title">Assistance</h3>
+					<hr>
+					<p>Faites appel à l'AMNet pour un problème de connexion ou de configuration d'équipement</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+			</div>
+
+			<br/><br/>
+
+			<div class="row">
+				<div class="col-2 card">
+					<h3 class="card-title">Actualité AMNet</h3>
+					<hr>
+					<p>Lorem ipsum</p>
+				</div>
+
+				<div class="col-2 card">
+					<h3 class="card-title">Votre statut AMNet</h3>
+					<hr>
+					<p>
+						Votre rôle: PG<br/>
+						Cotisation: Payée / Reste à payer<br/>
+						Charte: Acceptée / Refusée
+					</p>
+				</div>
+			</div>
+		</main>
+
+		<footer>
+			<div class="right-footer">
+				<p>Projet développé et maintenu par Hard Win'ss 58li218 - Version 1.2.1 -
+					<a href="https://github.com/Gunlek/AMNet-interface" target="_blank">
+						<i class="fab fa-github"></i>
+					</a>
+				</p>
+			</div>
+		</footer>
+	</body>
+
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		$(document).ready(() => {
+            let toggle_slide = false;
+            $('a[href="#toggle-slide"]').click((e) => {
+                e.stopPropagation();
+                if(!toggle_slide){
+                    e.preventDefault();
+                    $('.slide-nav').animate({
+                        width: "toggle"
+                    });
+                    toggle_slide = true;
+                }
+            });
+
+            $('nav').click((e) => {
+                e.stopPropagation();
+            });
+
+            $('html').click(() => {
+                if(toggle_slide){
+                    $('.slide-nav').animate({
+                        width: "toggle"
+                    });
+                    toggle_slide = false;
+                }
+            });
+        });
+	</script>
 </html>
