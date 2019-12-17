@@ -7,7 +7,7 @@ app.use(session({
     secret: "amnet-interface"
 }));
 
-require('./access')(app);           // Handle all requests from user management
+require('./users')(app);           // Handle all requests from user management
 require('./internet')(app);         // Handle management of internet requests and access
 require('./material')(app);         // Handle management of material requests and access
 require('./tickets')(app);          // Handle management of tickets and user-requests
