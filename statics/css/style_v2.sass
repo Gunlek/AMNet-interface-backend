@@ -124,7 +124,6 @@ footer
 .slide-nav
     z-index: 999
     position: fixed
-    padding: 10px 20px
     left: 0
     top: 0
     bottom: 0
@@ -134,9 +133,15 @@ footer
     overflow: hidden
     white-space: nowrap
 
+    a
+        padding: 15px 20px
+
+    a:hover
+
     .branding
         color: #fff
-        font-weight: 650
+        font-weight: 650  
+        padding: 10px 20px
 
     .nav-links
         list-style: none
@@ -146,19 +151,17 @@ footer
         font-weight: 500
 
         li
-            margin: 30px 0
-            padding: 0 0
+            transition: background-color 0.2s, color 0.2s
+
+            &:hover
+                background-color: #164813
+                transition: background-color 0.2s, color 0.2s
 
             a   
                 display: flex
                 align-items: center
                 text-decoration: none
                 color: #fff
-                transition: color 0.2s
-
-                &:hover, &:hover i
-                    color: #aaa
-                    transition: color 0.2s
 
                 i
                     color: #fff
@@ -170,19 +173,20 @@ footer
         position: absolute
         bottom: 0
         font-size: 30px
-        padding: 10px 0
+        width: 100%
 
         a
+            padding: 15px 20px
             text-decoration: none
             color: #fff
             vertical-align: middle
             display: flex
             align-items: center
-            transition: color 0.2s
+            transition: background-color 0.2s
 
             &:hover, &:hover i
-                color: #aaa
-                transition: color 0.2s
+                background-color: #164813
+                transition: background-color 0.2s, color 0.2s
 
             i
                 font-size: 50px

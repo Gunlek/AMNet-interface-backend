@@ -137,7 +137,6 @@ footer .right-footer {
 .slide-nav {
   z-index: 999;
   position: fixed;
-  padding: 10px 20px;
   left: 0;
   top: 0;
   bottom: 0;
@@ -147,9 +146,13 @@ footer .right-footer {
   overflow: hidden;
   white-space: nowrap;
 }
+.slide-nav a {
+  padding: 15px 20px;
+}
 .slide-nav .branding {
   color: #fff;
   font-weight: 650;
+  padding: 10px 20px;
 }
 .slide-nav .nav-links {
   list-style: none;
@@ -159,19 +162,17 @@ footer .right-footer {
   font-weight: 500;
 }
 .slide-nav .nav-links li {
-  margin: 30px 0;
-  padding: 0 0;
+  transition: background-color 0.2s, color 0.2s;
+}
+.slide-nav .nav-links li:hover {
+  background-color: #164813;
+  transition: background-color 0.2s, color 0.2s;
 }
 .slide-nav .nav-links li a {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: #fff;
-  transition: color 0.2s;
-}
-.slide-nav .nav-links li a:hover, .slide-nav .nav-links li a:hover i {
-  color: #aaa;
-  transition: color 0.2s;
 }
 .slide-nav .nav-links li a i {
   color: #fff;
@@ -183,19 +184,20 @@ footer .right-footer {
   position: absolute;
   bottom: 0;
   font-size: 30px;
-  padding: 10px 0;
+  width: 100%;
 }
 .slide-nav .bottom a {
+  padding: 15px 20px;
   text-decoration: none;
   color: #fff;
   vertical-align: middle;
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  transition: background-color 0.2s;
 }
 .slide-nav .bottom a:hover, .slide-nav .bottom a:hover i {
-  color: #aaa;
-  transition: color 0.2s;
+  background-color: #164813;
+  transition: background-color 0.2s, color 0.2s;
 }
 .slide-nav .bottom a i {
   font-size: 50px;
