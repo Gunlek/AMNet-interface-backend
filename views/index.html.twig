@@ -1,159 +1,105 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<link rel="stylesheet" href="/css/style_v2.css"/>
-		<link rel="stylesheet" href="/css/all.css"/>
-	</head>
+{% extends 'utils/template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
 
-	<body>
-		<header>
-			<nav class="slide-nav">
-				<h1 class="branding">AMNet - Birse</h1>
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Mon espace AMNet</h1>
+		<div class="row">
+			<div class="col-4 card">
+				<h3 class="card-title">Accès internet</h3>
+				<hr>
+				<p>Administrez vos demandes d'accès internet pour vos équipements</p>
+				<div class="spacer vertical-100">&nbsp;</div>
 
-				<ul class="nav-links">
-					<li>
-						<a href="#">
-							<i class="fas fa-user"></i>
-							Profil
-						</a>
-					</li>
-					<li>
-						<a href="#">
-							<i class="fas fa-tools"></i>
-							Administration
-						</a>
-					</li>
-				</ul>
-
-				<div class="bottom">
-					<a href="#">
-						<i class="fas fa-sign-out-alt"></i>
-						Déconnexion
-					</a>
-				</div>
-			</nav>
-			<nav class="left-nav">
-				<div class="branding">
-					<a href="#toggle-slide">
-						<i class="fas fa-bars"></i>
-					</a>
-				</div>
-
-				<div class="bottom">
-					<a href="#">
-						<i class="fas fa-sign-out-alt"></i>
-					</a>
-				</div>
-			</nav>
-		</header>
-
-		<main class="offset-main">
-			<h1 class="page-title">Mon espace AMNet</h1>
-			<div class="row">
-				<div class="col-4 card">
-					<h3 class="card-title">Accès internet</h3>
-					<hr>
-					<p>Administrez vos demandes d'accès internet pour vos équipements</p>
-					<div class="spacer vertical-100">&nbsp;</div>
-
-					<div class="card-bottom">
-						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
-					</div>
-				</div>
-
-				<div class="col-4 card">
-					<h3 class="card-title">Matériel</h3>
-					<hr>
-					<p>Gérez vos demandes de matériel pour un C-Vis, une soirée ou évènement</p>
-					<div class="spacer vertical-100">&nbsp;</div>
-
-					<div class="card-bottom">
-						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
-					</div>
-				</div>
-
-				<div class="col-4 card">
-					<h3 class="card-title">Stockage</h3>
-					<hr>
-					<p>Accédez à vos espaces de stockage</p>
-					<div class="spacer vertical-100">&nbsp;</div>
-
-					<div class="card-bottom">
-						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
-					</div>
-				</div>
-
-				<div class="col-4 card">
-					<h3 class="card-title">Assistance</h3>
-					<hr>
-					<p>Faites appel à l'AMNet pour un problème de connexion ou de configuration d'équipement</p>
-					<div class="spacer vertical-100">&nbsp;</div>
-
-					<div class="card-bottom">
-						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
-					</div>
+				<div class="card-bottom">
+					<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
 				</div>
 			</div>
 
-			<br/><br/>
+			<div class="col-4 card">
+				<h3 class="card-title">Matériel</h3>
+				<hr>
+				<p>Gérez vos demandes de matériel pour un C-Vis, une soirée ou évènement</p>
+				<div class="spacer vertical-100">&nbsp;</div>
 
-			<div class="row">
-				<div class="col-2 card">
-					<h3 class="card-title">Actualité AMNet</h3>
-					<hr>
-					<p>Lorem ipsum</p>
-				</div>
-
-				<div class="col-2 card">
-					<h3 class="card-title">Votre statut AMNet</h3>
-					<hr>
-					<p>
-						Votre rôle: PG<br/>
-						Cotisation: Payée / Reste à payer<br/>
-						Charte: Acceptée / Refusée
-					</p>
+				<div class="card-bottom">
+					<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
 				</div>
 			</div>
-		</main>
 
-		<footer>
-			<div class="right-footer">
-				<p>Projet développé et maintenu par Hard Win'ss 58li218 - Version 1.2.1 -
-					<a href="https://github.com/Gunlek/AMNet-interface" target="_blank">
-						<i class="fab fa-github"></i>
-					</a>
+			<div class="col-4 card">
+				<h3 class="card-title">Stockage</h3>
+				<hr>
+				<p>Accédez à vos espaces de stockage</p>
+				<div class="spacer vertical-100">&nbsp;</div>
+
+				<div class="card-bottom">
+					<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+				</div>
+			</div>
+
+			<div class="col-4 card">
+				<h3 class="card-title">Assistance</h3>
+				<hr>
+				<p>Faites appel à l'AMNet pour un problème de connexion ou de configuration d'équipement</p>
+				<div class="spacer vertical-100">&nbsp;</div>
+
+				<div class="card-bottom">
+					<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<div class="row">
+			<div class="col-2 card">
+				<h3 class="card-title">Actualité AMNet</h3>
+				<hr>
+				<p>Lorem ipsum</p>
+			</div>
+
+			<div class="col-2 card">
+				<h3 class="card-title">Votre statut AMNet</h3>
+				<hr>
+				<p>
+					Votre rôle: PG<br/>
+					Cotisation: Payée / Reste à payer<br/>
+					Charte: Acceptée / Refusée
 				</p>
 			</div>
-		</footer>
-	</body>
+		</div>
+	</div>
+{% endblock %}
 
+{% block scripts %}
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 	<script type="text/javascript">
 		$(document).ready(() => {
-            let toggle_slide = false;
-            $('a[href="#toggle-slide"]').click((e) => {
-                e.stopPropagation();
-                if(!toggle_slide){
-                    e.preventDefault();
-                    $('.slide-nav').animate({
-                        width: "toggle"
-                    });
-                    toggle_slide = true;
-                }
-            });
+			let toggle_slide = false;
+			$('a[href="#toggle-slide"]').click((e) => {
+				e.stopPropagation();
+				if(!toggle_slide){
+					e.preventDefault();
+					$('.slide-nav').animate({
+						width: "toggle"
+					});
+					toggle_slide = true;
+				}
+			});
 
-            $('nav').click((e) => {
-                e.stopPropagation();
-            });
+			$('nav').click((e) => {
+				e.stopPropagation();
+			});
 
-            $('html').click(() => {
-                if(toggle_slide){
-                    $('.slide-nav').animate({
-                        width: "toggle"
-                    });
-                    toggle_slide = false;
-                }
-            });
-        });
+			$('html').click(() => {
+				if(toggle_slide){
+					$('.slide-nav').animate({
+						width: "toggle"
+					});
+					toggle_slide = false;
+				}
+			});
+		});
 	</script>
-</html>
+{% endblock %}

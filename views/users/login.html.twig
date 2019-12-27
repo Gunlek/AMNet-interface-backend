@@ -1,51 +1,44 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="/css/style_v2.css" />
+{% extends 'utils/template.html.twig' %}
+{% block title %}Connexion &bull; AMNet Birse{% endblock %}
+{% block optional_style %}
+    <style>
+        body 
+        {
+            background-image: url('/img/cable_management.png');
+            background-size: cover;
+        }
+    </style>
+{% endblock %}
 
-        <style>
-            body 
-            {
-                background-image: url('/img/cable_management.png');
-                background-size: cover;
-            }
-        </style>
-    </head>
+{% block header %}{% endblock %}
 
-    <body>
-        <main>
-            <div class="row centered-row" style="width: 75%;">
-                <div class="col-3"></div>
-                <div class="col-3 container" id="login-container">
-                    <h1 class="heading centered">Espace AMNet - Birse</h1>
-                    <br/>
-                    <h2 class="centered">Connexion</h2>
-                    <br/>
-                    <form>
-                        <div class="form-group">
-                            <label for="username">Nom d'utilisateur</label>
-                            <input type="text" name="username" />
-                        </div>
-                        <br/>
-                        <div class="form-group">
-                            <label for="password">Mot de passe</label>
-                            <input type="password" name="password" />
-                        </div>
-                        <br/>
-                        <div class="form-group">
-                            <input type="submit" class="btn btn-birse" style="height: 50px;" value="Connexion" />
-                        </div>
-                    </form>
-                    <div class="spacer vertical-200">&nbsp;</div>
+{% block content %}
+    <div class="row centered-row" style="width: 75%;">
+        <div class="col-3"></div>
+        <div class="col-3 container" id="login-container">
+            <h1 class="heading centered">Espace AMNet - Birse</h1>
+            <br/>
+            <h2 class="centered">Connexion</h2>
+            <br/>
+            <form method="POST" action="/users/process_login/">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" name="username" />
                 </div>
-                <div class="col-3"></div>
-            </div>
-        </main>
-
-        <footer>
-            <div class="right-footer">
-                <p>Projet développé et maintenu par Hard Win'ss 58li218 - Version 1.2.1 - <a href="https://github.com/Gunlek/AMNet-interface" target="_blank"><i class="fab fa-github"></i></a></p>
-            </div>
-        </footer>
-    </body>
-</html>
+                <br/>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" />
+                </div>
+                <br/>
+                <a href="/access/lost_password/" target="_blank">Mot de passe oublié</a>
+                <br/>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-birse" style="height: 50px;" value="Connexion" />
+                </div>
+            </form>
+            <div class="spacer vertical-200">&nbsp;</div>
+        </div>
+        <div class="col-3"></div>
+    </div>
+{% endblock %}
