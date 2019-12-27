@@ -15,11 +15,10 @@ require('./tickets')(app);          // Handle management of tickets and user-req
 app.use(express.static('statics'));
 
 app.get('/', (req, res) => {
-    res.render('users/login.html.twig');
-});
-
-app.get('/index', (req, res) => {
-    res.render('index.html.twig');
+    if(!req.session['logged_in'])
+        res.redirect('users/login/');
+    else
+        res.render('index.html.twig');
 });
 
 app.use(function(req, res, next){
