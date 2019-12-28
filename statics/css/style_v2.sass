@@ -252,6 +252,7 @@ footer
     border: 1px solid #707070
     padding: 10px
     position: relative
+    height: 100%
 
     hr
         border: 1px solid rgba(112, 112, 112, 0.4)
@@ -284,30 +285,56 @@ main
     min-height: 50px
 
 .row
-    display: grid
-    grid-template-columns: repeat(12, 1fr)
-    grid-auto-rows: auto
+    height: 100%
+    display: flex
+    align-items: stretch
+
+    .col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12
+        width: 100%
+        position: relative
 
     .col
-        grid-column-end: span 12
-        grid-row: 1
+        flex-basis: 0
+        flex-growth: 1
+        max-width: 100%
+
+    .col-1
+        flex: 0 0 8.333333333333333%
+        max-width: 8.333333333333333%
 
     .col-2
-        grid-column-end: span 6
-        grid-row: 1
-
+        flex: 0 0 16.66666666666667%
+        max-width: 16.66666666666667%
+    
     .col-3
-        grid-column-end: span 4
-        grid-row: 1
-
+        flex: 0 0 25%
+        max-width: 25%
+    
     .col-4
-        grid-column-end: span 3
-        grid-row: 1
+        flex: 0 0 33.33333333333333%
+    
+    .col-5
+        flex: 0 0 41.66666666666667%
 
     .col-6
-        grid-column-end: span 2
-        grid-row: 1
+        flex: 0 0 50%
+
+    .col-7
+        flex: 0 0 58.33333333333333%
+    
+    .col-8
+        flex: 0 0 66.66666666666666%
+    
+    .col-9
+        flex: 0 0 75%
+    
+    .col-10
+        flex: 0 0 83.33333333333333%
+    
+    .col-11
+        flex: 0 0 91.66666666666667%
 
     .col-12
-        grid-column-end: span 1
-        grid-row: 1
+        flex: 0 0 100%
+
+    
