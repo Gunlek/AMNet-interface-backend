@@ -68,5 +68,38 @@
         </footer>
     </body>
 
-    {% block scripts %}{% endblock %}
+    {% block current_scripts %}
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            $(document).ready(() => {
+                let toggle_slide = false;
+                $('a[href="#toggle-slide"]').click((e) => {
+                    e.stopPropagation();
+                    if(!toggle_slide){
+                        e.preventDefault();
+                        $('.slide-nav').animate({
+                            width: "toggle"
+                        });
+                        toggle_slide = true;
+                    }
+                });
+
+                $('nav').click((e) => {
+                    e.stopPropagation();
+                });
+
+                $('html').click(() => {
+                    if(toggle_slide){
+                        $('.slide-nav').animate({
+                            width: "toggle"
+                        });
+                        toggle_slide = false;
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+
+    {% block scripts %}
+    {% endblock %}
 </html>
