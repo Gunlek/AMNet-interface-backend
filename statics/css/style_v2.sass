@@ -1,3 +1,6 @@
+$birse-green: #096a09
+$birse-green-hover: #164813
+    
 *
     font-family: segoe UI
     color: #707070
@@ -41,7 +44,7 @@ h2
 
 #login-container
     background-color: rgba(255, 255, 255, 0.7)
-    border: 10px solid #096A09
+    border: 10px solid $birse-green
     border-radius: 20px
 
     .heading
@@ -71,11 +74,23 @@ form
                 border-color: #3498db
                 box-shadow: 0 0 10px #3498db
 
+.badge
+    border-radius: 2px
+    padding: 5px
+    color: #fff
+
+.badge-red
+    background-color: #e74c3c
+
+.badge-green
+    background-color: #2ecc71
+
 .btn
     // border-radius: 2px
     height: 35px
     text-decoration: none
     text-align: center
+    padding: 5px 5px
 
     &:hover
         cursor: pointer
@@ -89,7 +104,7 @@ form
     transition: background-color 0.2s
 
     &:hover
-        background-color: #164813
+        background-color: $birse-green-hover
         transition: background-color 0.2s
 
 .btn-blue
@@ -103,6 +118,21 @@ form
     &:hover
         background-color: #2980b9
         transition: background-color 0.2s
+
+.btn-red
+    background-color: #e74c3c
+    border: 2px solid #c0392b
+    color: #fff
+    font-weight: 500
+    font-size: 25px
+    transition: background-color 0.2s
+
+    &:hover
+        background-color: #c0392b
+        transition: background-color 0.2s
+
+.btn-sm
+    font-size: 15px
 
 footer
     z-index: -1
@@ -131,7 +161,7 @@ footer
     top: 0
     bottom: 0
     color: #fff
-    background-color: #096a09
+    background-color: $birse-green
     display: none
     overflow: hidden
     white-space: nowrap
@@ -155,7 +185,7 @@ footer
             transition: background-color 0.2s, color 0.2s
 
             &:hover
-                background-color: #164813
+                background-color: $birse-green-hover
                 transition: background-color 0.2s, color 0.2s
 
             a   
@@ -186,7 +216,7 @@ footer
             transition: background-color 0.2s
 
             &:hover, &:hover i
-                background-color: #164813
+                background-color: $birse-green-hover
                 transition: background-color 0.2s, color 0.2s
 
             i
@@ -202,7 +232,7 @@ footer
     top: 0
     bottom: 0
     width: 80px
-    background-color: #096A09
+    background-color: $birse-green
 
     .nav-links
         margin-top: 80px !important
@@ -217,7 +247,7 @@ footer
             padding: 10px 10px
 
             &:hover
-                background-color: #164813
+                background-color: $birse-green-hover
                 transition: background-color 0.2s, color 0.2s
 
             a   
@@ -274,6 +304,37 @@ main
     top: 0
     left: 80px
     right: 0
+
+.table
+    width: 100%
+    border-collapse: collapse
+
+    thead
+        text-align: left
+
+        tr
+            background-color: $birse-green
+
+            th
+                border: 1px solid white
+                padding: 0 5px
+                color: white
+    
+    tr
+        height: 40px
+        transition: background-color 0.2s
+
+    tr:nth-child(even)
+        background-color: #eeeeee
+
+    tbody tr:hover
+        background-color: #c2c2c2
+        cursor: pointer
+        transition: background-color 0.2s
+
+    tr td
+        border-bottom: 1px solid #333
+        padding: 5px
 
 .spacer
     display: block

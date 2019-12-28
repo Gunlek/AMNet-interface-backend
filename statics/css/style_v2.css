@@ -50,7 +50,7 @@ h2 {
 
 #login-container {
   background-color: rgba(255, 255, 255, 0.7);
-  border: 10px solid #096A09;
+  border: 10px solid #096a09;
   border-radius: 20px;
 }
 #login-container .heading {
@@ -82,10 +82,25 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   box-shadow: 0 0 10px #3498db;
 }
 
+.badge {
+  border-radius: 2px;
+  padding: 5px;
+  color: #fff;
+}
+
+.badge-red {
+  background-color: #e74c3c;
+}
+
+.badge-green {
+  background-color: #2ecc71;
+}
+
 .btn {
   height: 35px;
   text-decoration: none;
   text-align: center;
+  padding: 5px 5px;
 }
 .btn:hover {
   cursor: pointer;
@@ -115,6 +130,23 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 .btn-blue:hover {
   background-color: #2980b9;
   transition: background-color 0.2s;
+}
+
+.btn-red {
+  background-color: #e74c3c;
+  border: 2px solid #c0392b;
+  color: #fff;
+  font-weight: 500;
+  font-size: 25px;
+  transition: background-color 0.2s;
+}
+.btn-red:hover {
+  background-color: #c0392b;
+  transition: background-color 0.2s;
+}
+
+.btn-sm {
+  font-size: 15px;
 }
 
 footer {
@@ -217,7 +249,7 @@ footer .right-footer {
   top: 0;
   bottom: 0;
   width: 80px;
-  background-color: #096A09;
+  background-color: #096a09;
 }
 .left-nav .nav-links {
   margin-top: 80px !important;
@@ -291,6 +323,38 @@ main .page-title {
   top: 0;
   left: 80px;
   right: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table thead {
+  text-align: left;
+}
+.table thead tr {
+  background-color: #096a09;
+}
+.table thead tr th {
+  border: 1px solid white;
+  padding: 0 5px;
+  color: white;
+}
+.table tr {
+  height: 40px;
+  transition: background-color 0.2s;
+}
+.table tr:nth-child(even) {
+  background-color: #eeeeee;
+}
+.table tbody tr:hover {
+  background-color: #c2c2c2;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.table tr td {
+  border-bottom: 1px solid #333;
+  padding: 5px;
 }
 
 .spacer {

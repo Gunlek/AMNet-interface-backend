@@ -53,4 +53,70 @@ module.exports = (app) => {
             });
         }
     });
+
+    /*
+     * Displays the list of all the users registered in the system
+     * Displays all their attributes and the number of registered
+     * MAC address per account
+     */
+    app.get('/admin/users/', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users/';
+            res.redirect('/users/login/');
+        }
+        else if(!req.session['user_rank'] == 'admin'){
+            res.redirect('/');
+        }
+        else {
+            connection.query('SELECT *, COUNT(access_id) AS mac_count FROM `users` LEFT JOIN `access` ON users.user_id=access.access_user GROUP BY user_id', (errors, results, fields) => {
+                res.render('admin/admin-users.html.twig', {data: req.session, user_list: results});
+            });
+        }
+    });
+
+    /*
+     * Delete a user from users table based on its user_id (passed over GET)
+     */
+    app.get('/admin/users/delete-user/:user_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('DELETE FROM users WHERE user_id = ?', [req.params.user_id], () => {
+                    res.redirect('/admin/users/');
+                });
+            }
+        }
+    });
+
+    /* 
+     * Allow granting operation on users
+     * To make them admin or downgrade them back to user
+     * data (user_id and new user_rank) are passed over GET request
+     */
+    app.get('/admin/users/grant-user/:user_id/:user_rank', (req, res) => {
+        let user_rank = req.params.user_rank;
+        let user_id = req.params.user_id;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_rank = ? WHERE user_id = ?', [user_rank, user_id], () => {
+                    res.redirect('/admin/users/');
+                });
+            }
+        }
+    });
 }
