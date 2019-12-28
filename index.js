@@ -11,6 +11,7 @@ require('./users')(app);           // Handle all requests from user management
 require('./internet')(app);         // Handle management of internet requests and access
 require('./material')(app);         // Handle management of material requests and access
 require('./tickets')(app);          // Handle management of tickets and user-requests
+require('./admin')(app);          // Handle all administration interfaces and actions
 
 app.use(express.static('statics'));
 
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
     if(!req.session['logged_in'])
         res.redirect('users/login/');
     else
-        res.render('index.html.twig');
+        res.render('index.html.twig', {data: req.session});
 });
 
 app.use(function(req, res, next){
