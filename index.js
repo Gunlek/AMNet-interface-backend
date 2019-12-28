@@ -4,7 +4,9 @@ let session = require('express-session');
 var app = express();
 
 app.use(session({
-    secret: "amnet-interface"
+    secret: "amnet-interface",
+    resave: false,
+    saveUninitialized: false,
 }));
 
 require('./users')(app);           // Handle all requests from user management

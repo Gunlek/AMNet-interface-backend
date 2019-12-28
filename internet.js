@@ -18,7 +18,9 @@ connection.connect();
 module.exports = (app) => {
 
     app.use(session({
-        secret: "amnet-interface"
+        secret: "amnet-interface",
+        resave: false,
+        saveUninitialized: false,
     }));
 
     /*
