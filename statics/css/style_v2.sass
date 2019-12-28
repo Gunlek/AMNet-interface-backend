@@ -2,6 +2,9 @@
     font-family: segoe UI
     color: #707070
 
+a
+    text-decoration: none
+
 html, body
     min-height: 100%
     margin: 0 0
@@ -201,6 +204,34 @@ footer
     width: 80px
     background-color: #096A09
 
+    .nav-links
+        margin-top: 80px !important
+        list-style: none
+        font-size: 30px
+        margin: 0 0
+        padding: 0 0
+        font-weight: 500
+
+        li
+            transition: background-color 0.2s, color 0.2s
+            padding: 10px 10px
+
+            &:hover
+                background-color: #164813
+                transition: background-color 0.2s, color 0.2s
+
+            a   
+                display: flex
+                align-items: center
+                text-decoration: none
+                color: #fff
+
+                i
+                    color: #fff
+                    font-size: 50px
+                    margin-right: 20px
+                    transition: color 0.2s
+
     i
         font-size: 50px
         margin: 10px 0
@@ -256,6 +287,10 @@ main
     display: grid
     grid-template-columns: repeat(12, 1fr)
     grid-auto-rows: auto
+
+    .col
+        grid-column-end: span 12
+        grid-row: 1
 
     .col-2
         grid-column-end: span 6

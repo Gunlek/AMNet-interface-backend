@@ -1,0 +1,42 @@
+{% extends 'admin/admin-template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
+
+
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Espace d'administration</h1>
+		<div class="row">
+			<div class="col-2 card">
+				<h3 class="card-title">Etat des demandes</h3>
+				<hr>
+				<p>
+					Nombre d'utilisateurs: (nombre)<br/>
+					Nombre d'utilisateurs n'ayant pas payé la cotiz': (nombre)<br/>
+					<br/>
+					Demandes d'accès internet: (nombre)<br/>
+					Demandes de matériel: (nombre)<br/>
+					<br/>
+					Nombre de tickets ouverts: (nombre)<br/>					
+				</p>
+				<div class="spacer vertical-100">&nbsp;</div>
+			</div>
+
+			<div class="col-2 card">
+				<h3 class="card-title">TODO-List globale</h3>
+				<hr>
+				<p></p>
+				<div class="spacer vertical-100">&nbsp;</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<div class="row">
+			<div class="col card">
+				<h3 class="card-title">Message d'actualité</h3>
+				<hr>
+				<textarea style="width: 100%;height: 200px;resize: none;" ></textarea>
+			</div>
+		</div>
+	</div>
+{% endblock %}

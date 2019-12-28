@@ -1,0 +1,88 @@
+{% extends 'utils/template.html.twig' %}
+
+{% block header %}
+    <nav class="slide-nav">
+        <a href="/"><h1 class="branding">AMNet - Birse</h1></a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="#">
+                    <i class="fas fa-users"></i>
+                    Utilisateurs
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-network-wired"></i>
+                    Internet
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-desktop"></i>
+                    Matériel
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-box-open"></i>
+                    Stockage
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-hands-helping"></i>
+                    Assistance
+                </a>
+            </li>
+        </ul>
+
+        <div class="bottom">
+            <a href="/users/disconnect/">
+                <i class="fas fa-sign-out-alt"></i>
+                Déconnexion
+            </a>
+        </div>
+    </nav>
+    <nav class="left-nav">
+        <div class="branding">
+            <a href="#toggle-slide">
+                <i class="fas fa-bars"></i>
+            </a>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="#">
+                    <i class="fas fa-users"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-network-wired"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-desktop"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-box-open"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-hands-helping"></i>
+                </a>
+            </li>
+        </ul>
+
+        <div class="bottom">
+            <a href="/users/disconnect/">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </nav>
+{% endblock %}
