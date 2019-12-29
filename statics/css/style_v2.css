@@ -383,6 +383,9 @@ footer .right-footer {
   right: 0;
   padding: 10px;
 }
+.card .card-bottom .btn {
+  width: auto !important;
+}
 
 main .page-title {
   padding: 20px 40px;
