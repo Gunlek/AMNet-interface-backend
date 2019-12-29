@@ -33,10 +33,13 @@ module.exports = (app) => {
             res.redirect('/users/login/');
         }
         else {
-            let access_list = [];
-            connection.query('SELECT * FROM access WHERE access_user = ?', [req.session.user_id], function(error, results, fields){
-                res.render('internet/list-access.html.twig', {data: req.session, access_list: results});
-            });
+            if(req.session['user_pay_status'] == 0)
+                res.redirect('/pay-cotiz/');
+            else {
+                connection.query('SELECT * FROM access WHERE access_user = ?', [req.session.user_id], function(error, results, fields){
+                    res.render('internet/list-access.html.twig', {data: req.session, access_list: results});
+                });
+            }
         }
     })
 
@@ -65,20 +68,6 @@ module.exports = (app) => {
                     res.redirect('/users/login/');
                 }
             });
-        }
-    });
-
-    /*
-     * Displays a form to allow user to register
-     * new MAC address
-     */
-    app.get('/internet/access-request/', (req, res) => {
-        if(!req.session['logged_in']){
-            req.session.returnTo = '/internet/';
-            res.redirect('/users/login/');
-        }
-        else {
-            res.render('internet/access-request.html.twig', {data: req.session});
         }
     });
 
