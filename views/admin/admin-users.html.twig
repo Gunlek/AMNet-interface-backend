@@ -24,36 +24,34 @@
                         </tr>
                     </thead>
                     {% for user in user_list %}
-                    <a href="/users/profile/{{ user.user_id }}">
-                        <tr id="{{ loop.index }}">
-                            <td>#{{ loop.index }}</td>
-                            <td><a href="/users/profile/{{ user.user_id }}">{{ user.user_name }}</td>
-                            <td>{{ user.user_firstname }}</td>
-                            <td>{{ user.user_lastname }}</td>
-                            <td>{{ user.user_email }}</td>
-                            <td>{{ user.user_bucque }}</td>
-                            <td>{{ user.user_fams }}</td>
-                            <td>{{ user.user_proms }}</td>
-                            <td>{{ user.mac_count }}</td>
-                            <td>{% if user.user_pay_status == 1 %}
-                                <span class="badge badge-green">Payée</span>
+                    <tr id="{{ loop.index }}">
+                        <td>#{{ loop.index }}</td>
+                        <td><a href="/admin/users/profile/{{ user.user_id }}">{{ user.user_name }}</td>
+                        <td>{{ user.user_firstname }}</td>
+                        <td>{{ user.user_lastname }}</td>
+                        <td>{{ user.user_email }}</td>
+                        <td>{{ user.user_bucque }}</td>
+                        <td>{{ user.user_fams }}</td>
+                        <td>{{ user.user_proms }}</td>
+                        <td>{{ user.mac_count }}</td>
+                        <td>{% if user.user_pay_status == 1 %}
+                            <span class="badge badge-green">Payée</span>
+                            {% else %}
+                            <span class="badge badge-red">Non payée</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.user_rank }}</td>
+                        <td>
+                            <a id="delete" href="/admin/users/delete-user/{{ user.user_id }}" class="btn btn-red btn-sm">Supprimer</a>
+                            <a href="/admin/users/grant-user/{{ user.user_id }}/{% if user.user_rank=='user' %}admin{% else %}user{% endif %}" class="btn btn-blue btn-sm">
+                                {% if user.user_rank=='user' %}
+                                    Promouvoir
                                 {% else %}
-                                <span class="badge badge-red">Non payée</span>
+                                    Rétrograder
                                 {% endif %}
-                            </td>
-                            <td>{{ user.user_rank }}</td>
-                            <td>
-                                <a id="delete" href="/admin/users/delete-user/{{ user.user_id }}" class="btn btn-red btn-sm">Supprimer</a>
-                                <a href="/admin/users/grant-user/{{ user.user_id }}/{% if user.user_rank=='user' %}admin{% else %}user{% endif %}" class="btn btn-blue btn-sm">
-                                    {% if user.user_rank=='user' %}
-                                        Promouvoir
-                                    {% else %}
-                                        Rétrograder
-                                    {% endif %}
-                                </a>
-                            </td>
-                        </tr>
-                    </a>
+                            </a>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </table>
             </div>

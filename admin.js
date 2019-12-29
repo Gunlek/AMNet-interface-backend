@@ -55,6 +55,31 @@ module.exports = (app) => {
     });
 
     /*
+     * Displays the specific profile page
+     * Allows admin to check a specific profile from tables
+     */
+    app.get('/admin/users/profile/:user_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/users/profile/'+req.params.user_id;
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                if(req.params.user_id != ""){
+                    connection.query('SELECT * FROM users WHERE user_id = ?', [parseInt(req.params.user_id)], (errors, results, fields) => {
+                        if(results.length > 0)
+                            res.render('users/profile.html.twig', {data: req.session, user_data: results[0]})
+                    });
+                }
+            }
+        }
+    });
+
+    /*
      * Displays the list of all the users registered in the system
      * Displays all their attributes and the number of registered
      * MAC address per account
