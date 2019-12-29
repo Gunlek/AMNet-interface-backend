@@ -74,9 +74,8 @@
 					<h3 class="card-title">Votre statut AMNet</h3>
 					<hr>
 					<p>
-						Votre rôle: PG<br/>
-						Cotisation: Payée / Reste à payer<br/>
-						Charte: Acceptée / Refusée
+						Votre rôle: PG<br/><br/>
+						Cotisation: {% if data.user_pay_status == 1 %}<span class="badge badge-green">Payée</span>{% else %}<span class="badge badge-red">Non-payée</span>{% endif %}<br/>
 					</p>
 				</div>
 			</div>
