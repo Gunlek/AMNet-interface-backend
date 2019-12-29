@@ -13,7 +13,7 @@
 					<div class="spacer vertical-100">&nbsp;</div>
 
 					<div class="card-bottom">
-						<a href="#" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+						<a href="/internet/" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
 					</div>
 				</div>
 			</div>
@@ -75,7 +75,7 @@
 					<hr>
 					<p>
 						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
-						Cotisation: {% if data.user_pay_status == 1 %}<span class="badge badge-green">Payée</span>{% else %}<span class="badge badge-red">Non-payée</span>{% endif %}<br/>
+						Cotisation: {% if data.user_pay_status == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/pay-cotiz/" class="badge badge-red">Non-payée</a>{% endif %}<br/>
 					</p>
 				</div>
 			</div>
