@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(function(req, res, next){
-    res.status(404).render('errors/404.html.twig');
+    res.status(404).render('errors/404.html.twig', {data: req.session});
 });
 
 app.listen(8080);

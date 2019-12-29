@@ -1,22 +1,14 @@
-<html>
-    {% include '/utils/headers.html.twig' %}
+{% extends 'utils/template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
 
-    <body>
-        {% include '/utils/menu.html.twig' %}
-
-        <div class="container-fluid h-100">
-            <div class="row h-100">
-                <div class="col"></div>
-                <div class="col-10 jumbotron">
-                    <h1 class="display-4">Oup'ss... Erreur 404</h1>
-                    <p class="lead">Il semble que même le pouvoir de la 58 ne suffise pas à trouver la page que vous recherchez...</p>
-                    <hr class="my-4">
-                    <p>La dernière solution serait sans doute d'invoquer le gorg'ss, la rochefouc'ss est contacté automatiquement par le channel 58 lors de ce genre d'erreur.</p>
-                </div>
-                <div class="col"></div>
-            </div>
-        </div>
-
-        {% include '/utils/js_imports.html.twig' %}
-    </body>
-</html>
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Oup'ss... Erreur 404</h1>
+		<div class="row" style="padding: 0 40px">
+			<div class="col-12">
+                <p>Il semble que même le pouvoir de la 58 ne suffise pas à trouver la page que vous recherchez...</p>
+				<p>La dernière solution serait sans doute d'invoquer le gorg'ss, la rochefouc'ss est contacté automatiquement par le channel 58 lors de ce genre d'erreur.</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}
