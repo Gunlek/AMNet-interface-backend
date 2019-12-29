@@ -25,29 +25,19 @@ module.exports = (app) => {
      * Displays the list of all the requested hardware for the currently logged-in
      * user
      */
-    app.get('/material/list-requests/', (req, res) => {
+    app.get('/material/', (req, res) => {
         if(!req.session['logged_in']){
-            req.session.returnTo = '/material/list-requests/';
-            res.redirect('/access/login/');
+            req.session.returnTo = '/material/';
+            res.redirect('/users/login/');
         }
         else {
-            connection.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
-                res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
-            });
-        }
-    });
-
-    /*
-     * Displays a form to allow user to request new
-     * material
-     */
-    app.get('/material/material-request/', (req, res) => {
-        if(!req.session['logged_in']){
-            req.session.returnTo = '/material/material-request/';
-            res.redirect('/access/login/');
-        }
-        else {
-            res.render('material/request-material.html.twig', {data: req.session});
+            if(req.session['user_pay_status'] == 0)
+                res.redirect('/pay-cotiz/');
+            else {
+                connection.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
+                    res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
+                });
+            }
         }
     });
 
@@ -60,7 +50,7 @@ module.exports = (app) => {
 
         connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("material-request", ?, ?)', [user_id, "description="+description]);
         connection.query('INSERT INTO materials(material_user, material_description) VALUES(?, ?)', [user_id, description], () => {
-            res.redirect('/material/list-requests/');
+            res.redirect('/material/');
         });
     });
 }
