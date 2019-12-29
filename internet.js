@@ -27,10 +27,10 @@ module.exports = (app) => {
      * Displays the list of all the requested access for the currently logged-in
      * user
      */
-    app.get('/internet/list-access/', (req, res) => {
+    app.get('/internet/', (req, res) => {
         if(!req.session['logged_in']) {
-            req.session.returnTo = '/internet/list-access/';
-            res.redirect('/access/login/');
+            req.session.returnTo = '/internet/';
+            res.redirect('/users/login/');
         }
         else {
             let access_list = [];
@@ -50,20 +50,19 @@ module.exports = (app) => {
     /*
      * Delete a request created by user
      */
-    app.get('/internet/delete-access/', (req, res) => {
+    app.get('/internet/delete/:user_id/:access_id/', (req, res) => {
         if(!req.session['logged_in']){
-            req.session.returnTo = '/internet/admin-access/';
-            res.redirect('/access/login/');
+            req.session.returnTo = '/internet/';
+            res.redirect('/users/login/');
         }
         else {
-            connection.query('SELECT * FROM access WHERE access_id = ? AND access_user = ?', [req.query.access_id, req.query.user_id], function(errors, results, fields){
+            connection.query('SELECT * FROM access WHERE access_id = ? AND access_user = ?', [req.params.access_id, req.params.user_id], function(errors, results, fields){
                 if(results.length > 0){
-                    connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("delete-access", ?, ?)', [req.query.user_id, results[0]['access_mac']]);
-                    connection.query('DELETE FROM access WHERE access_id = ?', [req.query.access_id]);
-                    res.redirect('/internet/list-access');
+                    connection.query('DELETE FROM access WHERE access_id = ?', [req.params.access_id]);
+                    res.redirect('/internet/');
                 }
                 else {
-                    res.redirect('/access/login/');
+                    res.redirect('/users/login/');
                 }
             });
         }
@@ -75,8 +74,8 @@ module.exports = (app) => {
      */
     app.get('/internet/access-request/', (req, res) => {
         if(!req.session['logged_in']){
-            req.session.returnTo = '/internet/access-request/';
-            res.redirect('/access/login/');
+            req.session.returnTo = '/internet/';
+            res.redirect('/users/login/');
         }
         else {
             res.render('internet/access-request.html.twig', {data: req.session});
@@ -91,9 +90,8 @@ module.exports = (app) => {
         let description = req.body.description;
         let user_id = req.body.user_id;
 
-        connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("add-access", ?, ?)', [user_id, "mac_addr="+mac_addr+";description="+description]);
         connection.query('INSERT INTO access(access_description, access_mac, access_user) VALUES(?, ?, ?)', [description, mac_addr, user_id], () => {
-            res.redirect('/internet/list-access/');
+            res.redirect('/internet/');
         });
     });
 }

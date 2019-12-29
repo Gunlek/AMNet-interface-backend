@@ -8,6 +8,7 @@ $birse-green-hover: #164813
 a
     text-decoration: none
     color: #707070
+    transition: color 0.2s
 
 html, body
     min-height: 100%
@@ -225,9 +226,13 @@ footer
         position: absolute
         padding-right: 20px
         right: 0
+    
+    a:hover
+        color: black
+        transition: color 0.2s
 
 .slide-nav
-    z-index: 999
+    z-index: 1
     position: fixed
     left: 0
     top: 0
@@ -411,6 +416,26 @@ main
     tr td
         border-bottom: 1px solid #333
         padding: 5px
+
+.search-field
+    padding: 0 10px
+
+.modal
+    display: none
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-color: rgba(0, 0, 0, 0.5)
+    
+    .modal-content
+        padding: 10px
+        width: 50%
+        margin: 10% 25%
+        background-color: #eee
+        border-radius: 5px
+        border: 4px solid $birse-green
 
 .spacer
     display: block
