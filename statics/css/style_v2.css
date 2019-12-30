@@ -252,6 +252,7 @@ footer a:hover {
 }
 
 .slide-nav {
+  z-index: 2;
   position: fixed;
   left: 0;
   top: 0;
@@ -332,6 +333,7 @@ header {
 }
 
 .left-nav {
+  z-index: 1;
   text-align: center;
   position: fixed;
   left: 0;
