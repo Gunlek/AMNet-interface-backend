@@ -45,7 +45,13 @@ module.exports = (app) => {
                             let nb_material_request = nb_material_request_result[0]['nb_material_request'];
                             connection.query('SELECT COUNT(*) as nb_tickets FROM tickets WHERE ticket_state=1', (error, nb_tickets_results, fields) => {
                                 let nb_tickets = nb_tickets_results[0]['nb_tickets'];
-                                res.render('admin/admin-index.html.twig', {data: req.session, nb_users: nb_users, nb_cotiz: nb_cotiz, nb_access_request: nb_access_request, nb_material_request: nb_material_request, nb_tickets: nb_tickets});
+                                connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
+                                    let settings = {};
+                                    settings_results.forEach(param => {
+                                        settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
+                                    });
+                                    res.render('admin/admin-index.html.twig', {data: req.session, setting: settings, nb_users: nb_users, nb_cotiz: nb_cotiz, nb_access_request: nb_access_request, nb_material_request: nb_material_request, nb_tickets: nb_tickets});
+                                });
                             });
                         });
                     });
@@ -283,6 +289,28 @@ module.exports = (app) => {
                 let material_id = parseInt(req.params.material_id);
                 connection.query('DELETE FROM materials WHERE material_id = ?', [material_id], () => {
                     res.redirect('/admin/material/');
+                });
+            }
+        }
+    });
+
+    /*
+     * Update news message from admin-index form
+     */
+    app.post('/admin/update-news-message/', urlencodedParser, (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let new_message = req.body.news_message.replace(/\r\n|\r|\n/g, '<br/>');
+                connection.query('UPDATE settings SET setting_value=? WHERE setting_name="news_message"', [new_message], () => {
+                    res.redirect('/admin/');
                 });
             }
         }
