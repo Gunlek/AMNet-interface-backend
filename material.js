@@ -48,7 +48,6 @@ module.exports = (app) => {
         let description = req.body.description;
         let user_id = req.body.user_id;
 
-        connection.query('INSERT INTO admin_actions(action_type, action_user, action_data) VALUES("material-request", ?, ?)', [user_id, "description="+description]);
         connection.query('INSERT INTO materials(material_user, material_description) VALUES(?, ?)', [user_id, description], () => {
             res.redirect('/material/');
         });
