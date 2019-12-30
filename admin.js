@@ -60,7 +60,7 @@ module.exports = (app) => {
      */
     app.get('/admin/users/profile/:user_id', (req, res) => {
         if(!req.session['logged_in']){
-            req.session.returnTo = '/users/profile/'+req.params.user_id;
+            req.session.returnTo = '/admin/users/profile/'+req.params.user_id;
             res.redirect('/users/login/');
         }
         else {
@@ -72,7 +72,7 @@ module.exports = (app) => {
                 if(req.params.user_id != ""){
                     connection.query('SELECT * FROM users WHERE user_id = ?', [parseInt(req.params.user_id)], (errors, results, fields) => {
                         if(results.length > 0)
-                            res.render('users/profile.html.twig', {data: req.session, user_data: results[0]})
+                            res.render('admin/admin-profile.html.twig', {data: req.session, user_data: results[0]})
                     });
                 }
             }

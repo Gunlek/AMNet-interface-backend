@@ -1,0 +1,45 @@
+{% extends 'admin/admin-template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
+
+
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Visualisation du profil de {{user_data.user_firstname}} {{user_data.user_lastname}} &bull; {{user_data.user_bucque}} {{user_data.user_fams}}li{{user_data.user_proms}}</h1>
+		<div class="row" style="padding: 0 40px;">
+			<div class="col-10">
+                <br/>
+                <form>
+                    <div class="form-group">
+                        <label>Nom d'utilisateur</label>
+                        <input type="text" class="form-control" disabled value="{{user_data.user_name}}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-5">
+                                <label>Prénom</label>
+                                <input type="text" class="form-control" disabled value="{{user_data.user_firstname}}"/>
+                            </div>
+                            <div class="col-2"></div>
+                            <div class="col-5">
+                                <label>Nom</label>
+                                <input type="text" class="form-control" disabled value="{{user_data.user_lastname}}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adresse email</label>
+                        <input type="email" class="form-control" disabled value="{{user_data.user_email}}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Identifiant gadzarts</label>
+                        <input type="text" class="form-control" disabled value="{{user_data.user_bucque}}  {{user_data.user_fams}}li{{user_data.user_proms}}"/>
+                    </div>
+                </form>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+{% endblock %}
