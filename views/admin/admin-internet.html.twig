@@ -52,21 +52,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        // Handle tab displays and selection
-        $(document).ready(function() {
-            $('.nav-tabs a').click(function(e) {
-                e.preventDefault();
-                let id = this.id;
-                let activate_id = id.replace("-tab", "");
-                
-                
-                $(".nav-tabs a").removeClass("active");
-                $(this).addClass("active");
-                $(".tab-content .tab-pane").fadeOut();
-                $("#"+activate_id).fadeIn();
-
-            });
-        });
-    </script>
+    <script type="text/javascript" src="/js/tabbed-nav.js"></script>
 {% endblock %}
