@@ -29,9 +29,6 @@ require('./admin')(app);          // Handle all administration interfaces and ac
 app.use(express.static('statics'));
 
 app.get('/', (req, res) => {
-<<<<<<< HEAD
-    res.render('index.html.twig', {data: req.session});
-=======
     if(!req.session['logged_in'])
         res.redirect('users/login/');
     else {
@@ -51,7 +48,6 @@ app.get('/pay-cotiz/', (req, res) => {
         res.redirect('users/login/');
     else
         res.render('users/pay-cotiz.html.twig', {data: req.session});
->>>>>>> design_update
 });
 
 app.use(function(req, res, next){
