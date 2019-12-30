@@ -44,13 +44,6 @@ module.exports = (app) => {
     })
 
     /*
-     * Displays policy of AMNet services
-     */
-    app.get('/internet/policy/', (req, res) => {
-        res.render('internet/policy.html.twig', {data: req.session});
-    });
-
-    /*
      * Delete a request created by user
      */
     app.get('/internet/delete/:user_id/:access_id/', (req, res) => {
