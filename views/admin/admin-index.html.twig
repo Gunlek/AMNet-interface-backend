@@ -1,0 +1,53 @@
+{% extends 'admin/admin-template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
+
+
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Espace d'administration</h1>
+		<div class="row">
+			<div class="col-6">
+				<div class="card">
+					<h3 class="card-title">Etat des demandes</h3>
+					<hr>
+					<p>
+						Nombre d'utilisateurs: {{ nb_users }}<br/>
+						Nombre d'utilisateurs n'ayant pas payé la cotiz': {{ nb_cotiz }}<br/>
+						<br/>
+						Demandes d'accès internet: {{ nb_access_request }}<br/>
+						Demandes de matériel: {{ nb_material_request }}<br/>
+						<br/>
+						Nombre de tickets ouverts: {{ nb_tickets }}<br/>					
+					</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+				</div>
+			</div>
+
+			<div class="col-6">
+				<div class="card">
+					<h3 class="card-title">TODO-List globale</h3>
+					<hr>
+					<p></p>
+					<div class="spacer vertical-100">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<h3 class="card-title">Message d'actualité</h3>
+					<hr>
+					<form method="POST" action="/admin/update-news-message/">
+						<textarea style="width: 100%;height: 200px;resize: none;" name="news_message">{{ setting.news_message }}</textarea>
+						<div class="form-group">
+							<input type="submit" class="btn btn-blue" value="Mettre à jour" style="width: 100%" />
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

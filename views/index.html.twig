@@ -1,49 +1,84 @@
-<html>
-    {% include '/utils/headers.html.twig' %}
+{% extends 'utils/template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
 
-    <body>
-        {% include '/utils/menu.html.twig' %}
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Mon espace AMNet</h1>
+		<div class="row">
+			<div class="col-3">
+				<div class="card">
+					<h3 class="card-title">Accès internet</h3>
+					<hr>
+					<p>Administrez vos demandes d'accès internet pour vos équipements</p>
+					<div class="spacer vertical-100">&nbsp;</div>
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col"></div>
-                <div class="jumbotron col-10">
-                    <h1>AMNet Birse</h1>
-                    <p class="lead">Gestion des accès internets et du parc informatique - Arts et Métiers Lille - Association des élèves</p>
-                    <hr class="my-4" />
-                    <div class="row">
-                        <div class="col">
-                            <div class="card-header">Accès internet</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Un accès internet Low-Cost pour tous les PG...<br/>Et même les washs !</h5>
-                                <p class="card-text">Notre mission principale est de fournir un accès internet à haute fiabilité à tous ceux qui le demandent. Ethernet ou Wifi, nous faisons de notre mieux pour permettre l'accès où que l'on soit dans la résidence</p>
-                                <a href="/internet/access-request/" class="container-fluid btn btn-outline-primary">Demander un accès internet</a>
-                            </div>
-                        </div>
-        
-                        <div class="col">
-                            <div class="card-header">Parc informatique</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Fourniture de babasses pour les CVis et les activités de prom'ss</h5>
-                                <p class="card-text">L'AMNet est en capacité de fournir gratuitement et rapidement des babasses pour l'ouverture de nouveaux CVis mais aussi pour les évènements exceptionnels, sur simple demande des élèves.</p>
-                                <a href="/material/material-request/" class="container-fluid btn btn-outline-primary">Formuler une demande</a>
-                            </div>
-                        </div>
-        
-                        <div class="col">
-                            <div class="card-header">Services</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Mise à disposition de serveurs et de VPN</h5>
-                                <p class="card-text">En plus de ses missions de base, l'AMNet propose divers services, allant de la fourniture de VPN pour le streaming/téléchargement en toute sécurité (et dans le respect de la charte informatique signée) jusqu'a la mise à disposition d'espaces de stockage gratuits</p>
-                                <a href="#" class="container-fluid btn btn-outline-primary">Découvrir nos services</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col"></div>
-            </div>
-        </div>
+					<div class="card-bottom">
+						<a href="/internet/" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+			</div>
 
-        {% include '/utils/js_imports.html.twig' %}
-    </body>
-</html>
+			<div class="col-3">
+				<div class="card">
+					<h3 class="card-title">Matériel</h3>
+					<hr>
+					<p>Gérez vos demandes de matériel pour un C-Vis, une soirée ou évènement</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="/material/" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-3">
+				<div class="card">
+					<h3 class="card-title">Stockage</h3>
+					<hr>
+					<p>Accédez à vos espaces de stockage</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-orange" style="display: block; width: 100%;">Pas encore disponible</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-3">
+				<div class="card">
+					<h3 class="card-title">Assistance</h3>
+					<hr>
+					<p>Faites appel à l'AMNet pour un problème de connexion ou de configuration d'équipement</p>
+					<div class="spacer vertical-100">&nbsp;</div>
+
+					<div class="card-bottom">
+						<a href="#" class="btn btn-orange" style="display: block; width: 100%;">Pas encore disponible</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+		<div class="row">
+			<div class="col-6">
+				<div class="card">
+					<h3 class="card-title">Actualité AMNet</h3>
+					<hr>
+					<p>{{ setting.news_message }}</p>
+				</div>
+			</div>
+
+			<div class="col-6">
+				<div class="card">
+					<h3 class="card-title">Votre statut AMNet</h3>
+					<hr>
+					<p>
+						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
+						Cotisation: {% if data.user_pay_status == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/pay-cotiz/" class="badge badge-red">Non-payée</a>{% endif %}<br/>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

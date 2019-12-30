@@ -1,51 +1,87 @@
-<html>
-    {% include '/utils/headers.html.twig' %}
+{% extends 'utils/template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
 
-    <body>
-        {% include '/utils/menu.html.twig' %}
+{% block content %}
+    <div class="offset-main">
+        <h1 class="page-title">Vos demandes d'accès internet</h1>
+        <div class="row" style="padding: 0 40px;">
+            <div class="col-10">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Désignation</th>
+                            <th>Adresse MAC</th>
+                            <th>Etat</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    {% for access in access_list %}
+                        <tr id="{{ loop.index }}">
+                            <td>#{{ loop.index }}</td>
+                            <td>{{ access.access_description }}</td>
+                            <td>{{ access.access_mac }}</td>
+                            <td>
+                                {% if access.access_state == "pending" %}
+                                    <span class="badge badge-orange">En cours</span>
+                                {% elseif access.access_state == "suspended" %}
+                                    <span class="badge badge-red">Suspendu</span>
+                                {% else %}
+                                    <span class="badge badge-green">Activé</span>
+                                {% endif %}
+                            </td>
+                            <td><a id="delete" href="/internet/delete/{{ data.user_id }}/{{ access.access_id }}/" class="btn btn-red btn-sm">Supprimer</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
 
-        <div class="container-fluid h-100">
-            <div class="row h-100">
-                <div class="col"></div>
-                <div class="h-100 col-10 main-content-bg padding-top">
-                    <div class="container">
-                        <br/>
-                        <h4 style="display: inline;">Vous souhaitez effectuer une demande d'accès ? </h4> <a href="/internet/request-access/" class="btn btn-outline-primary">Cliquez ici !</a>
-                        <br/><br/>
-                        <table class="table table-striped">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Désignation</th>
-                                    <th>Adresse MAC</th>
-                                    <th>Etat</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            {% for access in access_list %}
-                                <tr id="{{ loop.index }}">
-                                    <td>#{{ loop.index }}</td>
-                                    <td>{{ access.access_description }}</td>
-                                    <td>{{ access.access_mac }}</td>
-                                    <td>
-                                        {% if access.access_state == "pending" %}
-                                            <span class="badge badge-warning">En cours</span>
-                                        {% elseif access.access_state == "suspended" %}
-                                            <span class="badge badge-danger">Suspendu</span>
-                                        {% else %}
-                                            <span class="badge badge-success">Activé</span>
-                                        {% endif %}
-                                    </td>
-                                    <td><a id="delete" href="/internet/delete-access/?access_id={{ access.access_id }}&user_id={{ data.user_id }})" class="btn btn-danger btn-sm">Supprimer</a></td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div>
-                <div class="col"></div>
+            <div class="col-2 search-field">
+                <button data-toggle="adding-modal-form" style="width: 100%;" class="btn btn-blue btn-sm"><i class="fa fa-plus"></i>&nbsp;&nbsp;Nouvelle demande</button>  
             </div>
         </div>
+    </div>
 
-        {% include '/utils/js_imports.html.twig' %}
-    </body>
-</html>
+    <div class="modal" id="adding-modal-form">
+        <div class="modal-content">
+            <h2>Formuler une nouvelle demande d'accès</h2>
+            <form method="POST" action="/internet/add-request/">
+                <input type="hidden" name="user_id" value="{{ data.user_id }}" />
+
+                <div class="form-group">
+                    <label>Adresse MAC de l'équipement</label>
+                    <input type="text" class="form-control" name="mac_addr" required="required" placeholder="Par exemple: 5E:FF:56:A2:AF:15"/>
+                </div>
+                <div class="form-group">
+                    <label>Description de l'équipement</label>
+                    <input type="text" class="form-control" required="required" name="description"/>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Envoyer la demande" class="btn btn-blue btn-sm" />
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('button').click(function(e){
+                if($(this).attr('data-toggle') != ""){
+                    e.preventDefault();
+                    $('#'+$(this).attr('data-toggle')).fadeIn();
+                }
+            });
+
+            $('.modal').click(function(e){
+                e.preventDefault();
+                $(this).fadeOut();
+            });
+
+            $('.modal .modal-content').click(function(e){
+                e.stopPropagation();
+            });
+        });
+    </script>
+{% endblock %}

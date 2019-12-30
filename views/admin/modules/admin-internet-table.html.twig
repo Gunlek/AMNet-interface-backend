@@ -1,0 +1,34 @@
+<table class="table">
+    <thead class="thead-dark" style="width:100%;">
+        <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th>Demandeur</th>
+            <th>@ MAC</th>
+            <th>Etat</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for access_request in loop_var %}
+            <tr id="{{ loop.index }}">
+                <td>#{{ loop.index}}</td>
+                <td>{{ access_request.access_description }}</td>
+                <td><a href="/user/profile/{{ user_list[access_request.access_user].user_id }}">{{ user_list[access_request.access_user].user_name }}</a></td>
+                <td id="mac_addr">{{ access_request.access_mac }}</td>
+                <td>{% if access_request.access_state == "active" %}<span class="badge badge-green">Accordé</span>{% elseif access_request.access_state == "pending" %}<span class="badge badge-orange">En attente</span>{% else %}<span class="badge badge-red">Suspendu</span>{% endif %}</td>
+                <td>
+                    {% if access_request.access_state == "active" %}
+                        <a href="/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                    {% elseif access.access_state == "suspended" %}
+                        <a href="/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                    {% else %}
+                        <a href="/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                        <a href="/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                    {% endif %}
+                    <a href="/internet/delete/{{access_request.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

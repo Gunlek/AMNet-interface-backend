@@ -1,0 +1,32 @@
+<table class="table">
+    <thead class="thead-dark" style="width:100%;">
+        <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th>Demandeur</th>
+            <th>Etat</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for material_request in loop_var %}
+            <tr id="{{ loop.index }}">
+                <td>#{{ loop.index}}</td>
+                <td>{{ material_request.material_description }}</td>
+                <td><a href="/user/profile/{{ user_list[material_request.material_user].user_id }}">{{ user_list[material_request.material_user].user_name }}</a></td>
+                <td>{% if material_request.material_state == "granted" %}<span class="badge badge-green">Accordé</span>{% elseif material_request.material_state == "pending" %}<span class="badge badge-orange">En attente</span>{% else %}<span class="badge badge-red">Suspendu</span>{% endif %}</td>
+                <td>
+                    {% if material_request.material_state == "granted" %}
+                        <a href="/admin/material/disallow/{{material_request.material_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                    {% elseif material_request.material_state == "declined" %}
+                        <a href="/admin/material/allow/{{material_request.material_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                    {% else %}
+                        <a href="/admin/material/disallow/{{material_request.material_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                        <a href="/admin/material/allow/{{material_request.material_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                    {% endif %}
+                    <a href="/admin/material/delete/{{material_request.material_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
