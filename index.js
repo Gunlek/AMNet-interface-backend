@@ -24,6 +24,13 @@ app.get('/', (req, res) => {
         res.render('index.html.twig', {data: req.session});
 });
 
+app.get('/pay-cotiz/', (req, res) => {
+    if(!req.session['logged_in'])
+        res.redirect('users/login/');
+    else
+        res.render('users/pay-cotiz.html.twig', {data: req.session});
+});
+
 app.use(function(req, res, next){
     res.status(404).render('errors/404.html.twig', {data: req.session});
 });
