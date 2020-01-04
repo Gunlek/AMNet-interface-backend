@@ -1,0 +1,24 @@
+{% extends 'admin/admin-template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
+
+
+{% block content %}
+	<div class="offset-main">
+		<h1 class="page-title">Edition des paramètres</h1>
+		<div class="row" style="padding: 0 40px;">
+			<div class="col-10">
+                <br/>
+                <div class="fake-form">
+                    <div class="form-group">
+                        <form action="/admin/settings/new-api-key/" method="POST">
+                            <label>Clé d'API</label>
+                            <input type="text" class="form-control" name="api-key" value="{{form_data.api_token}}"/><br/><br/>
+                            <input type="submit" value="Générer une nouvelle clé d'API" class="btn btn-blue" style="width: 100%;" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+{% endblock %}
