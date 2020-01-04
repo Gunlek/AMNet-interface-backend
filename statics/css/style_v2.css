@@ -151,7 +151,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   display: inline-block;
   height: 35px !important;
   font-size: 20px;
-  line-height: 35px;
+  line-height: 20px;
   text-decoration: none;
   text-align: center;
   padding: 5px 5px;
@@ -222,7 +222,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 
 .btn-sm {
   font-size: 15px;
-  line-height: 20px !important;
+  line-height: 15px !important;
   height: 20px !important;
 }
 
