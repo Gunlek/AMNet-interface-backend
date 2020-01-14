@@ -2,4 +2,21 @@
 {% block title %}AMNet Birse{% endblock %}
 
 {% block content %}
+    <div class="offset-main">
+        <h1 class="page-title">Payer votre cotisation AMNet</h1>
+        <div class="row" style="padding: 0 40px;">
+            <div class="col-12">
+                <p>Le paiement s'effectue via Lydia, le montant de la cotisation est de 30€ pour une année</p>
+                <br/>
+                <form action="/action-pay-cotiz/" method="POST">
+                    <div class="form-group">
+                        <label>Numéro de téléphone:</label>
+                        <input type="text" name="lydia_phone" />
+                    </div>
+
+                    <input type="submit" class="btn btn-blue" style="width: 100%;" value="Effectuer le paiement" />
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
