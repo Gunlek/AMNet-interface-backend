@@ -95,4 +95,4 @@ app.use(function(req, res, next){
     res.status(404).render('errors/404.html.twig', {data: req.session});
 });
 
-app.listen(8080);
+app.listen(process.env.SERVER_PORT);
