@@ -69,7 +69,7 @@ app.post('/action-pay-cotiz/', urlencodedParser, (req, res) => {
                 form: {
                     amount: '30',
                     recipient: req.body.lydia_phone,
-                    vendor_token: '5d9757abd77e7056993390',
+                    vendor_token: process.env.LYDIA_TOKEN,
                     currency: 'EUR',
                     type: 'phone',
                     message: 'Paiement cotisation AMNet',
