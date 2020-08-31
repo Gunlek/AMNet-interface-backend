@@ -152,6 +152,50 @@ module.exports = (app) => {
     });
 
     /*
+     * Update cotisation status for the specified user
+     */
+    app.get('/admin/users/update-pay-status/:user_id/:status', (req, res) => {
+        let {user_id, status} = req.params;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users';
+            res.redirect('/users/login');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_pay_status=? WHERE user_id = ?', [status, user_id], () => {
+                    res.redirect('/admin/users');
+                });
+            }
+        }
+    });
+
+    /*
+     * Update cotisation status for all the users
+     */
+    app.get('/admin/users/udate-all-pay-status/:status', (req, res) => {
+        let {status} = req.params;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users';
+            res.redirect('/users/login');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_pay_status=?', [status], () => {
+                    res.redirect('/admin/users');
+                });
+            }
+        }
+    });
+
+    /*
      * Displays all the currently saved requests and display them
      * in tables to allow easier management from administrators
      */

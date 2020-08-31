@@ -149,7 +149,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 
 .btn {
   display: inline-block;
-  height: 35px !important;
+  min-height: 35px !important;
   font-size: 20px;
   line-height: 35px;
   text-decoration: none;
@@ -158,6 +158,8 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   color: #fff;
   font-weight: 500;
   transition: background-color 0.2s;
+  overflow: auto;
+  word-wrap: anywhere;
 }
 .btn:hover {
   cursor: pointer;
@@ -223,7 +225,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 .btn-sm {
   font-size: 15px;
   line-height: 20px !important;
-  height: 20px !important;
+  min-height: 20px !important;
 }
 
 footer {
@@ -539,5 +541,3 @@ main .page-title {
 .row .col-12 {
   flex: 0 0 100%;
 }
-
-/*# sourceMappingURL=style_v2.css.map */

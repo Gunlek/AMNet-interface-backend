@@ -1,0 +1,5 @@
+{
+    "verbose": true,
+    "ignore": ["*.sqlite"],
+    "ext": "js,json,css,html,twig"
+}
