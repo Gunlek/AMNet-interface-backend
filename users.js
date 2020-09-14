@@ -60,9 +60,9 @@ module.exports = (app) => {
         });
         let reset_link = "";
         if(process.env.DEBUG == "true")
-            reset_link = "http://localhost:8080/access/change_password/"+token_value;
+            reset_link = "http://localhost:8080/users/change_password/"+token_value;
         else
-            reset_link = "http://amnet.fr/access/change_password/"+token_value;
+            reset_link = "http://amnet.fr/users/change_password/"+token_value;
         var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link));
         let mailOptions = {
             from: 'presidentamnet@gmail.com',
