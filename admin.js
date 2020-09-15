@@ -237,6 +237,73 @@ module.exports = (app) => {
     });
 
     /*
+     * Allows an administrator to mark an internet request as "agreed"
+     */
+    app.get('/admin/internet/allow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/internet/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('UPDATE access SET access_state = "active" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
+                });
+            }
+        }
+    });
+
+    /*
+     * Allows an administrator to mark an internet request as "declined"
+     */
+    app.get('/admin/internet/disallow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/material/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('UPDATE access SET access_state = "suspended" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
+                });
+            }
+        }
+    });
+
+    /*
+     * Delete a hardware request created by user
+     * Only possible for administrators
+     */
+    app.get('/admin/internet/delete/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/material/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('DELETE FROM access WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
+                });
+            }
+        }
+    });
+
+    /*
      * Gather all the currently saved requests of hardware and display them
      * in tables to allow easier management from administrators
      */
