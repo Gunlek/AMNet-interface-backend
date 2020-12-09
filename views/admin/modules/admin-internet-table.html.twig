@@ -19,14 +19,14 @@
                 <td>{% if access_request.access_state == "active" %}<span class="badge badge-green">Accordé</span>{% elseif access_request.access_state == "pending" %}<span class="badge badge-orange">En attente</span>{% else %}<span class="badge badge-red">Suspendu</span>{% endif %}</td>
                 <td>
                     {% if access_request.access_state == "active" %}
-                        <a href="/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                        <a href="/admin/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
                     {% elseif access.access_state == "suspended" %}
-                        <a href="/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                        <a href="/admin/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
                     {% else %}
-                        <a href="/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
-                        <a href="/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
+                        <a href="/admin/internet/disallow/{{access_request.access_id}}" class="btn btn-sm btn-red"><i class="fas fa-times"></i> Révoquer</a>
+                        <a href="/admin/internet/allow/{{access_request.access_id}}" class="btn btn-sm btn-green"><i class="fas fa-check"></i> Accorder</a>
                     {% endif %}
-                    <a href="/internet/delete/{{access_request.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
+                    <a href="/admin/internet/delete/{{access_request.access_id}}" class="btn btn-sm btn-dark"><i class="fas fa-trash"></i> Effacer</a>
                 </td>
             </tr>
         {% endfor %}

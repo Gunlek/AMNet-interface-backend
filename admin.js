@@ -152,6 +152,50 @@ module.exports = (app) => {
     });
 
     /*
+     * Update cotisation status for the specified user
+     */
+    app.get('/admin/users/update-pay-status/:user_id/:status', (req, res) => {
+        let {user_id, status} = req.params;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users';
+            res.redirect('/users/login');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_pay_status=? WHERE user_id = ?', [status, user_id], () => {
+                    res.redirect('/admin/users');
+                });
+            }
+        }
+    });
+
+    /*
+     * Update cotisation status for all the users
+     */
+    app.get('/admin/users/udate-all-pay-status/:status', (req, res) => {
+        let {status} = req.params;
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/users';
+            res.redirect('/users/login');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('UPDATE users SET user_pay_status=?', [status], () => {
+                    res.redirect('/admin/users');
+                });
+            }
+        }
+    });
+
+    /*
      * Displays all the currently saved requests and display them
      * in tables to allow easier management from administrators
      */
@@ -187,6 +231,73 @@ module.exports = (app) => {
                             });
                         });
                     });
+                });
+            }
+        }
+    });
+
+    /*
+     * Allows an administrator to mark an internet request as "agreed"
+     */
+    app.get('/admin/internet/allow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/internet/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('UPDATE access SET access_state = "active" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
+                });
+            }
+        }
+    });
+
+    /*
+     * Allows an administrator to mark an internet request as "declined"
+     */
+    app.get('/admin/internet/disallow/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/material/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('UPDATE access SET access_state = "suspended" WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
+                });
+            }
+        }
+    });
+
+    /*
+     * Delete a hardware request created by user
+     * Only possible for administrators
+     */
+    app.get('/admin/internet/delete/:access_id', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/material/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                let access_id = parseInt(req.params.access_id);
+                connection.query('DELETE FROM access WHERE access_id = ?', [access_id], () => {
+                    res.redirect('/admin/internet/');
                 });
             }
         }
@@ -366,4 +477,30 @@ module.exports = (app) => {
             }
         }
     });
+  
+    /**
+     * Update settings based on data
+     */
+    app.post('/admin/update-settings/', urlencodedParser, (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/';
+            res.redirect('/users/login/');
+        }
+        else if(!req.session['user_rank'] == 'admin'){
+            res.redirect('/');
+        }
+        else {
+            const api_token = req.body.api_token;
+            const lydia_token = req.body.lydia_token;
+            const active_proms = req.body.active_proms;
+
+            connection.query('UPDATE settings SET setting_value=? WHERE setting_name="api_token"', [api_token], (err, results, fields) => {
+                connection.query('UPDATE settings SET setting_value=? WHERE setting_name="lydia_token"', [lydia_token], (err, results, fields) => {
+                    connection.query('UPDATE settings SET setting_value=? WHERE setting_name="active_proms"', [active_proms], (err, results, fields) => {
+                        res.redirect('/admin/');
+                    });
+                });
+            });
+        }
+    })
 }
