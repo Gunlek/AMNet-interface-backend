@@ -52,30 +52,31 @@ module.exports = (app) => {
     app.post('/users/process_lost_password/', urlencodedParser, (req, res) => {
         let email = req.body.email;
         let token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        connection.query('SELECT user_id FROM users WHERE user_email = ?', [email], (error, results, fields) => {
+        connection.query('SELECT * FROM users WHERE user_email = ?', [email], (error, results, fields) => {
             if(results.length > 0){
                 let user_id = results[0]['user_id'];
                 connection.query('INSERT INTO reset_token(token_user, token_value) VALUES(?, ?)', [user_id, token_value]);
+
+                let reset_link = "";
+                if(process.env.DEBUG == "true")
+                    reset_link = "http://localhost:8080/users/change_password/"+token_value;
+                else
+                    reset_link = "http://amnet.fr/users/change_password/"+token_value;
+                var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link)).pipe(replace("<ID_HERE>", results[0]['user_name']));
+                let mailOptions = {
+                    from: 'presidentamnet@gmail.com',
+                    to: email,
+                    subject: 'Réinitialisation de mot de passe',
+                    html: htmlstream
+                };
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if(error){
+                        htmlstream.close();
+                    }
+                });
+                res.redirect('/users/login/');
             }
         });
-        let reset_link = "";
-        if(process.env.DEBUG == "true")
-            reset_link = "http://localhost:8080/users/change_password/"+token_value;
-        else
-            reset_link = "http://amnet.fr/users/change_password/"+token_value;
-        var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link));
-        let mailOptions = {
-            from: 'presidentamnet@gmail.com',
-            to: email,
-            subject: 'Réinitialisation de mot de passe',
-            html: htmlstream
-        };
-        transporter.sendMail(mailOptions, (error, info) => {
-            if(error){
-                htmlstream.close();
-            }
-        });
-        res.redirect('/users/login/');
     });
 
     /*
@@ -135,7 +136,14 @@ module.exports = (app) => {
             signin_failed = true;
         if(req.query.state != null && req.query.state === "no_charte")
             no_charte = true;
-        res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte});
+        
+        connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
+            let settings = {};
+            settings_results.forEach(param => {
+                settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
+            });
+            res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte, setting: settings});
+        });
     });
 
     /*
@@ -206,5 +214,79 @@ module.exports = (app) => {
         }
         else
             res.redirect('/users/signin/?state=signin_failed');
+    });
+
+    /*
+     * Display user's profile edition page
+     */
+    app.get('/user/profile/', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/user/profile/';
+            res.redirect('/users/login/');
+        }
+        else {
+            connection.query('SELECT * FROM users WHERE user_id = ?', [req.session['user_id']], (_, results, __) => {
+                connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
+                    let settings = {};
+                    settings_results.forEach(param => {
+                        settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
+                    });
+                    if(results.length > 0){
+                        res.render('users/profile.html.twig', {user_data: results[0], setting: settings});
+                    }
+                });
+            });
+        }
+    });
+
+    /*
+     * Handle POST request to update user's profile based
+     * on data from profile edition page
+     */
+    app.post('/user/process-profile-update/', urlencodedParser, (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/user/profile/';
+            res.redirect('/users/login/');
+        }
+        else {
+            const user_id = req.session['user_id'];
+            
+            const select_or_text = req.body.select_or_text;
+            const user_name = req.body.user_name;
+            const user_bucque = req.body.user_bucque;
+            const user_firstname = req.body.user_firstname;
+            const user_lastname = req.body.user_lastname;
+            const user_fams = req.body.user_fams;
+            const user_campus = req.body.user_campus;
+            const user_email = req.body.user_email;
+            
+            let user_proms = req.body.user_proms_select;
+            if(select_or_text === "text"){
+                user_proms = req.body.user_proms_text;
+            }
+
+            let user_password = req.body.user_password;
+            let user_confPassword = req.body.user_confPassword;
+
+            if(user_password != "" && user_confPassword != ""){
+                user_password = md5(user_password);
+                user_confPassword = md5(user_confPassword);
+                if(user_password===user_confPassword){
+                    connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_password, user_id], (err, results, fields) => {
+                        if(err) throw err;
+                        res.redirect('/user/profile/');
+                    });
+                }
+                else {
+                    res.redirect('/user/profile/?err=1')
+                }
+            }
+            else {
+                connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_id], (err, results, fields) => {
+                    if(err) throw err;
+                    res.redirect('/user/profile/');
+                });
+            }
+        }
     });
 }

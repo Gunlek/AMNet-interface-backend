@@ -25,10 +25,50 @@
 
 			<div class="col-6">
 				<div class="card">
-					<h3 class="card-title">TODO-List globale</h3>
+					<h3 class="card-title">Paramètres</h3>
 					<hr>
 					<p></p>
-					<div class="spacer vertical-100">&nbsp;</div>
+					<form method="POST" action="/admin/update-settings/">
+						<div class="form-group">
+							<div class="row">
+								<div class="col-6">
+									<label for="api_token">Clé d'API: </label>
+								</div>
+								<div class="col-6">
+									<button type="button" class="btn btn-xs btn-red" onClick="generateToken()">Générer un nouveau token</button>
+									<script type="text/javascript">
+										function makeid(length) {
+											var result           = '';
+											var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+											var charactersLength = characters.length;
+											for ( var i = 0; i < length; i++ ) {
+												result += characters.charAt(Math.floor(Math.random() * charactersLength));
+											}
+											return result;
+										}
+										let generateToken = function(e){
+											let el = document.getElementById("api_token");
+											el.value = makeid(58);
+										}
+									</script>
+								</div>
+							</div>
+							<br/>
+							<input type="text" name="api_token" id="api_token" value="{{setting.api_token}}" class="form-control" />
+						</div>
+
+						<div class="form-group">
+							<label for="lydia_token">Clé d'API Lydia: </label>
+							<input type="text" name="lydia_token" value="{{setting.lydia_token}}" placeholder="currently unused..." class="form-control" />
+						</div>
+
+						<div class="form-group">
+							<label for="lydia_token">Promotion active: </label>
+							<input type="text" name="active_proms" value="{{setting.active_proms}}" class="form-control" />
+						</div>
+
+						<input class="btn btn-green" type="submit" style="width: 100%;" value="Mettre à jour" />
+					</form>
 				</div>
 			</div>
 		</div>

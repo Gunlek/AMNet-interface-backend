@@ -426,4 +426,30 @@ module.exports = (app) => {
             }
         }
     });
+
+    /**
+     * Update settings based on data
+     */
+    app.post('/admin/update-settings/', urlencodedParser, (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/';
+            res.redirect('/users/login/');
+        }
+        else if(!req.session['user_rank'] == 'admin'){
+            res.redirect('/');
+        }
+        else {
+            const api_token = req.body.api_token;
+            const lydia_token = req.body.lydia_token;
+            const active_proms = req.body.active_proms;
+
+            connection.query('UPDATE settings SET setting_value=? WHERE setting_name="api_token"', [api_token], (err, results, fields) => {
+                connection.query('UPDATE settings SET setting_value=? WHERE setting_name="lydia_token"', [lydia_token], (err, results, fields) => {
+                    connection.query('UPDATE settings SET setting_value=? WHERE setting_name="active_proms"', [active_proms], (err, results, fields) => {
+                        res.redirect('/admin/');
+                    });
+                });
+            });
+        }
+    })
 }
