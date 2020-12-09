@@ -135,7 +135,14 @@ module.exports = (app) => {
             signin_failed = true;
         if(req.query.state != null && req.query.state === "no_charte")
             no_charte = true;
-        res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte});
+        
+        connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
+            let settings = {};
+            settings_results.forEach(param => {
+                settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
+            });
+            res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte, setting: settings});
+        });
     });
 
     /*
