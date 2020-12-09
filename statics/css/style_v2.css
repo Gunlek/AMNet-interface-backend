@@ -82,12 +82,12 @@ form .form-group input[type=submit] {
   padding: 0 0;
   margin: 0 0;
 }
-form .form-group input[type=text], form .form-group input[type=password] {
+form .form-group input[type=text], form .form-group input[type=password], form .form-group input[type=email] {
   background-color: #fff;
   border-radius: 5px;
   border: 1px solid rgba(33, 33, 33, 0.6);
 }
-form .form-group input[type=text]:focus, form .form-group input[type=password]:focus {
+form .form-group input[type=text]:focus, form .form-group input[type=password]:focus, form .form-group input[type=email]:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 10px #3498db;
