@@ -60,9 +60,9 @@
                         <div class="col-3">
                             <label>Prom's</label>
                             <select name="user_proms_select" id="user_proms_select" class="form-control">
-                                <option {% if user_data.user_proms == "218" %}selected{% endif %} value="218">218</option>
-                                <option {% if user_data.user_proms == "219" %}selected{% endif %} value="219">218+1</option>
-                                <option {% if user_data.user_proms == "220" %}selected{% endif %} value="220">220</option>
+                                <option {% if user_data.user_proms == setting.active_proms - 1 %}selected{% endif %} value="{{setting.active_proms - 1}}">{{setting.active_proms - 1}}</option>
+                                <option {% if user_data.user_proms == setting.active_proms %}selected{% endif %} value="{{setting.active_proms}}">{{setting.active_proms}}</option>
+                                <option {% if user_data.user_proms == setting.active_proms + 1 %}selected{% endif %} value="{{setting.active_proms + 1}}">{{setting.active_proms}}+1</option>
                                 <option value="autre" onClick="otherPromsField()">Autre</option>
                             </select>
                             <input style="display: none;" type="text" id="user_proms_text" class="form-control" name="user_proms_text" value={{user_data.user_proms}} />
