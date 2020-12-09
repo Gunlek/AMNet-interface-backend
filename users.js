@@ -52,30 +52,31 @@ module.exports = (app) => {
     app.post('/users/process_lost_password/', urlencodedParser, (req, res) => {
         let email = req.body.email;
         let token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        connection.query('SELECT user_id FROM users WHERE user_email = ?', [email], (error, results, fields) => {
+        connection.query('SELECT * FROM users WHERE user_email = ?', [email], (error, results, fields) => {
             if(results.length > 0){
                 let user_id = results[0]['user_id'];
                 connection.query('INSERT INTO reset_token(token_user, token_value) VALUES(?, ?)', [user_id, token_value]);
+
+                let reset_link = "";
+                if(process.env.DEBUG == "true")
+                    reset_link = "http://localhost:8080/users/change_password/"+token_value;
+                else
+                    reset_link = "http://amnet.fr/users/change_password/"+token_value;
+                var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link)).pipe(replace("<ID_HERE>", results[0]['user_name']));
+                let mailOptions = {
+                    from: 'presidentamnet@gmail.com',
+                    to: email,
+                    subject: 'Réinitialisation de mot de passe',
+                    html: htmlstream
+                };
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if(error){
+                        htmlstream.close();
+                    }
+                });
+                res.redirect('/users/login/');
             }
         });
-        let reset_link = "";
-        if(process.env.DEBUG == "true")
-            reset_link = "http://localhost:8080/users/change_password/"+token_value;
-        else
-            reset_link = "http://amnet.fr/users/change_password/"+token_value;
-        var htmlstream = fs.createReadStream('mail_template.html').pipe(replace("<LINK_HERE>", reset_link));
-        let mailOptions = {
-            from: 'presidentamnet@gmail.com',
-            to: email,
-            subject: 'Réinitialisation de mot de passe',
-            html: htmlstream
-        };
-        transporter.sendMail(mailOptions, (error, info) => {
-            if(error){
-                htmlstream.close();
-            }
-        });
-        res.redirect('/users/login/');
     });
 
     /*
