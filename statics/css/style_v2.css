@@ -64,30 +64,32 @@ h2 {
   font-weight: bold;
 }
 
-form {
+form, .fake-form {
   width: 100%;
 }
-form .form-group {
+form .form-group, .fake-form .form-group {
   width: 100%;
   margin: 20px 0;
 }
-form .form-group label {
+form .form-group label, .fake-form .form-group label {
   font-size: 25px;
 }
-form .form-group input {
+form .form-group input, .fake-form .form-group input {
   width: 100%;
   height: 30px;
 }
-form .form-group input[type=submit] {
+form .form-group input[type=submit], .fake-form .form-group input[type=submit] {
   padding: 0 0;
   margin: 0 0;
 }
-form .form-group input[type=text], form .form-group input[type=password], form .form-group input[type=email] {
+
+form .form-group input[type=text], form .form-group input[type=password], .fake-form .form-group input[type=text], .fake-form .form-group input[type=password] {
   background-color: #fff;
   border-radius: 5px;
   border: 1px solid rgba(33, 33, 33, 0.6);
 }
-form .form-group input[type=text]:focus, form .form-group input[type=password]:focus, form .form-group input[type=email]:focus {
+
+form .form-group input[type=text]:focus, form .form-group input[type=password]:focus, .fake-form .form-group input[type=text]:focus, .fake-form .form-group input[type=password]:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 10px #3498db;
@@ -151,7 +153,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   display: inline-block;
   min-height: 35px !important;
   font-size: 20px;
-  line-height: 35px;
+  line-height: 20px;
   text-decoration: none;
   text-align: center;
   padding: 5px 5px;

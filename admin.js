@@ -427,6 +427,57 @@ module.exports = (app) => {
         }
     });
 
+    /*
+     * Allow an administrator to update settings and generate tokens
+     */
+    app.get('/admin/settings/', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/settings/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                connection.query('SELECT * FROM settings', (errors, results, fields) => {
+                    let json_dataset = {};
+                    for(let dataset of results){
+                        json_dataset[dataset['setting_name']] = dataset['setting_value'];
+                    }
+                    res.render('admin/admin-settings.html.twig', {data: req.session, form_data: json_dataset});
+                });
+            }
+        }
+    });
+
+    app.post('/admin/settings/new-api-key/', urlencodedParser, (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/admin/settings/';
+            res.redirect('/users/login/');
+        }
+        else {
+            if(req.session['user_rank'] != "admin")
+            {
+                res.redirect('/');
+            }
+            else {
+                console.log('test');
+                let key_length = 58;
+                var result           = '';
+                var characters       = '?!ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                var charactersLength = characters.length;
+                for ( var i = 0; i < key_length; i++ ) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                }
+                connection.query('UPDATE settings SET setting_value = ? WHERE setting_name = "api_token"', [result], (errors, results, fields) => {
+                    res.redirect('/admin/settings/');
+                });
+            }
+        }
+    });
+  
     /**
      * Update settings based on data
      */
