@@ -147,7 +147,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   background-color: #f39c12;
 }
 
-.btn {
+.btn, .custom-btn {
   display: inline-block;
   min-height: 35px !important;
   font-size: 20px;
@@ -161,7 +161,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   overflow: auto;
   word-wrap: anywhere;
 }
-.btn:hover {
+.btn:hover, .custom-btn:hover {
   cursor: pointer;
 }
 
@@ -177,11 +177,11 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   transition: background-color 0.2s;
 }
 
-.btn-blue {
+.btn-blue, .custom-btn-blue {
   background-color: #3498db;
   border: 2px solid #2980b9;
 }
-.btn-blue:hover {
+.btn-blue:hover, .custom-btn-blue:hover {
   background-color: #2980b9;
   transition: background-color 0.2s;
 }
