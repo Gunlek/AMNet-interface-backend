@@ -197,6 +197,7 @@ module.exports = (app) => {
         let password_conf = md5(req.body.password_confirmation);
         let charte = req.body.check_charte;
 
+        const select_or_text = req.body.select_or_text;
         let proms = req.body.user_proms_select;
         if(select_or_text === "text"){
             proms = req.body.user_proms_text;
