@@ -193,10 +193,14 @@ module.exports = (app) => {
         let email = req.body.email;
         let bucque = req.body.bucque;
         let fams = req.body.fams;
-        let proms = req.body.proms;
         let password = md5(req.body.password);
         let password_conf = md5(req.body.password_confirmation);
         let charte = req.body.check_charte;
+
+        let proms = req.body.user_proms_select;
+        if(select_or_text === "text"){
+            proms = req.body.user_proms_text;
+        }
         
         if((username != "" && bucque != "" && fams != "" && proms != "" && email!="") && password == password_conf){
             if(charte=="true"){
