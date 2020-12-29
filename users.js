@@ -191,6 +191,7 @@ module.exports = (app) => {
         let firstname = req.body.firstname;
         let lastname = req.body.lastname;
         let email = req.body.email;
+        let phone = req.body.phone;
         let bucque = req.body.bucque;
         let fams = req.body.fams;
         let password = md5(req.body.password);
@@ -203,11 +204,11 @@ module.exports = (app) => {
             proms = req.body.user_proms_text;
         }
         
-        if((username != "" && bucque != "" && fams != "" && proms != "" && email!="") && password == password_conf){
+        if((username !== "" && bucque !== "" && fams !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
             if(charte=="true"){
                 connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                     if(results.length == 0){
-                        connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, password, bucque, fams, proms]);
+                        connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
                         res.redirect('/users/login/');
                     }
                     else
@@ -264,6 +265,7 @@ module.exports = (app) => {
             const user_fams = req.body.user_fams;
             const user_campus = req.body.user_campus;
             const user_email = req.body.user_email;
+            const user_phone = req.body.user_phone;
             
             let user_proms = req.body.user_proms_select;
             if(select_or_text === "text"){
@@ -277,7 +279,7 @@ module.exports = (app) => {
                 user_password = md5(user_password);
                 user_confPassword = md5(user_confPassword);
                 if(user_password===user_confPassword){
-                    connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_password, user_id], (err, results, fields) => {
+                    connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
                         if(err) throw err;
                         res.redirect('/user/profile/');
                     });
@@ -287,7 +289,7 @@ module.exports = (app) => {
                 }
             }
             else {
-                connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_id], (err, results, fields) => {
+                connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_id], (err, results, fields) => {
                     if(err) throw err;
                     res.redirect('/user/profile/');
                 });
