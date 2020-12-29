@@ -333,8 +333,8 @@ module.exports = (app) => {
             parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
             parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
             parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-            parameters.append("browser_success_url", process.env.DEBUG ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
-            parameters.append("browser_fail_url ", process.env.DEBUG ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
+            parameters.append("browser_success_url", process.env.DEBUG == "false" ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
+            parameters.append("browser_fail_url ", process.env.DEBUG == "false" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
             parameters.append("display_confirmation", "no");
 
             console.log(parameters);
