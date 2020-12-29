@@ -6,6 +6,7 @@ let session = require('express-session');
 let nodemailer = require('nodemailer');
 let replace = require("stream-replace");
 let fs = require("fs");
+const axios = require('axios');
 
 require('dotenv').config();
 
@@ -311,15 +312,19 @@ module.exports = (app) => {
                 user_phone = "+33" + user_phone.substring(1);
 
             let parameters = new URLSearchParams();
-            parameters.append("amount", process.end.LYDIA_COTISATION_PAYMENT_AMOUNT);
+            parameters.append("message", "Paiement cotisation AMNet");
+            parameters.append("amount", process.env.LYDIA_COTISATION_PAYMENT_AMOUNT);
             parameters.append("currency", "EUR");
             parameters.append("type", "phone");
             parameters.append("recipient", user_phone);
             parameters.append("vendor_token", process.env.LYDIA_PUBLIC_VENDOR_TOKEN);
             parameters.append("payment_method", "auto");
-            parameters.append("confirm_url ", process.env.DEV ? "http://localhost/user/payment/success/" : process.env.APP_DOMAIN + "/user/payment/success/");
-            parameters.append("cancel_url  ", process.env.DEV ? "http://localhost/user/payment/cancel/" : process.env.APP_DOMAIN + "/user/payment/cancel/");
-            parameters.append("expire_url   ", process.env.DEV ? "http://localhost/user/payment/cancel/" : process.env.APP_DOMAIN + "/user/payment/cancel/");
+            parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/");
+            parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/");
+            parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/");
+            parameters.append("browser_success_url", process.env.DEV ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
+            parameters.append("browser_fail_url ", process.env.DEV ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
+            parameters.append("display_confirmation", "no");
             
             axios({
                 method: "POST",
@@ -328,12 +333,42 @@ module.exports = (app) => {
             })
             .then((response) => {
                 let { request_id, request_uuid, mobile_url } = response.data;
-                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.end.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], () => {
+                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], () => {
                     console.log(response.data);
                     res.redirect(mobile_url);
                 });
             })
             .catch((err) => console.log(err));
         }
+    });
+
+    
+
+    /**
+     * Handle successful payment request
+     */
+    app.post('/user/payment/success/', urlencodedParser, (req, res) => {
+        const { request_id, amount } = req.body;
+        connection.query('SELECT * FROM lydia_transaction WHERE request_id = ?', [request_id], (err, results) => {
+            if(err)
+                console.log(err);
+            if(results.length > 0){
+                const user_id = results[0]['request_payer_id'];
+                connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id]);
+                connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], () => {
+                    res.redirect('/');
+                });
+            }
+        });
+    });
+
+    /**
+     * Handle cancelled / expired payment request
+     */
+    app.post('/user/payment/cancel/', urlencodedParser, (req, res) => {
+        const { request_id, amount } = req.body;
+        connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], () => {
+            res.redirect('/');
+        });
     });
 }
