@@ -296,4 +296,44 @@ module.exports = (app) => {
             }
         }
     });
+
+    /**
+     * Handle lydia payment REST request (request/do)
+     */
+    app.get('/user/payment/do/:user_phone', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/user/profile/';
+            res.redirect('/users/login/');
+        }
+        else {
+            let user_phone = req.params.user_phone;
+            if(user_phone.length == 10 && user_phone[0] == "0")
+                user_phone = "+33" + user_phone.substring(1);
+
+            let parameters = new URLSearchParams();
+            parameters.append("amount", process.end.LYDIA_COTISATION_PAYMENT_AMOUNT);
+            parameters.append("currency", "EUR");
+            parameters.append("type", "phone");
+            parameters.append("recipient", user_phone);
+            parameters.append("vendor_token", process.env.LYDIA_PUBLIC_VENDOR_TOKEN);
+            parameters.append("payment_method", "auto");
+            parameters.append("confirm_url ", process.env.DEV ? "http://localhost/user/payment/success/" : process.env.APP_DOMAIN + "/user/payment/success/");
+            parameters.append("cancel_url  ", process.env.DEV ? "http://localhost/user/payment/cancel/" : process.env.APP_DOMAIN + "/user/payment/cancel/");
+            parameters.append("expire_url   ", process.env.DEV ? "http://localhost/user/payment/cancel/" : process.env.APP_DOMAIN + "/user/payment/cancel/");
+            
+            axios({
+                method: "POST",
+                url: process.env.LYDIA_API_URL + '/api/request/do.json',
+                data: parameters
+            })
+            .then((response) => {
+                let { request_id, request_uuid, mobile_url } = response.data;
+                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.end.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], () => {
+                    console.log(response.data);
+                    res.redirect(mobile_url);
+                });
+            })
+            .catch((err) => console.log(err));
+        }
+    });
 }
