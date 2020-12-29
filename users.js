@@ -333,9 +333,11 @@ module.exports = (app) => {
             })
             .then((response) => {
                 let { request_id, request_uuid, mobile_url } = response.data;
-                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], () => {
-                    console.log(response.data);
-                    res.redirect(mobile_url);
+                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                    if(err)
+                        console.log(err);
+                    else
+                        res.redirect(mobile_url);
                 });
             })
             .catch((err) => console.log(err));
@@ -349,12 +351,12 @@ module.exports = (app) => {
      */
     app.post('/user/payment/success/', urlencodedParser, (req, res) => {
         const { request_id, amount } = req.body;
-        connection.query('SELECT * FROM lydia_transaction WHERE request_id = ?', [request_id], (err, results) => {
+        connection.query('SELECT * FROM lydia_transactions WHERE request_id = ?', [request_id], (err, results) => {
             if(err)
                 console.log(err);
             if(results.length > 0){
                 const user_id = results[0]['request_payer_id'];
-                connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], (err) => {
+                connection.query('DELETE FROM lydia_transactions WHERE request_id = ?', [request_id], (err) => {
                     if(err)
                         console.log(err);
                 });
@@ -373,7 +375,7 @@ module.exports = (app) => {
      */
     app.post('/user/payment/cancel/', urlencodedParser, (req, res) => {
         const { request_id, amount } = req.body;
-        connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], (err) => {
+        connection.query('DELETE FROM lydia_transactions WHERE request_id = ?', [request_id], (err) => {
             if(err)
                 console.log(err);
             else
