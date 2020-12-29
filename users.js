@@ -354,9 +354,15 @@ module.exports = (app) => {
                 console.log(err);
             if(results.length > 0){
                 const user_id = results[0]['request_payer_id'];
-                connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id]);
-                connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], () => {
-                    res.redirect('/');
+                connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], (err) => {
+                    if(err)
+                        console.log(err);
+                });
+                connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], (err) => {
+                    if(err)
+                        console.log(err);
+                    else
+                        res.redirect('/');
                 });
             }
         });
@@ -367,8 +373,11 @@ module.exports = (app) => {
      */
     app.post('/user/payment/cancel/', urlencodedParser, (req, res) => {
         const { request_id, amount } = req.body;
-        connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], () => {
-            res.redirect('/');
+        connection.query('DELETE FROM lydia_transaction WHERE request_id = ?', [request_id], (err) => {
+            if(err)
+                console.log(err);
+            else
+                res.redirect('/');
         });
     });
 }
