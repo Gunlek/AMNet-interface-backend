@@ -82,14 +82,12 @@ form .form-group input[type=submit], .fake-form .form-group input[type=submit] {
   padding: 0 0;
   margin: 0 0;
 }
-
-form .form-group input[type=text], form .form-group input[type=password], .fake-form .form-group input[type=text], .fake-form .form-group input[type=password] {
+form .form-group input[type=text], form .form-group input[type=password], form .form-group input[type=email], .fake-form .form-group input[type=text], .fake-form .form-group input[type=password], .fake-form .form-group input[type=email] {
   background-color: #fff;
   border-radius: 5px;
   border: 1px solid rgba(33, 33, 33, 0.6);
 }
-
-form .form-group input[type=text]:focus, form .form-group input[type=password]:focus, .fake-form .form-group input[type=text]:focus, .fake-form .form-group input[type=password]:focus {
+form .form-group input[type=text]:focus, form .form-group input[type=password]:focus, form .form-group input[type=email]:focus, .fake-form .form-group input[type=text]:focus, .fake-form .form-group input[type=password]:focus, .fake-form .form-group input[type=email]:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 10px #3498db;
@@ -203,11 +201,11 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   transition: background-color 0.2s;
 }
 
-.btn-green {
+.btn-green, .custom-btn-green {
   background-color: #2ecc71;
   border: 2px solid #27ae60;
 }
-.btn-green:hover {
+.btn-green:hover, .custom-btn-green:hover {
   background-color: #27ae60;
   transition: background-color 0.2s;
 }
@@ -478,6 +476,12 @@ main .page-title {
   background-color: #eee;
   border-radius: 5px;
   border: 4px solid #096a09;
+}
+
+.pay-cotiz-box {
+  border: 1px solid #333;
+  padding: 10px;
+  height: 100%;
 }
 
 .spacer {

@@ -40,54 +40,15 @@ app.get('/', (req, res) => {
     else {
         connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
             let settings = {};
-            settings_results.forEach(param => {
+            settings_results.map((param) => {
                 settings[param['setting_name']] = param['setting_value']
             });
-            
-            res.render('index.html.twig', {data: req.session, setting: settings});
-        });
-    }
-});
 
-app.get('/pay-cotiz/', (req, res) => {
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/pay-cotiz/';
-        res.redirect('/users/login/');
-    }
-    else
-        res.render('users/pay-cotiz.html.twig', {data: req.session});
-});
-
-app.post('/action-pay-cotiz/', urlencodedParser, (req, res) => {
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/pay-cotiz/';
-        res.redirect('/users/login/');
-    }
-    else {
-        if(req.body.lydia_phone != ""){
-            request.post('https://homologation.lydia-app.com/api/request/do.json', {
-                form: {
-                    amount: '30',
-                    recipient: req.body.lydia_phone,
-                    vendor_token: process.env.LYDIA_TOKEN,
-                    currency: 'EUR',
-                    type: 'phone',
-                    message: 'Paiement cotisation AMNet',
-                    payment_method: 'lydia'
-                    // TODO: Add confirm / cancel / expire URL and success / fail URL
-                }
-            }, (error, res, body) => {
-                let json_result = JSON.parse(body);
-                if(json_result.error == '0'){
-                    console.log(json_result.request_id);
-                    // TODO: Register request_id in database (new table => transactions)
-                }
-                else
-                    console.log(body);
+            connection.query('SELECT user_pay_status FROM users WHERE user_id = ?', [req.session['user_id']], (err, result) => {
+                if(result.length > 0)
+                    res.render('index.html.twig', {data: req.session, setting: settings, cotiz_paid: result[0]['user_pay_status']});
             });
-        }
-        else
-            res.redirect('/pay-cotiz/');
+        });
     }
 });
 

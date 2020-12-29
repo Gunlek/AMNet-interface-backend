@@ -6,6 +6,7 @@ let session = require('express-session');
 let nodemailer = require('nodemailer');
 let replace = require("stream-replace");
 let fs = require("fs");
+const axios = require('axios');
 
 require('dotenv').config();
 
@@ -191,6 +192,7 @@ module.exports = (app) => {
         let firstname = req.body.firstname;
         let lastname = req.body.lastname;
         let email = req.body.email;
+        let phone = req.body.phone;
         let bucque = req.body.bucque;
         let fams = req.body.fams;
         let password = md5(req.body.password);
@@ -203,11 +205,11 @@ module.exports = (app) => {
             proms = req.body.user_proms_text;
         }
         
-        if((username != "" && bucque != "" && fams != "" && proms != "" && email!="") && password == password_conf){
+        if((username !== "" && bucque !== "" && fams !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
             if(charte=="true"){
                 connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                     if(results.length == 0){
-                        connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, password, bucque, fams, proms]);
+                        connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
                         res.redirect('/users/login/');
                     }
                     else
@@ -264,6 +266,7 @@ module.exports = (app) => {
             const user_fams = req.body.user_fams;
             const user_campus = req.body.user_campus;
             const user_email = req.body.user_email;
+            const user_phone = req.body.user_phone;
             
             let user_proms = req.body.user_proms_select;
             if(select_or_text === "text"){
@@ -277,7 +280,7 @@ module.exports = (app) => {
                 user_password = md5(user_password);
                 user_confPassword = md5(user_confPassword);
                 if(user_password===user_confPassword){
-                    connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_password, user_id], (err, results, fields) => {
+                    connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
                         if(err) throw err;
                         res.redirect('/user/profile/');
                     });
@@ -287,11 +290,105 @@ module.exports = (app) => {
                 }
             }
             else {
-                connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_id], (err, results, fields) => {
+                connection.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_id], (err, results, fields) => {
                     if(err) throw err;
                     res.redirect('/user/profile/');
                 });
             }
         }
+    });
+
+    /**
+     * Handle lydia payment REST request (request/do)
+     */
+    app.get('/user/payment/do/:user_phone', (req, res) => {
+        const randomString = (len) => {
+            const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let str = "";
+            for(let k=0; k<len; k++){
+                str += possible[Math.floor(Math.random() * possible.length)];
+            }
+
+            return str;
+        }
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/user/profile/';
+            res.redirect('/users/login/');
+        }
+        else {
+            let user_phone = req.params.user_phone;
+            if(user_phone.length == 10 && user_phone[0] == "0")
+                user_phone = "+33" + user_phone.substring(1);
+            
+            let ticketId = randomString(58);
+
+            let parameters = new URLSearchParams();
+            parameters.append("message", "Paiement cotisation AMNet");
+            parameters.append("amount", process.env.LYDIA_COTISATION_PAYMENT_AMOUNT);
+            parameters.append("currency", "EUR");
+            parameters.append("type", "phone");
+            parameters.append("recipient", user_phone);
+            parameters.append("vendor_token", process.env.LYDIA_PUBLIC_VENDOR_TOKEN);
+            parameters.append("payment_method", "auto");
+            parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
+            parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+            parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+            parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
+            parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
+            parameters.append("display_confirmation", "no");
+            
+            axios({
+                method: "POST",
+                url: process.env.LYDIA_API_URL + '/api/request/do.json',
+                data: parameters
+            })
+            .then((response) => {
+                let { request_id, request_uuid, mobile_url } = response.data;
+                connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                    if(err)
+                        console.log(err);
+                    else
+                        res.redirect(mobile_url);
+                });
+            })
+            .catch((err) => console.log(err));
+        }
+    });
+
+    
+
+    /**
+     * Handle successful payment request
+     */
+    app.post('/user/payment/success/:ticket_id', urlencodedParser, (req, res) => {
+        const { ticket_id } = req.params;
+        connection.query('SELECT * FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err, results) => {
+            if(err)
+                console.log(err);
+            if(results.length > 0){
+                const user_id = results[0]['request_payer_id'];
+                connection.query('DELETE FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err) => {
+                    if(err)
+                        console.log(err);
+                });
+                connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], (err) => {
+                    if(err)
+                        console.log(err);
+                    else
+                        res.redirect('/');
+                });
+            }
+        });
+    });
+
+    /**
+     * Handle cancelled / expired payment request
+     */
+    app.post('/user/payment/cancel/:ticket_id', urlencodedParser, (req, res) => {
+        const { ticket_id } = req.params;
+        connection.query('DELETE FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err) => {
+            if(err)
+                console.log(err);
+        });
     });
 }

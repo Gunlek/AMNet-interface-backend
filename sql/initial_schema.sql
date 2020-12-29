@@ -47,6 +47,7 @@ CREATE TABLE users (
     user_firstname VARCHAR NOT NULL,
     user_lastname VARCHAR NOT NULL,
     user_email VARCHAR NOT NULL,
+    user_phone VARCHAR NOT NULL,
     user_password VARCHAR NOT NULL,
     user_bucque VARCHAR NOT NULL,
     user_fams VARCHAR NOT NULL,
