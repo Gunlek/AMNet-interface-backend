@@ -302,6 +302,15 @@ module.exports = (app) => {
      * Handle lydia payment REST request (request/do)
      */
     app.get('/user/payment/do/:user_phone', (req, res) => {
+        const randomString = (len) => {
+            const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let str = "";
+            for(let k=0; k<len; k++){
+                str += possible[Math.floor(Math.random() * possible.length)];
+            }
+
+            return str;
+        }
         if(!req.session['logged_in']){
             req.session.returnTo = '/user/profile/';
             res.redirect('/users/login/');
@@ -310,6 +319,8 @@ module.exports = (app) => {
             let user_phone = req.params.user_phone;
             if(user_phone.length == 10 && user_phone[0] == "0")
                 user_phone = "+33" + user_phone.substring(1);
+            
+            let ticketId = randomString(58);
 
             let parameters = new URLSearchParams();
             parameters.append("message", "Paiement cotisation AMNet");
@@ -319,12 +330,14 @@ module.exports = (app) => {
             parameters.append("recipient", user_phone);
             parameters.append("vendor_token", process.env.LYDIA_PUBLIC_VENDOR_TOKEN);
             parameters.append("payment_method", "auto");
-            parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/");
-            parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/");
-            parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/");
+            parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
+            parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+            parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
             parameters.append("browser_success_url", process.env.DEBUG ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
             parameters.append("browser_fail_url ", process.env.DEBUG ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
             parameters.append("display_confirmation", "no");
+
+            console.log(parameters);
             
             axios({
                 method: "POST",
@@ -333,7 +346,7 @@ module.exports = (app) => {
             })
             .then((response) => {
                 let { request_id, request_uuid, mobile_url } = response.data;
-                connection.query('INSERT INTO lydia_transactions(request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?)', [request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
                     if(err)
                         console.log(err);
                     else
@@ -349,20 +362,22 @@ module.exports = (app) => {
     /**
      * Handle successful payment request
      */
-    app.post('/user/payment/success/', urlencodedParser, (req, res) => {
-        const { request_id, amount } = req.body;
-        connection.query('SELECT * FROM lydia_transactions WHERE request_id = ?', [request_id], (err, results) => {
+    app.post('/user/payment/success/:ticket_id', urlencodedParser, (req, res) => {
+        const { ticket_id } = req.params;
+        connection.query('SELECT * FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err, results) => {
             if(err)
                 console.log(err);
             if(results.length > 0){
                 const user_id = results[0]['request_payer_id'];
-                connection.query('DELETE FROM lydia_transactions WHERE request_id = ?', [request_id], (err) => {
+                connection.query('DELETE FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err) => {
                     if(err)
                         console.log(err);
                 });
                 connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], (err) => {
                     if(err)
                         console.log(err);
+                    else
+                        res.redirect('/');
                 });
             }
         });
@@ -371,9 +386,9 @@ module.exports = (app) => {
     /**
      * Handle cancelled / expired payment request
      */
-    app.post('/user/payment/cancel/', urlencodedParser, (req, res) => {
-        const { request_id, amount } = req.body;
-        connection.query('DELETE FROM lydia_transactions WHERE request_id = ?', [request_id], (err) => {
+    app.post('/user/payment/cancel/:ticket_id', urlencodedParser, (req, res) => {
+        const { ticket_id } = req.params;
+        connection.query('DELETE FROM lydia_transactions WHERE request_ticket = ?', [ticket_id], (err) => {
             if(err)
                 console.log(err);
         });
