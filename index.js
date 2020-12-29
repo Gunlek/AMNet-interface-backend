@@ -49,48 +49,6 @@ app.get('/', (req, res) => {
     }
 });
 
-app.get('/pay-cotiz/', (req, res) => {
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/pay-cotiz/';
-        res.redirect('/users/login/');
-    }
-    else
-        res.render('users/pay-cotiz.html.twig', {data: req.session});
-});
-
-app.post('/action-pay-cotiz/', urlencodedParser, (req, res) => {
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/pay-cotiz/';
-        res.redirect('/users/login/');
-    }
-    else {
-        if(req.body.lydia_phone != ""){
-            request.post('https://homologation.lydia-app.com/api/request/do.json', {
-                form: {
-                    amount: '30',
-                    recipient: req.body.lydia_phone,
-                    vendor_token: process.env.LYDIA_TOKEN,
-                    currency: 'EUR',
-                    type: 'phone',
-                    message: 'Paiement cotisation AMNet',
-                    payment_method: 'lydia'
-                    // TODO: Add confirm / cancel / expire URL and success / fail URL
-                }
-            }, (error, res, body) => {
-                let json_result = JSON.parse(body);
-                if(json_result.error == '0'){
-                    console.log(json_result.request_id);
-                    // TODO: Register request_id in database (new table => transactions)
-                }
-                else
-                    console.log(body);
-            });
-        }
-        else
-            res.redirect('/pay-cotiz/');
-    }
-});
-
 app.use(function(req, res, next){
     res.status(404).render('errors/404.html.twig', {data: req.session});
 });
