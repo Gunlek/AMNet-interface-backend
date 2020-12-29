@@ -363,8 +363,6 @@ module.exports = (app) => {
                 connection.query('UPDATE users SET user_pay_status = 1 WHERE user_id = ?', [user_id], (err) => {
                     if(err)
                         console.log(err);
-                    else
-                        res.redirect('/');
                 });
             }
         });
@@ -378,8 +376,6 @@ module.exports = (app) => {
         connection.query('DELETE FROM lydia_transactions WHERE request_id = ?', [request_id], (err) => {
             if(err)
                 console.log(err);
-            else
-                res.redirect('/');
         });
     });
 }
