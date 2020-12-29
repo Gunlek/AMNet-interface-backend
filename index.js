@@ -40,11 +40,14 @@ app.get('/', (req, res) => {
     else {
         connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
             let settings = {};
-            settings_results.forEach(param => {
+            settings_results.map((param) => {
                 settings[param['setting_name']] = param['setting_value']
             });
-            
-            res.render('index.html.twig', {data: req.session, setting: settings});
+
+            connection.query('SELECT user_pay_status FROM users WHERE user_id = ?', [req.session['user_id']], (err, result) => {
+                if(result.length > 0)
+                    res.render('index.html.twig', {data: req.session, setting: settings, cotiz_paid: result[0]['user_pay_status']});
+            });
         });
     }
 });
