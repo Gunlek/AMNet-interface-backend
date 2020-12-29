@@ -336,8 +336,6 @@ module.exports = (app) => {
             parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
             parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
             parameters.append("display_confirmation", "no");
-
-            console.log(parameters);
             
             axios({
                 method: "POST",
