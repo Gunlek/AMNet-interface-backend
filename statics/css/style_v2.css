@@ -395,11 +395,12 @@ header {
 }
 
 .card {
-  margin: 0px 40px;
+  margin: 0px 10px;
   border: 1px solid #707070;
   padding: 10px;
   position: relative;
   height: 100%;
+  box-sizing: border-box;
 }
 .card hr {
   border: 1px solid rgba(112, 112, 112, 0.4);
@@ -504,6 +505,7 @@ main .page-title {
   height: 100%;
   display: flex;
   align-items: stretch;
+  margin: 20px 0;
 }
 .row .col, .row .col-1, .row .col-2, .row .col-3, .row .col-4, .row .col-5, .row .col-6, .row .col-7, .row .col-8, .row .col-9, .row .col-10, .row .col-11, .row .col-12 {
   width: 100%;
