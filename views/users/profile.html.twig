@@ -26,7 +26,7 @@
                             <div class="pay-cotiz-box">
                                 <p>Le paiement de la cotisation s'effectue via Lydia. Il vous sera proposé d'utiliser l'application Lydia pour conclure le paiement. Si vous n'en disposez pas, vous pouvez conclure le paiement par carte bancaire via l'interface Lydia.</p>
                                 <p>En cas de problème lors du paiement, veuillez contacter le président de l'AMNet</p>
-                                <button type="button" onClick="redirectToPayment()" class="custom-btn custom-btn-green" style="width: 100%;" >Cliquez pour procéder au paiement (30€)</button>
+                                <button type="button" onClick="redirectToPayment()" class="custom-btn custom-btn-green" style="width: 100%;" >Cliquez pour procéder au paiement ({{setting.lydia_cotiz}}€)</button>
                             </div>
                             <script type="text/javascript">
                                 const redirectToPayment = () => {
