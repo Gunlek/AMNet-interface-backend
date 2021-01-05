@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 
             connection.query('SELECT user_pay_status FROM users WHERE user_id = ?', [req.session['user_id']], (err, result) => {
                 if(result.length > 0)
-                    res.render('index.html.twig', {data: req.session, setting: settings, cotiz_paid: result[0]['user_pay_status']});
+                    res.render('index.html.twig', {data: req.session, setting: settings, cotiz_paid: result[0]['user_pay_status'], payment_err: req.query['payment_err'] == "1" ? true : false});
             });
         });
     }

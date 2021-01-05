@@ -239,7 +239,7 @@ module.exports = (app) => {
                         settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
                     });
                     if(results.length > 0){
-                        res.render('users/profile.html.twig', {user_data: results[0], setting: settings});
+                        res.render('users/profile.html.twig', {user_data: results[0], setting: settings, phone_err: req.query['phone_err'] == "1" ? true : false});
                     }
                 });
             });
@@ -317,56 +317,65 @@ module.exports = (app) => {
         }
         else {
             let user_phone = req.params.user_phone;
-            if(user_phone.length == 10 && user_phone[0] == "0")
-                user_phone = "+33" + user_phone.substring(1);
-            
-            let ticketId = randomString(58);
+            if(user_phone.length >= 10){
+                if(user_phone.length == 10 && user_phone[0] == "0")
+                    user_phone = "+33" + user_phone.substring(1);
+                
+                let ticketId = randomString(58);
 
-            connection.query('SELECT * FROM settings WHERE setting_name = "lydia_token" OR setting_name="lydia_cotiz";', (err, results, fields) => {
-                if(results.length > 1){
-                    let lydiaToken = "";
-                    let cotizAmount = 0.0;
-                    if(results[0]['setting_name'] === "lydia_cotiz"){
-                        cotizAmount = parseFloat(results[0]['setting_value']);
-                        lydiaToken = results[1]['setting_value'];
+                connection.query('SELECT * FROM settings WHERE setting_name = "lydia_token" OR setting_name="lydia_cotiz";', (err, results, fields) => {
+                    if(results.length > 1){
+                        let lydiaToken = "";
+                        let cotizAmount = 0.0;
+                        if(results[0]['setting_name'] === "lydia_cotiz"){
+                            cotizAmount = parseFloat(results[0]['setting_value']);
+                            lydiaToken = results[1]['setting_value'];
+                        }
+                        else {
+                            cotizAmount = parseFloat(results[1]['setting_value']);
+                            lydiaToken = results[0]['setting_value'];
+                        }
+                        let parameters = new URLSearchParams();
+                        parameters.append("message", "Paiement cotisation AMNet");
+                        parameters.append("amount", cotizAmount.toString());
+                        parameters.append("currency", "EUR");
+                        parameters.append("type", "phone");
+                        parameters.append("recipient", user_phone);
+                        parameters.append("vendor_token", lydiaToken);
+                        parameters.append("payment_method", "auto");
+                        parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
+                        parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+                        parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+                        parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment" : process.env.APP_DOMAIN + "/user/success-cotiz-payment");
+                        parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
+                        parameters.append("display_confirmation", "no");
+                        
+                        axios({
+                            method: "POST",
+                            url: process.env.LYDIA_API_URL + '/api/request/do.json',
+                            data: parameters
+                        })
+                        .then((response) => {
+                            let { request_id, request_uuid, mobile_url } = response.data;
+                            connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                                if(err)
+                                    console.log(err);
+                                else
+                                    res.redirect(mobile_url);
+                            });
+                        })
+                        .catch((err) => console.log(err));
                     }
-                    else {
-                        cotizAmount = parseFloat(results[1]['setting_value']);
-                        lydiaToken = results[0]['setting_value'];
-                    }
-                    let parameters = new URLSearchParams();
-                    parameters.append("message", "Paiement cotisation AMNet");
-                    parameters.append("amount", cotizAmount.toString());
-                    parameters.append("currency", "EUR");
-                    parameters.append("type", "phone");
-                    parameters.append("recipient", user_phone);
-                    parameters.append("vendor_token", lydiaToken);
-                    parameters.append("payment_method", "auto");
-                    parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
-                    parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-                    parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-                    parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment" : process.env.APP_DOMAIN + "/user/success-cotiz-payment");
-                    parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
-                    parameters.append("display_confirmation", "no");
-                    
-                    axios({
-                        method: "POST",
-                        url: process.env.LYDIA_API_URL + '/api/request/do.json',
-                        data: parameters
-                    })
-                    .then((response) => {
-                        let { request_id, request_uuid, mobile_url } = response.data;
-                        connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
-                            if(err)
-                                console.log(err);
-                            else
-                                res.redirect(mobile_url);
-                        });
-                    })
-                    .catch((err) => console.log(err));
-                }
-            });
+                });
+            }
+            else {
+                res.redirect('/user/profile/?phone_err=1');
+            }
         }
+    });
+
+    app.get('/user/payment/do/', (req, res) => {
+        res.redirect('/user/profile/?phone_err=1');
     });
 
 

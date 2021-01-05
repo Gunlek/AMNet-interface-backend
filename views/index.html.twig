@@ -69,4 +69,20 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- Payment error -->
+	{% if payment_err %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Une erreur est survenue lors du paiement de la cotisation</h1>
+				<ul>
+					<li>Si vous avez été débité du montant de la cotisation ({{ setting.lydia_cotiz }}€), contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a></li>
+					<li>Si vous n'avez pas été débité, vous pouvez ré-essayer le paiement</li>
+					<li>Si le problème persiste, contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a>
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/handle-modal.js"></script>
 {% endblock %}
