@@ -493,11 +493,14 @@ module.exports = (app) => {
             const api_token = req.body.api_token;
             const lydia_token = req.body.lydia_token;
             const active_proms = req.body.active_proms;
+            const lydia_cotiz = parseFloat(req.body.lydia_cotiz.toString().replace(",", "."));
 
             connection.query('UPDATE settings SET setting_value=? WHERE setting_name="api_token"', [api_token], (err, results, fields) => {
                 connection.query('UPDATE settings SET setting_value=? WHERE setting_name="lydia_token"', [lydia_token], (err, results, fields) => {
                     connection.query('UPDATE settings SET setting_value=? WHERE setting_name="active_proms"', [active_proms], (err, results, fields) => {
-                        res.redirect('/admin/');
+                        connection.query('UPDATE settings SET setting_value=? WHERE setting_name="lydia_cotiz"', [lydia_cotiz], (err, results, fields) => {
+                            res.redirect('/admin/');
+                        });
                     });
                 });
             });
