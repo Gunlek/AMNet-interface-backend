@@ -382,7 +382,7 @@ module.exports = (app) => {
                         })
                         .then((response) => {
                             let { request_id, request_uuid, mobile_url } = response.data;
-                            connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                            connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, cotizAmount.toString(), req.session['user_id']], (err) => {
                                 if(err)
                                     console.log(err);
                                 else
