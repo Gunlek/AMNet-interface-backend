@@ -32,7 +32,7 @@ module.exports = (app) => {
         }
         else {
             if(req.session['user_pay_status'] == 0)
-                res.redirect('/pay-cotiz/');
+                res.redirect('/user/profile/');
             else {
                 connection.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
                     res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});

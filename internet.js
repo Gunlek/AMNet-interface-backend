@@ -34,7 +34,7 @@ module.exports = (app) => {
         }
         else {
             if(req.session['user_pay_status'] == 0)
-                res.redirect('/pay-cotiz/');
+                res.redirect('/user/profile/');
             else {
                 connection.query('SELECT * FROM access WHERE access_user = ?', [req.session.user_id], function(error, results, fields){
                     res.render('internet/list-access.html.twig', {data: req.session, access_list: results});
