@@ -4,17 +4,16 @@
 {% block content %}
 	<div class="offset-main">
 		<h1 class="page-title">Mon espace AMNet</h1>
+
 		<div class="row">
-			<div class="col-12">
+			<div class="col-6">
 				<div class="card">
-					<center><h2>Besoin d'assistance ? Contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a> !</h2></center>
+					<h3 class="card-title">Actualité AMNet</h3>
+					<hr>
+					<p>{{ setting.news_message }}</p>
 				</div>
 			</div>
-		</div>
 
-		<br/><br/>
-
-		<div class="row">
 			<div class="col-6">
 				<div class="card">
 					<h3 class="card-title">Accès internet</h3>
@@ -27,8 +26,21 @@
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<div class="col-6">
+		<div class="row">
+			<div class="col-4">
+				<div class="card">
+					<h3 class="card-title">Votre statut AMNet</h3>
+					<hr>
+					<p>
+						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
+						Cotisation: {% if cotiz_paid == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/user/profile/" class="badge badge-red">Non-payée</a>{% endif %}<br/>
+					</p>
+				</div>
+			</div>
+
+			<div class="col-4">
 				<div class="card">
 					<h3 class="card-title">Matériel</h3>
 					<hr>
@@ -40,33 +52,42 @@
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<br/><br/>
-
-		<div class="row">
-			<div class="col-12">
+			<div class="col-4">
 				<div class="card">
-					<h3 class="card-title">Actualité AMNet</h3>
+					<h3 class="card-title">Serveur Minecraft</h3>
 					<hr>
-					<p>{{ setting.news_message }}</p>
+					<center><img src="/img/mc_cube.png" alt="minecraft-cube" style="width: 25%;"/></center>
+					<center>
+						<p>Rejoignez le serveur Minecraft de la résidence</p>
+						<a href="minecraft.amnet.fr"><h2>minecraft.amnet.fr</h2></a>
+					</center>
 				</div>
 			</div>
 		</div>
 
-		<br/><br/>
-
 		<div class="row">
 			<div class="col-12">
 				<div class="card">
-					<h3 class="card-title">Votre statut AMNet</h3>
-					<hr>
-					<p>
-						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
-						Cotisation: {% if cotiz_paid == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/user/profile/" class="badge badge-red">Non-payée</a>{% endif %}<br/>
-					</p>
+					<center><h3>Besoin d'assistance ? Contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a> !</h3></center>
 				</div>
 			</div>
 		</div>
 	</div>
+	
+	<!-- Payment error -->
+	{% if payment_err %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Une erreur est survenue lors du paiement de la cotisation</h1>
+				<ul>
+					<li>Si vous avez été débité du montant de la cotisation ({{ setting.lydia_cotiz }}€), contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a></li>
+					<li>Si vous n'avez pas été débité, vous pouvez ré-essayer le paiement</li>
+					<li>Si le problème persiste, contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a>
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/js/handle-modal.js"></script>
 {% endblock %}

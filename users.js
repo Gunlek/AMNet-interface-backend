@@ -207,6 +207,31 @@ module.exports = (app) => {
         
         if((username !== "" && bucque !== "" && fams !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
             if(charte=="true"){
+
+                if(process.env.RADIUS == "true"){
+                    let radiusConnection = mysql.createConnection({
+                        host    :   process.env.RADIUS_DB_HOST,
+                        user    :   process.env.RADIUS_DB_USER,
+                        password:   process.env.RADIUS_DB_PASS,
+                        database:   process.env.RADIUS_DB_NAME
+                    });
+                    
+                    radiusConnection.connect();
+                    radiusConnection.query('INSERT INTO radcheck(username, attribute, op, value) VALUES (?, "MD5-Password", ":=", ?)', [username, password], (err) => {
+                        if(err)
+                            console.log(err)
+                    });
+                    radiusConnection.query('INSERT INTO radusergroup(username, groupname, priority) VALUES (?, "daloRADIUS-Disabled-Users", 0)', [username], (err) => {
+                        if(err)
+                            console.log(err)
+                    });
+                    radiusConnection.query('INSERT INTO userinfo(username, firstname, lastname, email, department, company, workphone, homephone, mobilephone, address, city, state, country, zip, notes, changeuserinfo, portalloginpassword, enableportallogin, creationdate, creationby, updatedate) VALUES (?, ?, ?, ?, "", "", "", "", "", "", "", "", "", "", "", 0, "", 0, NOW(), "amnet_birse", NULL)', [username, firstname, lastname, email], (err) => {
+                        if(err)
+                            console.log(err)
+                    })
+                    radiusConnection.end();
+                }
+
                 connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                     if(results.length == 0){
                         connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
@@ -239,7 +264,7 @@ module.exports = (app) => {
                         settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
                     });
                     if(results.length > 0){
-                        res.render('users/profile.html.twig', {user_data: results[0], setting: settings});
+                        res.render('users/profile.html.twig', {user_data: results[0], setting: settings, phone_err: req.query['phone_err'] == "1" ? true : false});
                     }
                 });
             });
@@ -317,41 +342,98 @@ module.exports = (app) => {
         }
         else {
             let user_phone = req.params.user_phone;
-            if(user_phone.length == 10 && user_phone[0] == "0")
-                user_phone = "+33" + user_phone.substring(1);
-            
-            let ticketId = randomString(58);
+            if(user_phone.length >= 10){
+                if(user_phone.length == 10 && user_phone[0] == "0")
+                    user_phone = "+33" + user_phone.substring(1);
+                
+                let ticketId = randomString(58);
 
-            let parameters = new URLSearchParams();
-            parameters.append("message", "Paiement cotisation AMNet");
-            parameters.append("amount", process.env.LYDIA_COTISATION_PAYMENT_AMOUNT);
-            parameters.append("currency", "EUR");
-            parameters.append("type", "phone");
-            parameters.append("recipient", user_phone);
-            parameters.append("vendor_token", process.env.LYDIA_PUBLIC_VENDOR_TOKEN);
-            parameters.append("payment_method", "auto");
-            parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
-            parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-            parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-            parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/" : process.env.APP_DOMAIN + "/");
-            parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
-            parameters.append("display_confirmation", "no");
-            
-            axios({
-                method: "POST",
-                url: process.env.LYDIA_API_URL + '/api/request/do.json',
-                data: parameters
-            })
-            .then((response) => {
-                let { request_id, request_uuid, mobile_url } = response.data;
-                connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
-                    if(err)
-                        console.log(err);
-                    else
-                        res.redirect(mobile_url);
+                connection.query('SELECT * FROM settings WHERE setting_name = "lydia_token" OR setting_name="lydia_cotiz";', (err, results, fields) => {
+                    if(results.length > 1){
+                        let lydiaToken = "";
+                        let cotizAmount = 0.0;
+                        if(results[0]['setting_name'] === "lydia_cotiz"){
+                            cotizAmount = parseFloat(results[0]['setting_value']);
+                            lydiaToken = results[1]['setting_value'];
+                        }
+                        else {
+                            cotizAmount = parseFloat(results[1]['setting_value']);
+                            lydiaToken = results[0]['setting_value'];
+                        }
+                        let parameters = new URLSearchParams();
+                        parameters.append("message", "Paiement cotisation AMNet");
+                        parameters.append("amount", cotizAmount.toString());
+                        parameters.append("currency", "EUR");
+                        parameters.append("type", "phone");
+                        parameters.append("recipient", user_phone);
+                        parameters.append("vendor_token", lydiaToken);
+                        parameters.append("payment_method", "auto");
+                        parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
+                        parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+                        parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
+                        parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment" : process.env.APP_DOMAIN + "/user/success-cotiz-payment");
+                        parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
+                        parameters.append("display_confirmation", "no");
+                        
+                        axios({
+                            method: "POST",
+                            url: process.env.LYDIA_API_URL + '/api/request/do.json',
+                            data: parameters
+                        })
+                        .then((response) => {
+                            let { request_id, request_uuid, mobile_url } = response.data;
+                            connection.query('INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)', [ticketId, request_id, request_uuid, process.env.LYDIA_COTISATION_PAYMENT_AMOUNT, req.session['user_id']], (err) => {
+                                if(err)
+                                    console.log(err);
+                                else
+                                    res.redirect(mobile_url);
+                            });
+                        })
+                        .catch((err) => console.log(err));
+                    }
                 });
-            })
-            .catch((err) => console.log(err));
+            }
+            else {
+                res.redirect('/user/profile/?phone_err=1');
+            }
+        }
+    });
+
+    app.get('/user/payment/do/', (req, res) => {
+        res.redirect('/user/profile/?phone_err=1');
+    });
+
+
+    app.get('/user/success-cotiz-payment', (req, res) => {
+        if(!req.session['logged_in']){
+            req.session.returnTo = '/user/profile/';
+            res.redirect('/users/login/');
+        }
+        else {
+            connection.query('SELECT * FROM users WHERE user_id=?', [req.session.user_id], (errors, results, fields) => {
+                if(results.length > 0){
+                    req.session['user_pay_status'] = results[0]['user_pay_status'];
+
+                    if(req.session['user_pay_status'] == "1"){
+                        if(process.env.RADIUS == "true"){
+                            let radiusConnection = mysql.createConnection({
+                                host    :   process.env.RADIUS_DB_HOST,
+                                user    :   process.env.RADIUS_DB_USER,
+                                password:   process.env.RADIUS_DB_PASS,
+                                database:   process.env.RADIUS_DB_NAME
+                            });
+                            
+                            radiusConnection.connect();
+                            radiusConnection.query('UPDATE radusergroup SET groupname="pgmoyss" WHERE username=?', [username], (err) => {
+                                if(err)
+                                    console.log(err)
+                            });
+                            radiusConnection.end();
+                        }
+                    }
+                    res.redirect('/');
+                }
+            });
         }
     });
 

@@ -147,4 +147,19 @@
             </form>
         </div>
     </div>
+
+    <!-- No phone error -->
+	{% if phone_err %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Aucun numéro de téléphone renseigné, impossible de lancer le paiement</h1>
+				<ul>
+					<li>Veuillez renseigner un numéro de téléphone valide sur votre profil. Si vous ne disposez pas d'un compte Lydia associé à ce numéro, pas d'inquiétude, il vous sera proposé de régler la cotisation par carte bancaire</li>
+					<li>Si le problème persiste, contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a>
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/handle-modal.js"></script>
 {% endblock %}
