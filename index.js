@@ -1,9 +1,8 @@
 let mysql = require('mysql');
 var express = require('express');
 let session = require('express-session');
-let bodyParser = require('body-parser');
-let urlencodedParser = bodyParser.urlencoded({ extended: false});
-let request = require('request');
+let cron = require('node-cron');
+
 
 require('dotenv').config();
 
@@ -33,6 +32,41 @@ require('./admin')(app);            // Handle all administration interfaces and 
 require('./api')(app);              // Handle API actions
 
 app.use(express.static('statics'));
+
+let radiusConnection;
+if(process.env.RADIUS == 'true'){
+    radiusConnection = mysql.createConnection({
+        host    :   process.env.RADIUS_DB_HOST,
+        user    :   process.env.RADIUS_DB_USER,
+        password:   process.env.RADIUS_DB_PASS,
+        database:   process.env.RADIUS_DB_NAME
+    });
+
+    radiusConnection.connect();
+}
+
+cron.schedule('58 23 * * *', () => {
+    if(process.env.RADIUS == 'true'){
+        connection.query('SELECT * FROM users', (errors, results, fields) => {
+            results.forEach((user) => {
+                if(user['user_pay_status'] == '1'){
+                    radiusConnection.query('UPDATE radusergroup SET groupname="pgmoyss" WHERE username=?', [user['user_name']], (err) => {
+                        if(err)
+                            console.log(err)
+                    });
+                }
+                else {
+                    radiusConnection.query('UPDATE radusergroup SET groupname="daloRADIUS-Disabled-Users" WHERE username=?', [user['user_name']], (err) => {
+                        if(err)
+                            console.log(err)
+                    });
+                }
+            });
+        });
+
+        console.log("UPDATE DONE !");
+    }
+});
 
 app.get('/', (req, res) => {
     if(!req.session['logged_in'])
