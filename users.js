@@ -207,6 +207,28 @@ module.exports = (app) => {
         
         if((username !== "" && bucque !== "" && fams !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
             if(charte=="true"){
+                let radiusConnection = mysql.createConnection({
+                    host    :   process.env.RADIUS_DB_HOST,
+                    user    :   process.env.RADIUS_DB_USER,
+                    password:   process.env.RADIUS_DB_PASS,
+                    database:   process.env.RADIUS_DB_NAME
+                });
+                
+                radiusConnection.connect();
+                radiusConnection.query('INSERT INTO radcheck(username, attribute, op, value) VALUES (?, "MD5-Password", ":=", ?)', [username, password], (err) => {
+                    if(err)
+                        console.log(err)
+                });
+                radiusConnection.query('INSERT INTO radusergroup(username, groupname, priority) VALUES (?, "daloRADIUS-Disabled-Users", 0)', [username], (err) => {
+                    if(err)
+                        console.log(err)
+                });
+                radiusConnection.query('INSERT INTO userinfo(username, firstname, lastname, email, department, company, workphone, homephone, mobilephone, address, city, state, country, zip, notes, changeuserinfo, portalloginpassword, enableportallogin, creationdate, creationby, updatedate) VALUES (?, ?, ?, ?, "", "", "", "", "", "", "", "", "", "", "", 0, "", 0, NOW(), "amnet_birse", NULL)', [username, firstname, lastname, email], (err) => {
+                    if(err)
+                        console.log(err)
+                })
+                radiusConnection.end();
+
                 connection.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                     if(results.length == 0){
                         connection.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
