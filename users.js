@@ -371,7 +371,7 @@ module.exports = (app) => {
                         parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
                         parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
                         parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-                        parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment" : process.env.APP_DOMAIN + "/user/success-cotiz-payment");
+                        parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment/" : process.env.APP_DOMAIN + "/user/success-cotiz-payment/");
                         parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
                         parameters.append("display_confirmation", "no");
                         
@@ -404,12 +404,8 @@ module.exports = (app) => {
     });
 
 
-    app.get('/user/success-cotiz-payment', (req, res) => {
-        if(!req.session['logged_in']){
-            req.session.returnTo = '/user/profile/';
-            res.redirect('/users/login/');
-        }
-        else {
+    app.get('/user/success-cotiz-payment/', (req, res) => {
+        if(req.session['logged_in']){
             connection.query('SELECT * FROM users WHERE user_id=?', [req.session.user_id], (errors, results, fields) => {
                 if(results.length > 0){
                     req.session['user_pay_status'] = results[0]['user_pay_status'];
@@ -431,10 +427,10 @@ module.exports = (app) => {
                             radiusConnection.end();
                         }
                     }
-                    res.redirect('/');
                 }
             });
         }
+        res.render('errors/payment_redirection.html.twig');
     });
 
     

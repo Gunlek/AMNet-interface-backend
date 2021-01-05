@@ -1,0 +1,27 @@
+{% extends 'utils/template.html.twig' %}
+{% block title %}AMNet Birse{% endblock %}
+
+{% block content %}
+	<div class="offset-main">
+		<div class="row" style="padding: 0 40px">
+			<div class="col-12">
+                <p>Votre paiement a été pris en compte</p>
+				<p>La validation de votre cotisation est en cours, vous serez redirigé dans <span id="timer">0</span> secondes.</p>
+				<script type="text/javascript">
+					let el = document.getElementById("timer");
+					let delayValue = 5;
+					el.innerHTML = delayValue.toString();
+					let timingFunction = () => {
+						delayValue--;
+						el.innerHTML = delayValue.toString();
+
+						if(delayValue <= 0){
+							window.location = "/";
+						}
+					}
+					setInterval(timingFunction, 1000);
+				</script>
+			</div>
+		</div>
+	</div>
+{% endblock %}
