@@ -63,8 +63,6 @@ cron.schedule('58 23 * * *', () => {
                 }
             });
         });
-
-        console.log("UPDATE DONE !");
     }
 });
 
