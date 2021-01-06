@@ -8,7 +8,6 @@ const { DatabaseSingleton } = require('./src/utils/databaseSingleton');
 const ticketRouter = require('./src/routes/ticketRouter');
 const materialRouter = require('./src/routes/materialRouter');
 const internetRouter = require('./src/routes/internetRouter');
-const { RadiusSingleton } = require('./src/utils/radiusSingleton');
 const { EnableRadiusConnection } = require('./src/utils/radius/enableRadiusConnection');
 const { DisableRadiusConnection } = require('./src/utils/radius/disableRadiusConnection');
 
@@ -33,8 +32,6 @@ app.use('/users', userRouter);
 require('./src/api/api')(app);              // Handle API actions
 
 app.use(express.static('statics'));
-
-let radiusConnection = RadiusSingleton.getInstance().getDatabase();
 
 cron.schedule('58 23 * * *', () => {
     let database = DatabaseSingleton.getInstance().getDatabase();
