@@ -120,4 +120,35 @@
         </div>
         <div class="col"></div>
     </div>
+
+    <!-- Empty field -->
+	{% if signin_failed and fail_reason == "empty_field" %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Au moins l'un des champs est vide</h1>
+				<p>Vous devez renseigner tous les champs pour compléter votre inscription.</p>
+			</div>
+		</div>
+	{% endif %}
+    {% if signin_failed and fail_reason == "no_charte" %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Vous n'avez pas accepté la charte AMNet</h1>
+				<p>Vous devez cocher la case permettant d'accepter la charte AMNet pour compléter votre inscription.</p>
+			</div>
+		</div>
+	{% endif %}
+    {% if signin_failed and fail_reason == "username_already_used" %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Ce nom d'utilisateur est déjà utilisé</h1>
+				<ul>
+                    <li>Si vous ne vous souvenez plus de votre mot de passe, utilisez la fonction "mot de passe oublié" sur l'écran de connexion</li>
+                    <li>Si vous n'avez pas de compte AMNet, essayez un nom d'utilisateur différent</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/handle-modal.js"></script>
 {% endblock %}

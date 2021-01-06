@@ -132,18 +132,18 @@ module.exports = (app) => {
      */
     app.get('/users/signin/', (req, res) => {
         let signin_failed = false;
-        let no_charte = false;
-        if(req.query.state != null && req.query.state === "signin_failed")
+        let fail_reason = "";
+        if(req.query.state != null){
             signin_failed = true;
-        if(req.query.state != null && req.query.state === "no_charte")
-            no_charte = true;
+            fail_reason = req.query.state;
+        }
         
         connection.query('SELECT * FROM settings', (error, settings_results, fields) => {
             let settings = {};
             settings_results.forEach(param => {
                 settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
             });
-            res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, no_charte: no_charte, setting: settings});
+            res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, fail_reason: fail_reason, setting: settings});
         });
     });
 
@@ -238,14 +238,14 @@ module.exports = (app) => {
                         res.redirect('/users/login/');
                     }
                     else
-                        res.redirect('/users/signin/?state=signin_failed');
+                        res.redirect('/users/signin/?state=username_already_used');
                 });
             }
             else
                 res.redirect('/users/signin/?state=no_charte');
         }
         else
-            res.redirect('/users/signin/?state=signin_failed');
+            res.redirect('/users/signin/?state=empty_field');
     });
 
     /*
