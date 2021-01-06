@@ -11,6 +11,7 @@ const DatabaseSingleton = (function(){
             password:   process.env.DB_PASS,
             database:   process.env.DB_NAME
         });
+        this.database.connect();
 
         this.getDatabase = () => {
             return this.database;
