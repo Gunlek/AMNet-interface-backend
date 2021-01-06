@@ -8,6 +8,9 @@ const { DatabaseSingleton } = require('./src/utils/databaseSingleton');
 const ticketRouter = require('./src/routes/ticketRouter');
 const materialRouter = require('./src/routes/materialRouter');
 const internetRouter = require('./src/routes/internetRouter');
+const { RadiusSingleton } = require('./src/utils/radiusSingleton');
+const { EnableRadiusConnection } = require('./src/utils/radius/enableRadiusConnection');
+const { DisableRadiusConnection } = require('./src/utils/radius/disableRadiusConnection');
 
 require('dotenv').config();
 
@@ -31,17 +34,7 @@ require('./src/api/api')(app);              // Handle API actions
 
 app.use(express.static('statics'));
 
-let radiusConnection;
-if(process.env.RADIUS == 'true'){
-    radiusConnection = mysql.createConnection({
-        host    :   process.env.RADIUS_DB_HOST,
-        user    :   process.env.RADIUS_DB_USER,
-        password:   process.env.RADIUS_DB_PASS,
-        database:   process.env.RADIUS_DB_NAME
-    });
-
-    radiusConnection.connect();
-}
+let radiusConnection = RadiusSingleton.getInstance().getDatabase();
 
 cron.schedule('58 23 * * *', () => {
     let database = DatabaseSingleton.getInstance().getDatabase();
@@ -49,16 +42,10 @@ cron.schedule('58 23 * * *', () => {
         database.query('SELECT * FROM users', (errors, results, fields) => {
             results.forEach((user) => {
                 if(user['user_pay_status'] == '1'){
-                    radiusConnection.query('UPDATE radusergroup SET groupname="pgmoyss" WHERE username=?', [user['user_name']], (err) => {
-                        if(err)
-                            console.log(err)
-                    });
+                    EnableRadiusConnection(user['user_name']);
                 }
                 else {
-                    radiusConnection.query('UPDATE radusergroup SET groupname="daloRADIUS-Disabled-Users" WHERE username=?', [user['user_name']], (err) => {
-                        if(err)
-                            console.log(err)
-                    });
+                    DisableRadiusConnection(user['user_name']);
                 }
             });
         });

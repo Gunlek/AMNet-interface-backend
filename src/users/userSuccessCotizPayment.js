@@ -1,4 +1,5 @@
 const { DatabaseSingleton } = require('../utils/databaseSingleton');
+const { EnableRadiusConnection } = require('../utils/radius/enableRadiusConnection');
 
 require('dotenv').config();
 
@@ -11,19 +12,7 @@ const UserSuccessCotizPayment = (req, res) => {
 
                 if(req.session['user_pay_status'] == "1"){
                     if(process.env.RADIUS == "true"){
-                        let radiusConnection = mysql.createConnection({
-                            host    :   process.env.RADIUS_DB_HOST,
-                            user    :   process.env.RADIUS_DB_USER,
-                            password:   process.env.RADIUS_DB_PASS,
-                            database:   process.env.RADIUS_DB_NAME
-                        });
-                        
-                        radiusConnection.connect();
-                        radiusConnection.query('UPDATE radusergroup SET groupname="pgmoyss" WHERE username=?', [username], (err) => {
-                            if(err)
-                                console.log(err)
-                        });
-                        radiusConnection.end();
+                        EnableRadiusConnection(req.session['user_name']);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const md5 = require('md5');
+const { RegisterNewRadiusUser } = require("../utils/radius/registerNewRadiusUser");
 
 require('dotenv').config();
 
@@ -32,27 +33,7 @@ const UserProcessSignin = (req, res) => {
         if(charte=="true"){
 
             if(process.env.RADIUS == "true"){
-                let radiusConnection = mysql.createConnection({
-                    host    :   process.env.RADIUS_DB_HOST,
-                    user    :   process.env.RADIUS_DB_USER,
-                    password:   process.env.RADIUS_DB_PASS,
-                    database:   process.env.RADIUS_DB_NAME
-                });
-                
-                radiusConnection.connect();
-                radiusConnection.query('INSERT INTO radcheck(username, attribute, op, value) VALUES (?, "MD5-Password", ":=", ?)', [username, password], (err) => {
-                    if(err)
-                        console.log(err)
-                });
-                radiusConnection.query('INSERT INTO radusergroup(username, groupname, priority) VALUES (?, "daloRADIUS-Disabled-Users", 0)', [username], (err) => {
-                    if(err)
-                        console.log(err)
-                });
-                radiusConnection.query('INSERT INTO userinfo(username, firstname, lastname, email, department, company, workphone, homephone, mobilephone, address, city, state, country, zip, notes, changeuserinfo, portalloginpassword, enableportallogin, creationdate, creationby, updatedate) VALUES (?, ?, ?, ?, "", "", "", "", "", "", "", "", "", "", "", 0, "", 0, NOW(), "amnet_birse", NULL)', [username, firstname, lastname, email], (err) => {
-                    if(err)
-                        console.log(err)
-                })
-                radiusConnection.end();
+                RegisterNewRadiusUser(username, password);
             }
 
             database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
