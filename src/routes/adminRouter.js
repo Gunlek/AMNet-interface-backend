@@ -19,7 +19,14 @@ const { AdminUserUpdateGlobalPayStatus } = require('../admin/users/adminUserUpda
 const { AdminUserUpdateUserPayStatus } = require('../admin/users/adminUserUpdateUserPayStatus');
 const { AdminUserGrant } = require('../admin/users/adminUserGrant');
 
+const { isUserAdmin } = require('../utils/isUserAdmin');
+const { isUserLoggedIn } = require('../utils/isUserLoggedIn');
+
 let adminRouter = express.Router();
+
+// Ensure user is logged-in and admin
+adminRouter.use(isUserLoggedIn);
+adminRouter.use(isUserAdmin);
 
 adminRouter.get('/', AdminHome)
 

@@ -11,6 +11,8 @@ const internetRouter = require('./src/routes/internetRouter');
 const { EnableRadiusConnection } = require('./src/utils/radius/enableRadiusConnection');
 const { DisableRadiusConnection } = require('./src/utils/radius/disableRadiusConnection');
 
+const { isUserLoggedIn } = require('./src/utils/isUserLoggedIn');
+
 require('dotenv').config();
 
 var app = express();
@@ -23,11 +25,11 @@ app.use(session({
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/users', userRouter);
 app.use('/internet', internetRouter);
 app.use('/material', materialRouter);
 app.use('/tickets', ticketRouter);
 app.use('/admin', adminRouter);
-app.use('/users', userRouter);
 
 require('./src/api/api')(app);              // Handle API actions
 
