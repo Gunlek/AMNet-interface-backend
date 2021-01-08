@@ -14,6 +14,7 @@ const { UserProfile } = require('../users/userProfile');
 const { UserSignin } = require('../users/userSignin');
 const { UserSuccessCotizPayment } = require('../users/userSuccessCotizPayment');
 const { UserUpdatePassword } = require('../users/userUpdatePassword');
+const { isUserLoggedIn } = require('../utils/isUserLoggedIn');
 
 let userRouter = express.Router();
 
@@ -31,6 +32,14 @@ userRouter.post('/process_login/', UserProcessLogin);
 userRouter.get('/signin', UserSignin);
 userRouter.post('/process_signin/', UserProcessSignin);
 
+// Lydia transactions
+userRouter.get('/payment/do/:user_phone', UserDoPayment);
+userRouter.get('/payment/do/', (req, res) => { res.redirect('/user/profile/?phone_err=1'); });
+userRouter.post('/payment/success/:ticket_id', UserPaymentSuccess);
+userRouter.post('/payment/cancel/:ticket_id', UserCancelPayment);
+
+// Ensure user is logged in
+userRouter.use(isUserLoggedIn);
 // Disconnection
 userRouter.get('/disconnect', UserDisconnect);
 
@@ -39,10 +48,6 @@ userRouter.get('/profile/', UserProfile);
 userRouter.post('/process-profile-update/', UserProcessProfileUpdate);
 
 // Lydia transactions
-userRouter.get('/payment/do/:user_phone', UserDoPayment);
-userRouter.get('/payment/do/', (req, res) => { res.redirect('/user/profile/?phone_err=1'); });
 userRouter.get('/success-cotiz-payment/', UserSuccessCotizPayment);
-userRouter.post('/payment/success/:ticket_id', UserPaymentSuccess);
-userRouter.post('/payment/cancel/:ticket_id', UserCancelPayment);
 
 module.exports = userRouter;
