@@ -149,7 +149,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   display: inline-block;
   min-height: 35px !important;
   font-size: 20px;
-  line-height: 20px;
+  line-height: 35px;
   text-decoration: none;
   text-align: center;
   padding: 5px 5px;
@@ -165,7 +165,7 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 
 .btn-xs {
   max-height: 25px !important;
-  mine-height: 15px !important;
+  min-height: 15px !important;
   line-height: 15px;
 }
 
@@ -217,11 +217,11 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
   transition: background-color 0.2s;
 }
 
-.btn-orange {
+.btn-orange, .custom-btn-orange {
   background-color: #f39c12;
   border: 2px solid #e67e22;
 }
-.btn-orange:hover {
+.btn-orange:hover, .custom-btn-orange:hover {
   background-color: #e67e22;
   transition: background-color 0.2s;
 }

@@ -58,6 +58,23 @@
 						</div>
 
 						<div class="form-group">
+							<div class="row">
+								<div class="col-6">
+									<label>Compte invité: {% if setting.guest_access == '1' %}Activé{% else %}Désactivé{% endif %}</label>
+								</div>
+
+								{% if setting.guest_access == '0' %}
+									<div class="col-6">
+										<a href="/admin/settings/enable-guest-access/" class="custom-btn btn-xs custom-btn-green">Activer</a>
+									</div>
+								{% else %}
+									<div class="col-6">
+										<a href="/admin/settings/disable-guest-access/" class="custom-btn btn-xs custom-btn-orange">Désactiver</a>
+									</div>
+								{% endif %}
+							</div>
+						</div>
+						<div class="form-group">
 							<label for="lydia_token">Clé d'API Lydia: </label>
 							<input type="text" name="lydia_token" value="{{setting.lydia_token}}" placeholder="currently unused..." class="form-control" />
 						</div>
