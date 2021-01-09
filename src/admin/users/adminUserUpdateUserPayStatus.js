@@ -1,4 +1,6 @@
 const { DatabaseSingleton } = require("../../utils/databaseSingleton");
+const { EnableRadiusConnection } = require("../../utils/radius/enableRadiusConnection");
+const { DisableRadiusConnection } = require('../../utils/radius/disableRadiusConnection');
 
 /*
  * Update cotisation status for the specified user
@@ -6,21 +8,19 @@ const { DatabaseSingleton } = require("../../utils/databaseSingleton");
 const AdminUserUpdateUserPayStatus = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
     let {user_id, status} = req.params;
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/admin/users';
-        res.redirect('/users/login');
-    }
-    else {
-        if(req.session['user_rank'] != "admin")
-        {
-            res.redirect('/');
+    
+    database.query('SELECT * FROM users WHERE user_id = ?', [user_id], (err, results, fields) => {
+        if(results.length > 0){
+            if(status == "1")
+                EnableRadiusConnection(results[0]['user_name']);
+            else
+                DisableRadiusConnection(results[0]['user_name']);
         }
-        else {
-            database.query('UPDATE users SET user_pay_status=? WHERE user_id = ?', [status, user_id], () => {
-                res.redirect('/admin/users');
-            });
-        }
-    }
+    });
+
+    database.query('UPDATE users SET user_pay_status=? WHERE user_id = ?', [status, user_id], () => {
+        res.redirect('/admin/users');
+    });
 }
 
 module.exports = { AdminUserUpdateUserPayStatus };

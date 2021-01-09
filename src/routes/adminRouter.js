@@ -18,8 +18,17 @@ const { AdminUserProfile } = require('../admin/users/adminUserProfile');
 const { AdminUserUpdateGlobalPayStatus } = require('../admin/users/adminUserUpdateGlobalPayStatus');
 const { AdminUserUpdateUserPayStatus } = require('../admin/users/adminUserUpdateUserPayStatus');
 const { AdminUserGrant } = require('../admin/users/adminUserGrant');
+const { AdminEnableGuestAccess } = require('../admin/settings/adminEnableGuestAccess');
+const { AdminDisableGuestAccess } = require('../admin/settings/adminDisableGuestAccess');
+
+const { isUserAdmin } = require('../utils/isUserAdmin');
+const { isUserLoggedIn } = require('../utils/isUserLoggedIn');
 
 let adminRouter = express.Router();
+
+// Ensure user is logged-in and admin
+adminRouter.use(isUserLoggedIn);
+adminRouter.use(isUserAdmin);
 
 adminRouter.get('/', AdminHome)
 
@@ -40,6 +49,8 @@ adminRouter.get('/settings', AdminSettings);
 adminRouter.post('/settings/new-api-key/', AdminSettingsNewApiKey);
 adminRouter.post('/update-news-message/', AdminSettingsUpdateNewsMessage);
 adminRouter.post('/update-settings/', AdminSettingsUpdateSettings);
+adminRouter.get('/settings/enable-guest-access/', AdminEnableGuestAccess);
+adminRouter.get('/settings/disable-guest-access/', AdminDisableGuestAccess);
 
 // Users
 adminRouter.get('/users/', AdminUserListUsers);

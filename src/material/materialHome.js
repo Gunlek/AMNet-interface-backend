@@ -6,18 +6,13 @@ const { DatabaseSingleton } = require("../utils/databaseSingleton");
 */
 const MaterialHome = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
-    if(!req.session['logged_in']){
-        req.session.returnTo = '/material/';
-        res.redirect('/users/login/');
-    }
+    
+    if(req.session['user_pay_status'] == 0)
+        res.redirect('/user/profile/');
     else {
-        if(req.session['user_pay_status'] == 0)
-            res.redirect('/user/profile/');
-        else {
-            database.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
-                res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
-            });
-        }
+        database.query('SELECT * FROM materials WHERE material_user = ?', [1], function(error, results, fields){
+            res.render('material/list-requests.html.twig', {data: req.session, requests_list: results});
+        });
     }
 }
 
