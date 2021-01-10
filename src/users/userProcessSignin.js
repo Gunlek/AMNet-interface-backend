@@ -30,7 +30,7 @@ const UserProcessSignin = (req, res) => {
                 RegisterNewRadiusUser(username, firstname, lastname, email, password);
             }
 
-            database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
+            database.query('SELECT * FROM users WHERE user_name=? OR user_email=?', [username, email], function(errors, results, fields){
                 if(results.length == 0){
                     database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
                     res.redirect('/users/login/');
