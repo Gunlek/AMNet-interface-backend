@@ -35,7 +35,10 @@
 					<hr>
 					<p>
 						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
-						Cotisation: {% if cotiz_paid == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/users/profile/" class="badge badge-red">Non-payée</a>{% endif %}<br/>
+						Cotisation: {% if cotiz_paid == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/users/profile/" class="badge badge-red">Non-payée</a>{% endif %}<br/><br/>
+						{% if cotiz_paid == 0 %}
+							<a href="/users/profile" class="custom-btn custom-btn-orange" style="width: 100%;" >Cliquez pour procéder au paiement ({{setting.lydia_cotiz}}€)</a>
+						{% endif %}
 					</p>
 				</div>
 			</div>
