@@ -1,3 +1,4 @@
+const md5 = require('md5');
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 
 /*
