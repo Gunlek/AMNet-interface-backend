@@ -11,7 +11,7 @@ const AdminUserDeleteUser = (req, res) => {
 
     database.query('SELECT * FROM users WHERE user_id = ?', [user_id], (err, results, fields) => {
         if(results.length > 0){
-            DeleteRadiusUser(results[0]['username']);
+            DeleteRadiusUser(results[0]['user_name']);
         }
 
         database.query('DELETE FROM users WHERE user_id = ?', [user_id], () => {
