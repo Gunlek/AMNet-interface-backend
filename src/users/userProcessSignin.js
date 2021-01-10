@@ -12,13 +12,7 @@ require('dotenv').config();
 */
 const UserProcessSignin = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
-    let username = req.body.username;
-    let firstname = req.body.firstname;
-    let lastname = req.body.lastname;
-    let email = req.body.email;
-    let phone = req.body.phone;
-    let bucque = req.body.bucque;
-    let fams = req.body.fams;
+    const { username, firstname, lastname, email, phone, bucque, fams } = req.body;
     let password = md5(req.body.password);
     let password_conf = md5(req.body.password_confirmation);
     let charte = req.body.check_charte;
@@ -33,7 +27,7 @@ const UserProcessSignin = (req, res) => {
         if(charte=="true"){
 
             if(process.env.RADIUS == "true"){
-                RegisterNewRadiusUser(username, password);
+                RegisterNewRadiusUser(username, firstname, lastname, email, password);
             }
 
             database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
