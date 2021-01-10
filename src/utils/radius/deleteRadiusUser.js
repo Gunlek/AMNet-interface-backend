@@ -1,3 +1,5 @@
+const { RadiusSingleton } = require('../radiusSingleton');
+
 const DeleteRadiusUser = (username) => {
     let radiusConnection = RadiusSingleton.getInstance().getDatabase();
 
