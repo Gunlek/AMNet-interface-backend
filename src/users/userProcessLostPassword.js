@@ -48,6 +48,9 @@ const UserProcessLostPassword = (req, res) => {
             });
             res.redirect('/users/login/');
         }
+        else {
+            res.redirect('/users/lost_password/?err=no_corresponding_account');
+        }
     });
 }
 
