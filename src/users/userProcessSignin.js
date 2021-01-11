@@ -30,10 +30,17 @@ const UserProcessSignin = (req, res) => {
                 RegisterNewRadiusUser(username, firstname, lastname, email, password);
             }
 
-            database.query('SELECT * FROM users WHERE user_name=? OR user_email=?', [username, email], function(errors, results, fields){
+            database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                 if(results.length == 0){
-                    database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
-                    res.redirect('/users/login/');
+                    database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
+                        if(user_results.length == 0){
+                            database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
+                            res.redirect('/users/login/');
+                        }
+                        else {
+                            res.redirect('/users/signin/?state=email_already_used');
+                        }
+                    });
                 }
                 else
                     res.redirect('/users/signin/?state=username_already_used');
