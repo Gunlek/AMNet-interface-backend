@@ -1,4 +1,5 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
+const { UpdateRadiusAccountPassword } = require("../utils/radius/updateRadiusAccountPassword");
 
 /*
  * Handle POST request to update user's profile based
@@ -30,8 +31,9 @@ const UserProcessProfileUpdate = (req, res) => {
         user_password = md5(user_password);
         user_confPassword = md5(user_confPassword);
         if(user_password===user_confPassword){
-            database.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
+            database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
                 if(err) throw err;
+                UpdateRadiusAccountPassword(user_name, user_password);
                 res.redirect('/user/profile/');
             });
         }
@@ -40,7 +42,7 @@ const UserProcessProfileUpdate = (req, res) => {
         }
     }
     else {
-        database.query('UPDATE users SET user_name=?, user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=? WHERE user_id = ?', [user_name, user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_id], (err, results, fields) => {
+        database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_id], (err, results, fields) => {
             if(err) throw err;
             res.redirect('/user/profile/');
         });
