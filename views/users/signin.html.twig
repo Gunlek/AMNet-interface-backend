@@ -37,6 +37,7 @@
                 <div class="form-group">
                     <label for="username">Nom d'utilisateur</label>
                     <input type="text" required="required" name="username" />
+                    <p>Votre nom d'utilisateur ne doit contenir que des lettres majuscules ou minuscules et des chiffres. Il peut contenir des espaces.</p>
                 </div>
                 <br/>
                 <div class="form-group">
@@ -108,8 +109,8 @@
 
                 <div class"form-group">
                     <label>Vous devez accepter la charte AMNet pour vous inscrire: <a href="/docs/charte.pdf">Télécharger la charte</a></label>&nbsp;&nbsp;
-                    <input type="radio" name="check_charte" value="true"/>Accepter&nbsp;&nbsp;
-                    <input type="radio" name="check_charte" value="false" checked="checked"/>Refuser
+                    <input type="radio" name="check_charte" value="true" id="chartTrue"/><label for="chartTrue">&nbsp;Accepter</label>&nbsp;&nbsp;
+                    <input type="radio" name="check_charte" value="false" checked="checked" id="chartFalse"/><label for="chartFalse">&nbsp;Refuser</label>
                 </div>
                 <br/>
                 <div class="form-group">
@@ -157,6 +158,16 @@
                     <li>Si vous ne vous souvenez plus de votre mot de passe, utilisez la fonction "mot de passe oublié" sur l'écran de connexion</li>
                     <li>Si vous n'avez pas de compte AMNet, essayez une adresse email différente</li>
                     <li>Si le problème persiste, contactez <a href="mailto:contact@amnet.fr">contact@amnet.fr</a></li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
+    {% if signin_failed and fail_reason == "invalid_username" %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Ce nom d'utilisateur est invalide</h1>
+				<ul>
+                    <li>Vérifiez que votre nom d'utilisateur ne contient que des chiffres/lettres majuscules/minuscules</li>
                 </ul>
 			</div>
 		</div>

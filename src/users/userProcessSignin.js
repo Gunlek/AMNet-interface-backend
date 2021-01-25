@@ -17,6 +17,8 @@ const UserProcessSignin = (req, res) => {
     let password_conf = md5(req.body.password_confirmation);
     let charte = req.body.check_charte;
 
+    const validateUsername = (username) => /^[a-zA-Z0-9 ]+$/.test(username);
+
     const select_or_text = req.body.select_or_text;
     let proms = req.body.user_proms_select;
     if(select_or_text === "text"){
@@ -30,21 +32,25 @@ const UserProcessSignin = (req, res) => {
                 RegisterNewRadiusUser(username, firstname, lastname, email, password);
             }
 
-            database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
-                if(results.length == 0){
-                    database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
-                        if(user_results.length == 0){
-                            database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
-                            res.redirect('/users/login/');
-                        }
-                        else {
-                            res.redirect('/users/signin/?state=email_already_used');
-                        }
-                    });
-                }
-                else
-                    res.redirect('/users/signin/?state=username_already_used');
-            });
+            if(!validateUsername(username))
+                res.redirect('/users/signin/?state=invalid_username');
+            else {
+                database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
+                    if(results.length == 0){
+                        database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
+                            if(user_results.length == 0){
+                                database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
+                                res.redirect('/users/login/');
+                            }
+                            else {
+                                res.redirect('/users/signin/?state=email_already_used');
+                            }
+                        });
+                    }
+                    else
+                        res.redirect('/users/signin/?state=username_already_used');
+                });
+            }
         }
         else
             res.redirect('/users/signin/?state=no_charte');
