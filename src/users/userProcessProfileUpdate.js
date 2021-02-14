@@ -34,17 +34,17 @@ const UserProcessProfileUpdate = (req, res) => {
             database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
                 if(err) throw err;
                 UpdateRadiusAccountPassword(user_name, user_password);
-                res.redirect('/user/profile/');
+                res.redirect('/users/profile/');
             });
         }
         else {
-            res.redirect('/user/profile/?err=1')
+            res.redirect('/users/profile/?err=1')
         }
     }
     else {
         database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_id], (err, results, fields) => {
             if(err) throw err;
-            res.redirect('/user/profile/');
+            res.redirect('/users/profile/');
         });
     }
 }

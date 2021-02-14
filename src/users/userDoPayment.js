@@ -44,10 +44,10 @@ const UserDoPayment = (req, res) => {
                 parameters.append("recipient", user_phone);
                 parameters.append("vendor_token", lydiaToken);
                 parameters.append("payment_method", "auto");
-                parameters.append("confirm_url", process.env.APP_DOMAIN + "/user/payment/success/" + ticketId);
-                parameters.append("cancel_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-                parameters.append("expire_url", process.env.APP_DOMAIN + "/user/payment/cancel/" + ticketId);
-                parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/user/success-cotiz-payment/" : process.env.APP_DOMAIN + "/user/success-cotiz-payment/");
+                parameters.append("confirm_url", process.env.APP_DOMAIN + "/users/payment/success/" + ticketId);
+                parameters.append("cancel_url", process.env.APP_DOMAIN + "/users/payment/cancel/" + ticketId);
+                parameters.append("expire_url", process.env.APP_DOMAIN + "/users/payment/cancel/" + ticketId);
+                parameters.append("browser_success_url", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/users/success-cotiz-payment/" : process.env.APP_DOMAIN + "/users/success-cotiz-payment/");
                 parameters.append("browser_fail_url ", process.env.DEBUG == "true" ? "http://localhost:"+process.env.SERVER_PORT+"/?payment_err=1" : process.env.APP_DOMAIN + "/?payment_err=1");
                 parameters.append("display_confirmation", "no");
                 
@@ -70,7 +70,7 @@ const UserDoPayment = (req, res) => {
         });
     }
     else {
-        res.redirect('/user/profile/?phone_err=1');
+        res.redirect('/users/profile/?phone_err=1');
     }
 }
 
