@@ -92,6 +92,14 @@
                                 <img src="/img/gadzflix.svg" style="margin: 0 auto; max-width: 80px; height: 80px;" />
                             </a>
                         </li>
+
+                        {% if data.user_rank == 'admin' %}
+                            <li>
+                                <a href="/admin/">
+                                    <i class="fas fa-tools"></i>
+                                </a>
+                            </li>
+                        {% endif %}
                         <!--<li>
                             <a href="/storage/">
                                 <i class="fas fa-box-open"></i>
