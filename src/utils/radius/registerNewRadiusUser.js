@@ -3,7 +3,7 @@ const { RadiusSingleton } = require("../radiusSingleton");
 const RegisterNewRadiusUser = (username, firstname, lastname, email, password) => {
     let radiusConnection = RadiusSingleton.getInstance().getDatabase();
 
-    radiusConnection.query('INSERT INTO radcheck(username, attribute, op, value) VALUES (?, "MD5-Password", ":=", ?)', [username, password], (err) => {
+    radiusConnection.query('INSERT INTO radcheck(username, attribute, op, value) VALUES (?, "Cleartext-Password", ":=", ?)', [username, password], (err) => {
         if(err)
             console.log(err)
     });

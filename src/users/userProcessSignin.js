@@ -13,7 +13,8 @@ require('dotenv').config();
 const UserProcessSignin = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
     const { username, firstname, lastname, email, phone, bucque, fams } = req.body;
-    let password = md5(req.body.password);
+    let clearPassword = req.body.password;          // Used by radius
+    let password = md5(clearPassword);
     let password_conf = md5(req.body.password_confirmation);
     let charte = req.body.check_charte;
 
@@ -29,7 +30,7 @@ const UserProcessSignin = (req, res) => {
         if(charte=="true"){
 
             if(process.env.RADIUS == "true"){
-                RegisterNewRadiusUser(username, firstname, lastname, email, password);
+                RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
             }
 
             if(!validateUsername(username))

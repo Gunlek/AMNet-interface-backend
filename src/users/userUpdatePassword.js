@@ -9,7 +9,8 @@ const { UpdateRadiusAccountPassword } = require('../utils/radius/updateRadiusAcc
 */
 const UserUpdatePassword = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
-    let password = md5(req.body.password);
+    let clearPassword = req.body.password;          // Used by radius
+    let password = md5(clearPassword);
     let conf_password = md5(req.body.conf_password);
     let token = req.body.token;
     if(password === conf_password){
