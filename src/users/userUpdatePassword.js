@@ -20,7 +20,7 @@ const UserUpdatePassword = (req, res) => {
                     database.query("DELETE FROM reset_token WHERE token_value = ?", [token], () => {
                         database.query('SELECT * FROM users WHERE user_id=?', [results[0]["token_user"]], (errors, user_results, fields) => {
                             if(user_results.length > 0)
-                                UpdateRadiusAccountPassword(user_results[0]['user_name'], password);
+                                UpdateRadiusAccountPassword(user_results[0]['user_name'], clearPassword);
                             res.redirect('/users/login');
                         });
                     });
