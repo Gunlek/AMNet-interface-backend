@@ -5,6 +5,10 @@
   "main": "index.js",
   "author": "Fabien Aubret <fabien.aubret@gadz.org>",
   "license": "ISC",
+  "scripts": {
+    "run": "pm2 start . --name AMNetInterface",
+    "dev": "nodemon ."
+  },
   "dependencies": {
     "axios": "^0.21.1",
     "dotenv": "^8.0.0",
