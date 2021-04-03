@@ -26,7 +26,7 @@ const UserProcessSignin = (req, res) => {
         proms = req.body.user_proms_text;
     }
 
-    if((username !== "" && bucque !== "" && fams !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
+    if((username !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
         if(charte=="true"){
 
             if(process.env.RADIUS == "true"){

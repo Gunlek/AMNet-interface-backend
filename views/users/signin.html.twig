@@ -63,19 +63,21 @@
                     <label>Téléphone</label>
                     <input type="tel" class="form-control" required="required"  name="phone" placeholder="Numéro de téléphone "/>
                 </div>
+                
+                <div class="localGadzOnly">
+                    <div class="form-group">
+                        <label>Bucque</label>
+                        <input type="text" class="form-control" name="bucque" placeholder="Exemple: Hard Win'ss"/>
+                    </div>
 
-                <div class="form-group">
-                    <label>Bucque</label>
-                    <input type="text" class="form-control" name="bucque" placeholder="Exemple: Hard Win'ss"/>
+                    <div class="form-group">
+                        <label>Fam'ss</label>
+                        <input type="text" class="form-control" name="fams" placeholder="Exemple: 58"/>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Fam'ss</label>
-                    <input type="text" class="form-control" name="fams" placeholder="Exemple: 58"/>
-                </div>
-
-                <div class="form-group">
-                    <label>Prom'ss</label>
+                    <label id="promsLabel">Prom'ss</label>
                     <select name="user_proms_select" id="user_proms_select" class="form-control">
                         <option selected value="{{setting.active_proms - 1}}">{{setting.active_proms - 1}}</option>
                         <option value="{{setting.active_proms}}">{{setting.active_proms}}</option>
@@ -174,4 +176,5 @@
 	{% endif %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/js/handle-modal.js"></script>
+    <script type="text/javascript" src="/js/handle-gadz-only-form.js"></script>
 {% endblock %}
