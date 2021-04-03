@@ -1,5 +1,6 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const { UpdateRadiusAccountPassword } = require("../utils/radius/updateRadiusAccountPassword");
+const md5 = require('md5');
 
 /*
  * Handle POST request to update user's profile based
