@@ -35,6 +35,7 @@ const UserProcessProfileUpdate = (req, res) => {
         if(user_password===user_confPassword){
             database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
                 if(err) throw err;
+                console.log(user_name, clearPassword);
                 UpdateRadiusAccountPassword(user_name, clearPassword);
                 res.redirect('/users/profile/');
             });
