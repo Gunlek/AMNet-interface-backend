@@ -81,7 +81,7 @@
                     <select name="user_proms_select" id="user_proms_select" class="form-control">
                         <option selected value="{{setting.active_proms - 1}}">{{setting.active_proms - 1}}</option>
                         <option value="{{setting.active_proms}}">{{setting.active_proms}}</option>
-                        <option value="{{setting.active_proms + 1}}">{{setting.active_proms}}+1</option>
+                        <option value="{{setting.active_proms + 1}}" selected>{{setting.active_proms}}+1</option>
                         <option value="autre" onClick="otherPromsField()">Autre</option>
                     </select>
                     <input style="display: none;" type="text" id="user_proms_text" class="form-control" name="user_proms_text" />
