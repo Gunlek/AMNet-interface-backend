@@ -170,14 +170,15 @@ form .form-group input[type=text]:focus, form .form-group input[type=password]:f
 }
 
 .btn-birse {
-  background-color: #1B5C17;
+  background-color: #096a09 !important;
   border: none;
+  color: #fff !important;
 }
 .btn-birse i {
-  color: #fff;
+  color: #fff !important;
 }
 .btn-birse:hover {
-  background-color: #164813;
+  background-color: #164813 !important;
   transition: background-color 0.2s;
 }
 
