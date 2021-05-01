@@ -1,6 +1,7 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const md5 = require('md5');
 const { RegisterNewRadiusUser } = require("../utils/radius/registerNewRadiusUser");
+const { isPasswordValid } = require("../utils/isPasswordValid");
 
 require('dotenv').config();
 
@@ -26,38 +27,42 @@ const UserProcessSignin = (req, res) => {
         proms = req.body.user_proms_text;
     }
 
-    if((username !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
-        if(charte=="true"){
+    if(isPasswordValid(clearPassword)){
+        if((username !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
+            if(charte=="true"){
 
-            if(process.env.RADIUS == "true"){
-                RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
-            }
+                if(process.env.RADIUS == "true"){
+                    RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
+                }
 
-            if(!validateUsername(username))
-                res.redirect('/users/signin/?state=invalid_username');
-            else {
-                database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
-                    if(results.length == 0){
-                        database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
-                            if(user_results.length == 0){
-                                database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
-                                res.redirect('/users/login/');
-                            }
-                            else {
-                                res.redirect('/users/signin/?state=email_already_used');
-                            }
-                        });
-                    }
-                    else
-                        res.redirect('/users/signin/?state=username_already_used');
-                });
+                if(!validateUsername(username))
+                    res.redirect('/users/signin/?state=invalid_username');
+                else {
+                    database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
+                        if(results.length == 0){
+                            database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
+                                if(user_results.length == 0){
+                                    database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
+                                    res.redirect('/users/login/');
+                                }
+                                else {
+                                    res.redirect('/users/signin/?state=email_already_used');
+                                }
+                            });
+                        }
+                        else
+                            res.redirect('/users/signin/?state=username_already_used');
+                    });
+                }
             }
+            else
+                res.redirect('/users/signin/?state=no_charte');
         }
         else
-            res.redirect('/users/signin/?state=no_charte');
+            res.redirect('/users/signin/?state=empty_field');
     }
     else
-        res.redirect('/users/signin/?state=empty_field');
+        res.redirect('/users/signin/?state=invalid_password');
 }
 
 module.exports = { UserProcessSignin };

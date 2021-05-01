@@ -174,6 +174,16 @@
 			</div>
 		</div>
 	{% endif %}
+    {% if signin_failed and fail_reason == "invalid_password" %}
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Mot de passe invalide</h1>
+				<ul>
+                    <li>Votre mot de passe ne doit pas contenir de caractères accentués (é, è, à, ô, ï, etc...) ou de caractères type "ç"</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/js/handle-modal.js"></script>
     <script type="text/javascript" src="/js/handle-gadz-only-form.js"></script>
