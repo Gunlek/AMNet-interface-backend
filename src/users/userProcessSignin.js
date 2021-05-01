@@ -2,6 +2,7 @@ const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const md5 = require('md5');
 const { RegisterNewRadiusUser } = require("../utils/radius/registerNewRadiusUser");
 const { isPasswordValid } = require("../utils/isPasswordValid");
+const { loginUser } = require('../utils/loginUser');
 
 require('dotenv').config();
 
@@ -11,7 +12,7 @@ require('dotenv').config();
  * form and check if password and conf_password corresponds
  * then register the newly created user to the database and redirect to log-in
 */
-const UserProcessSignin = (req, res) => {
+const UserProcessSignin = async (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
     const { username, firstname, lastname, email, phone, bucque, fams } = req.body;
     let clearPassword = req.body.password;          // Used by radius
@@ -36,13 +37,22 @@ const UserProcessSignin = (req, res) => {
                 else {
                     database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
                         if(results.length == 0){
-                            database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
+                            database.query('SELECT * FROM users WHERE user_email=?', [email], async (errors, user_results, fields) => {
                                 if(user_results.length == 0){
                                     database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
                                     if(process.env.RADIUS == "true"){
                                         RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
                                     }
-                                    res.redirect('/users/login/');
+                                    
+                                    let loggedIn = await loginUser(req, req.body.username, req.body.password);
+                                    if(loggedIn){
+                                            let returnURL = "/";
+                                            if(req.session.returnTo != null)
+                                                returnURL = req.session.returnTo;
+                                            res.redirect(returnURL);
+                                    }
+                                    else
+                                        res.redirect('/users/login/?state=failed');
                                 }
                                 else {
                                     res.redirect('/users/signin/?state=email_already_used');
