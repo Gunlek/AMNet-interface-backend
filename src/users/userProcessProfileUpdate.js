@@ -1,6 +1,7 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const { UpdateRadiusAccountPassword } = require("../utils/radius/updateRadiusAccountPassword");
 const md5 = require('md5');
+const { isPasswordValid } = require("../utils/isPasswordValid");
 
 /*
  * Handle POST request to update user's profile based
@@ -30,18 +31,22 @@ const UserProcessProfileUpdate = (req, res) => {
 
     if(user_password != "" && user_confPassword != ""){
         let clearPassword = req.body.user_password;
-        user_password = md5(user_password);
-        user_confPassword = md5(user_confPassword);
-        if(user_password===user_confPassword){
-            database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
-                if(err) throw err;
-                console.log(user_name, clearPassword);
-                UpdateRadiusAccountPassword(user_name, clearPassword);
-                res.redirect('/users/profile/');
-            });
+        if(isPasswordValid(clearPassword)){
+            user_password = md5(user_password);
+            user_confPassword = md5(user_confPassword);
+            if(user_password===user_confPassword){
+                database.query('UPDATE users SET user_bucque=?, user_firstname=?, user_lastname=?, user_fams=?, user_campus=?, user_proms=?, user_email=?, user_phone=?, user_password=? WHERE user_id = ?', [user_bucque, user_firstname, user_lastname, user_fams, user_campus, user_proms, user_email, user_phone, user_password, user_id], (err, results, fields) => {
+                    if(err) throw err;
+                    UpdateRadiusAccountPassword(user_name, clearPassword);
+                    res.redirect('/users/profile/');
+                });
+            }
+            else {
+                res.redirect('/users/profile/?err=1')
+            }
         }
         else {
-            res.redirect('/users/profile/?err=1')
+            res.redirect('/users/profile/?err=2')
         }
     }
     else {
