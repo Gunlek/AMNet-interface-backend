@@ -31,10 +31,6 @@ const UserProcessSignin = (req, res) => {
         if((username !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
             if(charte=="true"){
 
-                if(process.env.RADIUS == "true"){
-                    RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
-                }
-
                 if(!validateUsername(username))
                     res.redirect('/users/signin/?state=invalid_username');
                 else {
@@ -43,6 +39,9 @@ const UserProcessSignin = (req, res) => {
                             database.query('SELECT * FROM users WHERE user_email=?', [email], (errors, user_results, fields) => {
                                 if(user_results.length == 0){
                                     database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
+                                    if(process.env.RADIUS == "true"){
+                                        RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
+                                    }
                                     res.redirect('/users/login/');
                                 }
                                 else {
