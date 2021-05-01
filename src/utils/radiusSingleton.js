@@ -2,6 +2,9 @@ let mysql = require('mysql');
 
 require('dotenv').config();
 
+/**
+ * This is a Singleton class for Radius database
+ */
 const RadiusSingleton = (function(){
 
     const RadiusClass = function(){

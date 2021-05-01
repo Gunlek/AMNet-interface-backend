@@ -1,7 +1,13 @@
 const { DatabaseSingleton } = require('../utils/databaseSingleton');
 const md5 = require('md5');
 
-
+/**
+ * Login user to AMNet Interface system
+ * @param {*} req 
+ * @param {string} username 
+ * @param {string} password 
+ * @returns 
+ */
 const loginUser = (req, username, password) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
     const loggedIn = new Promise((resolve) => {
