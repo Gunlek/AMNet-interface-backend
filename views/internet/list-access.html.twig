@@ -4,6 +4,19 @@
 {% block content %}
     <div class="offset-main">
         <h1 class="page-title">Vos demandes d'accès internet</h1>
+        <div style="padding: 0 40px;">
+            <p>
+                Cette page est utile uniquement pour les appareils qui ne peuvent pas se connecter à AMNet Wi-Fi. C'est à dire les objets connectés, comme les enceintes, les chromecasts ou les consoles de jeux.<br/>
+                Cependant nous vous conseillons vivement de brancher votre console en Ethernet (débit plus élevé, ping plus faible et meilleure stabilité)
+                <br/><br/>
+                La marche à suivre est la suivante :
+                <ul>
+                    <li>Il faut renseigner l'adresse physique (aussi appelé MAC) de votre appareil ainsi qu'une photo où l'on distingue clairement l'objet et l'adresse mac qui lui est associée.</li>
+                    <li>Attendre qu'un administrateur valide votre demande (2-3 jours, si ce n'est pas le cas dépassé ce laps de temps merci d'envoyer un mail à contact@amnet.fr)</li>
+                    <li>Une fois la demande validée vous pouvez connecter votre appareil au réseau AMNet IoT</li>
+                </ul>
+            </p>
+        </div>
         <div class="row" style="padding: 0 40px;">
             <div class="col-10">
                 <table class="table table-striped">
@@ -44,20 +57,24 @@
 
     <div class="modal" id="adding-modal-form">
         <div class="modal-content">
-            <h2>Formuler une nouvelle demande d'accès</h2>
-            <form method="POST" action="/internet/add-request/">
-                <input type="hidden" name="user_id" value="{{ data.user_id }}" />
+            <h2>Ajouter un objet connecté</h2>
+            <form method="POST" action="/internet/add-request/" enctype="multipart/form-data">
+                <input type="hidden" name="userId" value="{{ data.user_id }}" />
 
                 <div class="form-group">
                     <label>Adresse MAC de l'équipement</label>
-                    <input type="text" class="form-control" name="mac_addr" required="required" placeholder="Par exemple: 5E:FF:56:A2:AF:15"/>
+                    <input type="text" class="form-control" name="macAddr" required="required" placeholder="Par exemple: 5E:FF:56:A2:AF:15"/>
                 </div>
                 <div class="form-group">
                     <label>Description de l'équipement</label>
                     <input type="text" class="form-control" required="required" name="description"/>
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Envoyer la demande" class="btn btn-blue btn-sm" />
+                    <label>Photographie de l'objet avec adresse mac visible</label>
+                    <input type="file" name="photoProof" accept=".jpg,.png,.jpeg">
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Envoyer la demande" class="btn btn-blue btn-sm" required/>
                 </div>
             </form>
         </div>

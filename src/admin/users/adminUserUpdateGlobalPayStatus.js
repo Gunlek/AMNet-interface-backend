@@ -11,10 +11,12 @@ const AdminUserUpdateGlobalPayStatus = (req, res) => {
     
     database.query('SELECT * FROM users', (err, results, fields) => {
         results.forEach((user) => {
-            if(status == "1")
-                EnableRadiusConnection(user['user_name']);
-            else
-                DisableRadiusConnection(user['user_name']);
+            if(process.env.RADIUS == "true"){
+                if(status == "1")
+                    EnableRadiusConnection(user['user_name']);
+                else
+                    DisableRadiusConnection(user['user_name']);
+            }
         });
     });
     database.query('UPDATE users SET user_pay_status=?', [status], () => {
