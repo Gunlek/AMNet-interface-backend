@@ -11,10 +11,12 @@ const AdminUserUpdateUserPayStatus = (req, res) => {
     
     database.query('SELECT * FROM users WHERE user_id = ?', [user_id], (err, results, fields) => {
         if(results.length > 0){
-            if(status == "1")
-                EnableRadiusConnection(results[0]['user_name']);
-            else
-                DisableRadiusConnection(results[0]['user_name']);
+            if(process.env.RADIUS == "true"){
+                if(status == "1")
+                    EnableRadiusConnection(results[0]['user_name']);
+                else
+                    DisableRadiusConnection(results[0]['user_name']);
+            }
         }
     });
 
