@@ -5,13 +5,19 @@ const { DatabaseSingleton } = require("../utils/databaseSingleton");
 */
 const InternetAddRequest = (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
-    let mac_addr = req.body.mac_addr.replace(/-/g, ':');
-    let description = req.body.description;
-    let user_id = req.body.user_id;
+    
+    let { userId, macAddr, description } = req.body;
+    if(!!req.file){
+        const accessProof = req.file.filename;
+        macAddr = macAddr.replace(/-/g, ':');
 
-    database.query('INSERT INTO access(access_description, access_mac, access_user) VALUES(?, ?, ?)', [description, mac_addr, user_id], () => {
-        res.redirect('/internet/');
-    });
+        database.query('INSERT INTO access(access_description, access_mac, access_user, access_proof) VALUES(?, ?, ?, ?)', [description, macAddr, userId, accessProof], () => {
+            res.redirect('/internet/');
+        });
+    }
+    else {
+        res.redirect('/internet/?error=1');
+    }
 }
 
 module.exports = { InternetAddRequest };
