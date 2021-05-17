@@ -517,41 +517,41 @@ main .page-title {
   max-width: 100%;
 }
 .row .col-1 {
-  flex-grow: 1;
+  flex: 0 0 8.3333333333%;
   max-width: 8.3333333333%;
 }
 .row .col-2 {
-  flex-grow: 2;
+  flex: 0 0 16.6666666667%;
   max-width: 16.6666666667%;
 }
 .row .col-3 {
-  flex-grow: 3;
+  flex: 0 0 25%;
   max-width: 25%;
 }
 .row .col-4 {
-  flex-grow: 4;
+  flex: 0 0 33.3333333333%;
 }
 .row .col-5 {
-  flex-grow: 5;
+  flex: 0 0 41.6666666667%;
 }
 .row .col-6 {
-  flex-grow: 6;
+  flex: 0 0 50%;
 }
 .row .col-7 {
-  flex-grow: 7;
+  flex: 0 0 58.3333333333%;
 }
 .row .col-8 {
-  flex-grow: 8;
+  flex: 0 0 66.6666666667%;
 }
 .row .col-9 {
-  flex-grow: 9;
+  flex: 0 0 75%;
 }
 .row .col-10 {
-  flex-grow: 10;
+  flex: 0 0 83.3333333333%;
 }
 .row .col-11 {
-  flex-grow: 11;
+  flex: 0 0 91.6666666667%;
 }
 .row .col-12 {
-  flex-grow: 12;
+  flex: 0 0 100%;
 }
