@@ -12,7 +12,7 @@ const UserProfile = (req, res) => {
                 settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
             });
             if(results.length > 0){
-                res.render('users/profile.html.twig', {user_data: results[0], setting: settings, phone_err: req.query['phone_err'] == "1" ? true : false});
+                res.render('users/profile.html.twig', {data: req.session, user_data: results[0], setting: settings, phone_err: req.query['phone_err'] == "1" ? true : false});
             }
         });
     });
