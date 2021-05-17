@@ -24,7 +24,7 @@
 						Votre rôle: {% if data.user_rank != 'admin' %}PG{% else %}Administrateur{% endif %}<br/><br/>
 						Cotisation: {% if cotiz_paid == 1 %}<span class="badge badge-green">Payée</span>{% else %}<a href="/users/profile/" class="badge badge-red">Non-payée</a>{% endif %}<br/><br/>
 						{% if cotiz_paid == 0 %}
-							<a href="/users/profile" class="custom-btn custom-btn-orange" style="width: 100%;" >Cliquez pour procéder au paiement ({{setting.lydia_cotiz}}€)</a>
+							<a href="/users/profile" class="custom-btn custom-btn-green" style="width: 100%;" >Cliquez pour procéder au paiement ({{setting.lydia_cotiz}}€)</a>
 						{% endif %}
 					</p>
 				</div>
@@ -32,13 +32,13 @@
 
 			<div class="col-4">
 				<div class="card">
-					<h3 class="card-title">Matériel</h3>
+					<h3 class="card-title">Objets connectés</h3>
 					<hr>
-					<p>Gérez vos demandes de matériel pour un C-Vis, une soirée ou évènement</p>
+					<p>Faites vos demandes d'ajouts spécifiques (Objets connectés (IoT), consoles, etc...) depuis cette page spécifique</p>
 					<div class="spacer vertical-100">&nbsp;</div>
 
 					<div class="card-bottom">
-						<a href="/material/" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
+						<a href="/internet/" class="btn btn-blue" style="display: block; width: 100%;">Accéder</a>
 					</div>
 				</div>
 			</div>

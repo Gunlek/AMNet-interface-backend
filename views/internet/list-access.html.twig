@@ -9,7 +9,7 @@
                 Cette page est utile uniquement pour les appareils qui ne peuvent pas se connecter à AMNet Wi-Fi. C'est à dire les objets connectés, comme les enceintes, les chromecasts ou les consoles de jeux.<br/>
                 Cependant nous vous conseillons vivement de brancher votre console en Ethernet (débit plus élevé, ping plus faible et meilleure stabilité)
                 <br/><br/>
-                La marche à suivre est la suivante :
+                La démarche est la suivante :
                 <ul>
                     <li>Il faut renseigner l'adresse physique (aussi appelé MAC) de votre appareil ainsi qu'une photo où l'on distingue clairement l'objet et l'adresse mac qui lui est associée.</li>
                     <li>Attendre qu'un administrateur valide votre demande (2-3 jours, si ce n'est pas le cas dépassé ce laps de temps merci d'envoyer un mail à contact@amnet.fr)</li>
@@ -79,6 +79,30 @@
             </form>
         </div>
     </div>
+
+    {% if query.error == "1" %}
+        <!-- Missing image on form submit -->
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Preuve image manquante</h1>
+				<ul>
+                    <li>Vous devez joindre une image à votre demande d'ajout</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
+
+    {% if query.error == "2" %}
+        <!-- Mac address already registered -->
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Adresse mac déjà enregistrée</h1>
+				<ul>
+                    <li>L'adresse mac que vous avez spécifiée est déjà enregistrée, contactez un administrateur si l'accès ne fonctionne pas</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block scripts %}
