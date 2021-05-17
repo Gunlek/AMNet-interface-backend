@@ -79,6 +79,30 @@
             </form>
         </div>
     </div>
+
+    {% if query.error == "1" %}
+        <!-- Missing image on form submit -->
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Preuve image manquante</h1>
+				<ul>
+                    <li>Vous devez joindre une image à votre demande d'ajout</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
+
+    {% if query.error == "2" %}
+        <!-- Mac address already registered -->
+		<div class="modal" style="display: block;" >
+			<div class="modal-content">
+				<h1>Adresse mac déjà enregistrée</h1>
+				<ul>
+                    <li>L'adresse mac que vous avez spécifiée est déjà enregistrée, contactez un administrateur si l'accès ne fonctionne pas</li>
+                </ul>
+			</div>
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block scripts %}

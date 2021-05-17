@@ -11,7 +11,7 @@ const InternetHome = (req, res) => {
         res.redirect('/users/profile/');
     else {
         database.query('SELECT * FROM access WHERE access_user = ?', [req.session.user_id], function(error, results, fields){
-            res.render('internet/list-access.html.twig', {data: req.session, access_list: results});
+            res.render('internet/list-access.html.twig', {data: req.session, access_list: results, query: req.query});
         });
     }
 }
