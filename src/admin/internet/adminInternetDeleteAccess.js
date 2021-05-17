@@ -13,7 +13,7 @@ const AdminInternetDeleteAccess = (req, res) => {
     database.query('SELECT * FROM access WHERE access_id = ?', [access_id], (errors, results, fields) => {
         if(!!results && results.length > 0) {
             if(process.env.RADIUS == "true"){
-                DisableRadiusIOTConnection(prepareMacAddress(results[0].access_mac));
+                DisableRadiusIOTConnection(results[0].access_mac);
             }
             database.query('DELETE FROM access WHERE access_id = ?', [access_id], () => {
                 res.redirect('/admin/internet/');
