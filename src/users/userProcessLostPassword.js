@@ -35,7 +35,7 @@ const UserProcessLostPassword = (req, res) => {
                 reset_link = "http://amnet.fr/users/change_password/"+token_value;
             var htmlstream = fs.createReadStream('src/users/templates/mail_template.html').pipe(replace("<LINK_HERE>", reset_link)).pipe(replace("<ID_HERE>", results[0]['user_name']));
             let mailOptions = {
-                from: 'presidentamnet@gmail.com',
+                from: 'no-reply@amnet.fr',
                 to: email,
                 subject: 'Réinitialisation de mot de passe',
                 html: htmlstream
