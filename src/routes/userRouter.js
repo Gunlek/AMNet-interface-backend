@@ -34,7 +34,7 @@ userRouter.post('/process_signin/', UserProcessSignin);
 
 // Lydia transactions
 userRouter.get('/payment/do/:user_phone', UserDoPayment);
-userRouter.get('/payment/do/', (req, res) => { res.redirect('/user/profile/?phone_err=1'); });
+userRouter.get('/payment/do/', (req, res) => { res.redirect('/users/profile/?phone_err=1'); });
 userRouter.post('/payment/success/:ticket_id', UserPaymentSuccess);
 userRouter.post('/payment/cancel/:ticket_id', UserCancelPayment);
 

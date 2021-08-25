@@ -13,7 +13,7 @@
             <tr id="{{ loop.index }}">
                 <td>#{{ loop.index}}</td>
                 <td>{{ material_request.material_description }}</td>
-                <td><a href="/user/profile/{{ user_list[material_request.material_user].user_id }}">{{ user_list[material_request.material_user].user_name }}</a></td>
+                <td><a href="/users/profile/{{ user_list[material_request.material_user].user_id }}">{{ user_list[material_request.material_user].user_name }}</a></td>
                 <td>{% if material_request.material_state == "granted" %}<span class="badge badge-green">Accordé</span>{% elseif material_request.material_state == "pending" %}<span class="badge badge-orange">En attente</span>{% else %}<span class="badge badge-red">Suspendu</span>{% endif %}</td>
                 <td>
                     {% if material_request.material_state == "granted" %}
