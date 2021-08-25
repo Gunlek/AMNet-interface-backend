@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ssh root@10.10.10.21 <<EOF
+    cd /app/AMNet-interface
+    git pull
+    npm install --production
+    pm2 restart all
+    exit
+EOF
