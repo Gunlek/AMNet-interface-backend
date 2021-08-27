@@ -14,7 +14,8 @@ const localSendMail = (users, mailContent) => {
             process.env.CONTACT_MAIL_PASSWD,
             "Mail aux adhérents AMNet",
             mailContent,
-            mailDestinationStr
+            mailDestinationStr,
+            "contact@amnet.fr"
         );
     }
 }
