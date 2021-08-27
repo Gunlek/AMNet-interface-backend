@@ -20,10 +20,10 @@ const loginUser = (req, username, password) => {
                 req.session['user_rank'] = results[0]['user_rank'];
                 req.session['user_pay_status'] = results[0]['user_pay_status'];
 
-                resolve(true);
+                resolve([true, results[0]['user_password']]);
             }
             else {
-                resolve(false);
+                resolve([false, null]);
             }
         })
     });

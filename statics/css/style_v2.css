@@ -72,7 +72,7 @@ form .form-group, .fake-form .form-group {
 form .form-group label, .fake-form .form-group label {
   font-size: 25px;
 }
-form .form-group input, .fake-form .form-group input {
+form .form-group input[type=text], form .form-group input[type=password], form .form-group input[type=email], form .form-group input[type=submit], form .form-group input[type=phone], form .form-group input[type=select], .fake-form .form-group input[type=text], .fake-form .form-group input[type=password], .fake-form .form-group input[type=email], .fake-form .form-group input[type=submit], .fake-form .form-group input[type=phone], .fake-form .form-group input[type=select] {
   width: 100%;
   height: 30px;
 }

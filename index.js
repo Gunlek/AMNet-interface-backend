@@ -1,6 +1,6 @@
-let mysql = require('mysql');
 var express = require('express');
 let session = require('express-session');
+const cookieSession = require('cookie-session');
 let cron = require('node-cron');
 const adminRouter = require('./src/routes/adminRouter');
 const userRouter = require('./src/routes/userRouter');
@@ -11,16 +11,18 @@ const internetRouter = require('./src/routes/internetRouter');
 const { EnableRadiusConnection } = require('./src/utils/radius/enableRadiusConnection');
 const { DisableRadiusConnection } = require('./src/utils/radius/disableRadiusConnection');
 
-const { isUserLoggedIn } = require('./src/utils/isUserLoggedIn');
-
 require('dotenv').config();
 
 var app = express();
 
-app.use(session({
-    secret: "amnet-interface",
+/* app.use(session({
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+})); */
+app.use(cookieSession({
+    secret: process.env.SESSION_SECRET,
+    name: 'session'
 }));
 
 app.use(express.urlencoded({ extended: true }));
