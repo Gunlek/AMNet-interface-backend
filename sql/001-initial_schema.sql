@@ -16,7 +16,7 @@ CREATE TABLE materials (
 CREATE TABLE reset_token (
     token_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     token_user INT NOT NULL,
-    token_value INT NOT NULL
+    token_value VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE settings (
