@@ -54,5 +54,6 @@ CREATE TABLE users (
     user_proms VARCHAR(255) NOT NULL,
     user_campus VARCHAR(255) NOT NULL DEFAULT(" "),
     user_pay_status INT NOT NULL DEFAULT(0),
+    user_is_gadz INT NOT NULL DEFAULT(0),
     user_rank VARCHAR(255) NOT NULL
 )

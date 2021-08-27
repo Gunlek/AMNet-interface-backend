@@ -23,6 +23,7 @@ const { AdminDisableGuestAccess } = require('../admin/settings/adminDisableGuest
 
 const { isUserAdmin } = require('../utils/isUserAdmin');
 const { isUserLoggedIn } = require('../utils/isUserLoggedIn');
+const { AdminSendGlobalMail } = require('../admin/adminSendGlobalMail');
 
 let adminRouter = express.Router();
 
@@ -31,6 +32,7 @@ adminRouter.use(isUserLoggedIn);
 adminRouter.use(isUserAdmin);
 
 adminRouter.get('/', AdminHome)
+adminRouter.post('/send-global-mail', AdminSendGlobalMail);
 
 // Internet
 adminRouter.get('/internet', AdminInternet);

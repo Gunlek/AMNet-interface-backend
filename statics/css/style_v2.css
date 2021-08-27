@@ -395,7 +395,7 @@ header {
 }
 
 .card {
-  margin: 0px 10px;
+  margin: 10px 10px;
   border: 1px solid #707070;
   padding: 10px;
   position: relative;
@@ -555,3 +555,5 @@ main .page-title {
 .row .col-12 {
   flex: 0 0 100%;
 }
+
+/*# sourceMappingURL=style_v2.css.map */
