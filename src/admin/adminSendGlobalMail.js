@@ -9,7 +9,7 @@ const localSendMail = (users, mailContent) => {
     users.map((user) => destinations.push(user['user_email']));
     
     if(destinations.length > 0){
-        const mailDestinationStr = destinations.toString().replaceAll(",", ";");
+        const mailDestinationStr = replaceAll(destinations.toString(), ",", ";");
         sendMail(
             process.env.CONTACT_MAIL_USER,
             process.env.CONTACT_MAIL_PASSWD,
