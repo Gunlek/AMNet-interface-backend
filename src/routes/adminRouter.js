@@ -23,6 +23,27 @@ const { AdminDisableGuestAccess } = require('../admin/settings/adminDisableGuest
 
 const { isUserAdmin } = require('../utils/isUserAdmin');
 const { isUserLoggedIn } = require('../utils/isUserLoggedIn');
+const { AdminSendGlobalMail } = require('../admin/adminSendGlobalMail');
+const { AdminDocuments } = require('../admin/documents/adminDocuments');
+const { AdminProcessDocumentUpdate } = require('../admin/documents/adminProcessDocumentUpdate');
+
+const fs = require('fs');
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        if(!fs.existsSync('./statics/uploads/'))
+            fs.mkdirSync('./statics/uploads/', {recursive: true});
+        cb(null, './statics/uploads/')
+    },
+
+    filename: (req, file, cb) => {
+        let lastExtension = file.originalname.split('.').length - 1;
+        cb(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.')[lastExtension]);
+    }
+})
+const upload = multer({
+    storage: storage
+});
 
 let adminRouter = express.Router();
 
@@ -31,6 +52,7 @@ adminRouter.use(isUserLoggedIn);
 adminRouter.use(isUserAdmin);
 
 adminRouter.get('/', AdminHome)
+adminRouter.post('/send-global-mail', AdminSendGlobalMail);
 
 // Internet
 adminRouter.get('/internet', AdminInternet);
@@ -59,6 +81,25 @@ adminRouter.get('/users/update-pay-status/:user_id/:status', AdminUserUpdateUser
 adminRouter.get('/users/udate-all-pay-status/:status', AdminUserUpdateGlobalPayStatus);
 adminRouter.get('/users/profile/:user_id', AdminUserProfile);
 adminRouter.get('/users/grant-user/:user_id/:user_rank', AdminUserGrant);
+
+// Documents
+adminRouter.get('/documents/', AdminDocuments);
+adminRouter.post(
+    '/documents/processDocumentUpdate', 
+    upload.fields(
+        [
+            {
+                name: 'reglement_interieur',
+                maxCount: 1,
+            },
+
+            {
+                name: 'statuts',
+                maxCount: 1
+            }
+        ]
+    ), 
+    AdminProcessDocumentUpdate);
 
 module.exports = adminRouter;
 

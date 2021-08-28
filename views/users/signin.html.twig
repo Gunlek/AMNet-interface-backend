@@ -74,6 +74,20 @@
                         <label>Fam'ss</label>
                         <input type="text" class="form-control" name="fams" placeholder="Exemple: 58"/>
                     </div>
+
+                    <div class="form-group">
+                        <label>Tabagn'ss</label>
+                        <select name="tbk" class="form-control">
+                            <option selected value="li">Birse</option>
+                            <option selected value="kin">KIN</option>
+                            <option selected value="an">Boquette</option>
+                            <option selected value="me">Siber'ss</option>
+                            <option selected value="pa">P3</option>
+                            <option selected value="bo">Bordel'ss</option>
+                            <option selected value="cl">Clun'ss</option>
+                            <option selected value="ch">Chalon'ss</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -108,12 +122,26 @@
                     <label>Confirmez votre mot de passe</label>
                     <input type="password" class="form-control" required="required"  name="password_confirmation" />
                 </div>
+                
+                <div class="form-group">
+                    <label>Administratif:</label>
+                    <p>
+                        {% if documents.statuts and documents.statuts.path != "" %}
+                            Consulter les statuts de l'assocation: <a href="{{ documents.statuts.path }}">Statuts de l'association</a><br/>
+                        {% endif %}
 
-                <div class"form-group">
+                        {% if documents.reglement_interieur and documents.reglement_interieur.path != "" %}
+                            Consultez le règlement intérieur de l'assocation: <a href="{{ documents.reglement_interieur.path }}">Règlement intérieur de l'association</a>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
                     <label>Vous devez accepter la charte AMNet pour vous inscrire: <a href="/docs/charte.pdf">Télécharger la charte</a></label>&nbsp;&nbsp;
                     <input type="radio" name="check_charte" value="true" id="chartTrue"/><label for="chartTrue">&nbsp;Accepter</label>&nbsp;&nbsp;
                     <input type="radio" name="check_charte" value="false" checked="checked" id="chartFalse"/><label for="chartFalse">&nbsp;Refuser</label>
                 </div>
+
                 <br/>
                 <div class="form-group">
                     <input type="submit" class="btn btn-birse" style="height: 50px;" value="Inscription" />

@@ -16,7 +16,7 @@ CREATE TABLE materials (
 CREATE TABLE reset_token (
     token_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     token_user INT NOT NULL,
-    token_value INT NOT NULL
+    token_value VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE settings (
@@ -54,5 +54,12 @@ CREATE TABLE users (
     user_proms VARCHAR(255) NOT NULL,
     user_campus VARCHAR(255) NOT NULL DEFAULT(" "),
     user_pay_status INT NOT NULL DEFAULT(0),
+    user_is_gadz INT NOT NULL DEFAULT(0),
     user_rank VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE documents (
+    document_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    document_title VARCHAR(255) NOT NULL,
+    document_path VARCHAR(512)
 )

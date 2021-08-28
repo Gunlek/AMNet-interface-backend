@@ -2,16 +2,9 @@ const { DatabaseSingleton } = require('../utils/databaseSingleton');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const replace = require('stream-replace');
+const { sendMail } = require('../utils/sendMail');
 
 require('dotenv').config();
-
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASSWD
-    }
-});
 
 /*
  * Handle post request from lost-password form
@@ -33,19 +26,10 @@ const UserProcessLostPassword = (req, res) => {
                 reset_link = "http://localhost:8080/users/change_password/"+token_value;
             else
                 reset_link = "http://amnet.fr/users/change_password/"+token_value;
+            
             var htmlstream = fs.createReadStream('src/users/templates/mail_template.html').pipe(replace("<LINK_HERE>", reset_link)).pipe(replace("<ID_HERE>", results[0]['user_name']));
-            let mailOptions = {
-                from: 'no-reply@amnet.fr',
-                to: email,
-                subject: 'Réinitialisation de mot de passe',
-                html: htmlstream
-            };
-            transporter.sendMail(mailOptions, (error, info) => {
-                if(error)
-                    console.log(error);
-                else
-                    htmlstream.close();
-            });
+            sendMail(process.env.NO_REPLY_MAIL_USER, process.env.NO_REPLY_MAIL_PASSWD, 'Réinitialisation de mot de passe', htmlstream, email);
+            
             res.redirect('/users/login/');
         }
         else {
