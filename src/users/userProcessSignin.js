@@ -39,7 +39,7 @@ const UserProcessSignin = async (req, res) => {
                         if(results.length == 0){
                             database.query('SELECT * FROM users WHERE user_email=?', [email], async (errors, user_results, fields) => {
                                 if(user_results.length == 0){
-                                    database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms]);
+                                    database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms, user_campus) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms, tbk]);
                                     if(process.env.RADIUS == "true"){
                                         RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
                                     }
