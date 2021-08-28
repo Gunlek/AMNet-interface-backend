@@ -56,4 +56,10 @@ CREATE TABLE users (
     user_pay_status INT NOT NULL DEFAULT(0),
     user_is_gadz INT NOT NULL DEFAULT(0),
     user_rank VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE documents (
+    document_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    document_title VARCHAR(255) NOT NULL,
+    document_path VARCHAR(512)
 )

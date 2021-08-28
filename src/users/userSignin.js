@@ -17,7 +17,20 @@ const UserSignin = (req, res) => {
         settings_results.forEach(param => {
             settings[param['setting_name']] = param['setting_value'].replace(/<br\/>/g, '\n');
         });
-        res.render('users/signin.html.twig', {data: req.session, signin_failed: signin_failed, fail_reason: fail_reason, setting: settings});
+
+        database.query('SELECT * FROM documents WHERE document_title="reglement_interieur" OR document_title="statuts"', (err, results) => {
+            let documents = {};
+            if(err)
+                console.error(err);
+            results.forEach(document => {
+                documents[document.document_title] = {
+                    key: document.document_title,
+                    path: document.document_path
+                };
+            });
+
+            res.render('users/signin.html.twig', { data: req.session, signin_failed: signin_failed, fail_reason: fail_reason, setting: settings, documents: documents });
+        });
     });
 }
 

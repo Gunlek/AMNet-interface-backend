@@ -27,8 +27,6 @@ const UserPaymentSuccess = (req, res) => {
                 }
                 else {
                     database.query('SELECT * FROM users WHERE user_id = ?', [user_id], (err, storedUserResults) => {
-                        console.error(user_id);
-                        console.log(storedUserResults);
                         if(storedUserResults.length > 0){
                             const user = storedUserResults[0];
                             if(process.env.RADIUS == "true"){

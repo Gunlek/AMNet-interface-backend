@@ -14,7 +14,7 @@ require('dotenv').config();
 */
 const UserProcessSignin = async (req, res) => {
     let database = DatabaseSingleton.getInstance().getDatabase();
-    const { username, firstname, lastname, email, phone, bucque, fams } = req.body;
+    const { username, firstname, lastname, email, phone, bucque, fams, tbk } = req.body;
     let clearPassword = req.body.password;          // Used by radius
     let password = md5(clearPassword);
     let password_conf = md5(req.body.password_confirmation);
