@@ -5,6 +5,7 @@
 const UserChangePassword = (req, res) => {
     let token = req.params.token;
     let update_failed = false;
+    let fail_reason = "";
     if(req.query.state != null){
         update_failed = true;
         fail_reason = req.query.state;
