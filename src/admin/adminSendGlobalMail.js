@@ -1,5 +1,6 @@
 const { DatabaseSingleton } = require("../utils/databaseSingleton");
 const {sendMail } = require('../utils/sendMail');
+const { replaceAll } = require('../utils/replaceAll');
 
 require('dotenv').config();
 

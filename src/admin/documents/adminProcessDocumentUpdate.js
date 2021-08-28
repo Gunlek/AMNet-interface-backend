@@ -1,4 +1,5 @@
 const { DatabaseSingleton } = require("../../utils/databaseSingleton");
+const { replaceAll } = require('../../utils/replaceAll');
 
 const AdminProcessDocumentUpdate = (req, res) => {
     console.log(req.files);
