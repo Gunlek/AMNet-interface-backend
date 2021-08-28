@@ -30,42 +30,37 @@ const UserProcessSignin = async (req, res) => {
 
     if(isPasswordValid(clearPassword)){
         if((username !== "" && proms !== "" && email !== "" && phone !== "") && password === password_conf){
-            if(charte=="true"){
-
-                if(!validateUsername(username))
-                    res.redirect('/users/signin/?state=invalid_username');
-                else {
-                    database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
-                        if(results.length == 0){
-                            database.query('SELECT * FROM users WHERE user_email=?', [email], async (errors, user_results, fields) => {
-                                if(user_results.length == 0){
-                                    database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms, user_campus) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms, tbk]);
-                                    if(process.env.RADIUS == "true"){
-                                        RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
-                                    }
-                                    
-                                    let loggedIn = await loginUser(req, req.body.username, req.body.password);
-                                    if(loggedIn){
-                                            let returnURL = "/";
-                                            if(req.session.returnTo != null)
-                                                returnURL = req.session.returnTo;
-                                            res.redirect(returnURL);
-                                    }
-                                    else
-                                        res.redirect('/users/login/?state=failed');
+            if(!validateUsername(username))
+                res.redirect('/users/signin/?state=invalid_username');
+            else {
+                database.query('SELECT * FROM users WHERE user_name=?', [username], function(errors, results, fields){
+                    if(results.length == 0){
+                        database.query('SELECT * FROM users WHERE user_email=?', [email], async (errors, user_results, fields) => {
+                            if(user_results.length == 0){
+                                database.query('INSERT INTO users(user_name, user_firstname, user_lastname, user_email, user_phone, user_password, user_bucque, user_fams, user_proms, user_campus) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [username, firstname, lastname, email, phone, password, bucque, fams, proms, tbk]);
+                                if(process.env.RADIUS == "true"){
+                                    RegisterNewRadiusUser(username, firstname, lastname, email, clearPassword);
                                 }
-                                else {
-                                    res.redirect('/users/signin/?state=email_already_used');
+                                
+                                let loggedIn = await loginUser(req, req.body.username, req.body.password);
+                                if(loggedIn){
+                                        let returnURL = "/";
+                                        if(req.session.returnTo != null)
+                                            returnURL = req.session.returnTo;
+                                        res.redirect(returnURL);
                                 }
-                            });
-                        }
-                        else
-                            res.redirect('/users/signin/?state=username_already_used');
-                    });
-                }
+                                else
+                                    res.redirect('/users/login/?state=failed');
+                            }
+                            else {
+                                res.redirect('/users/signin/?state=email_already_used');
+                            }
+                        });
+                    }
+                    else
+                        res.redirect('/users/signin/?state=username_already_used');
+                });
             }
-            else
-                res.redirect('/users/signin/?state=no_charte');
         }
         else
             res.redirect('/users/signin/?state=empty_field');
