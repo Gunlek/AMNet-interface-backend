@@ -1,5 +1,7 @@
 import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('hardware')
 @Controller('hardware')
 export class HardwareController {
   @Post('add')
