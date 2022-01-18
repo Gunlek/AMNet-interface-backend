@@ -14,11 +14,6 @@ export class UserController {
     return 'create a new user';
   }
 
-  @Post('auth')
-  auth(): string {
-    return 'authenticate a user';
-  }
-
   @Put('promote/:id')
   promote(): string {
     return 'promote a user';

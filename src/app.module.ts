@@ -8,9 +8,10 @@ import { SettingsModule } from './settings/settings.module';
 import { UserModule } from './user/user.module';
 import { HardwareModule } from './hardware/hardware.module';
 import { AccessModule } from './access/access.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [SettingsModule, UserModule, HardwareModule, AccessModule],
+  imports: [SettingsModule, UserModule, HardwareModule, AccessModule, AuthModule],
   controllers: [
     AccessController,
     HardwareController,

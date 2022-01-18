@@ -13,6 +13,7 @@ async function bootstrap() {
     .addTag('hardware')
     .addTag('settings')
     .addTag('user')
+    .addTag('auth')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, document);
