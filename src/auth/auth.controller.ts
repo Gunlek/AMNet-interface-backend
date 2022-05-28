@@ -7,7 +7,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthBody } from 'src/user/user.model';
+import { AuthBody } from 'src/models/auth.model';
 import { AuthService } from './auth.service';
 
 @ApiTags('auth')

@@ -11,7 +11,13 @@ import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [SettingsModule, UserModule, HardwareModule, AccessModule, AuthModule],
+  imports: [
+    SettingsModule,
+    UserModule,
+    HardwareModule,
+    AccessModule,
+    AuthModule,
+  ],
   controllers: [
     AccessController,
     HardwareController,
