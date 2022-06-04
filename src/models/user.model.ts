@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type User = {
   user_id: number;
+  user_name: string;
   user_firstname: string;
   user_lastname: string;
   user_email: string;
@@ -19,6 +20,9 @@ export type User = {
 export class UserType {
   @ApiProperty({ default: 58 })
   user_id: number;
+
+  @ApiProperty({ default: 'Pseudo' })
+  user_name: string;
 
   @ApiProperty({ default: 'Prénom' })
   user_firstname: string;
