@@ -11,14 +11,14 @@ export class SettingsController {
   })
   @ApiResponse({ status: 200, description: 'List of admin' })
   @ApiProduces('application/json')
-  @Get('adminlist')
-  async list(): Promise<any[]> {
-    const List = (await Database.promisedQuery(
+  @Get('admin-list')
+  async list(): Promise<{ pseudo: string, id: string }[]> {
+    const list = await Database.promisedQuery(
       'SELECT setting_value FROM settings WHERE setting_name="admin_pseudos" ||  setting_name="admin_nums"'
-    ));
-      
-    const pseudos = List[0].setting_value.split(';');
-    const nums = List[1].setting_value.split(';');
+    ) as { setting_value: string }[];
+
+    const pseudos = list[0].setting_value.split(';');
+    const nums = list[1].setting_value.split(';');
     let adminList = [];
 
     pseudos.map((pseudo: string, index: number) => {
@@ -41,13 +41,13 @@ export class SettingsController {
   async get(
     @Res({ passthrough: true }) res: Response,
     @Param('name') name: string,
-  ): Promise<any> {
+  ): Promise<string> {
     const value = (await Database.promisedQuery(
       'SELECT setting_value FROM settings WHERE setting_name=?',
       [name],
-    )) as {setting_value: string}[];
+    )) as { setting_value: string }[];
 
-    if (value.length == 0) res.status(HttpStatus.NO_CONTENT);
+    if (value.length == 0) { res.status(HttpStatus.NO_CONTENT); return "" }
     return value[0].setting_value;
   }
 
@@ -55,6 +55,4 @@ export class SettingsController {
   update(): string {
     return 'update a setting by id';
   }
-
-  
 }
