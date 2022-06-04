@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -19,7 +20,9 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { User, UserType } from 'src/models/user.model';
-import { Database } from 'src/utils/database';
+import { Database, RadiusDatabase } from 'src/utils/database';
+const nthash = require('smbhash').nthash;
+const bcrypt = require('bcrypt');
 
 @ApiTags('user')
 @Controller('user')
@@ -32,13 +35,67 @@ export class UserController {
   @ApiOperation({
     summary: 'Create a user matching the provided informations',
   })
+  @ApiResponse({ status: 200, description: 'A User is created' })
+  @ApiResponse({ status: 206, description: 'No user is created because of a lack of information' })
+  @ApiResponse({
+    status: 409,
+    description: 'No user is created because of email and/or name already used',
+  })
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
   @Post('add')
-  add(user: User): string {
-    // TODO
-    return 'create a new user';
+  async add(
+    @Res({ passthrough: true }) res: Response,
+    @Body() user: User
+  ): Promise<any> {
+    if (user.user_name !== "" && user.user_email !== "" && user.user_password !== "" && user.user_phone !== "") {
+      const name = (await Database.promisedQuery(
+        'SELECT user_id FROM users WHERE user_name=?', [user.user_name]
+      )) as { user_name: string }[];
+
+      const email = (await Database.promisedQuery(
+        'SELECT user_id FROM users WHERE user_email=?', [user.user_email]
+      )) as { user_email: string }[];
+
+      if (name.length == 0 && email.length == 0) {
+        const saltRounds = 10;
+
+        bcrypt.hash(user.user_password, saltRounds, function (err: any, hash_password: string) {
+          Database.promisedQuery(
+            'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hash_password, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, "user", user.user_is_gadz, 0]
+          );
+
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?,?,?,?,?,?)',
+            [user.user_name, user.user_firstname, user.user_lastname, user.user_email, "API REST AMNet", "NOW()"]
+          );
+
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
+            [user.user_name, "daloRADIUS-Disabled-Users", 0]
+          );
+
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
+            [user.user_name, "NT-Password", ":=", nthash(user.user_password)]
+          );
+
+          if (err) return err
+          return "User is created"
+        });
+      }
+      else {
+        res.status(HttpStatus.CONFLICT)
+        return { user_name: (name.length == 0), user_email: (email.length == 0) }
+      }
+    }
+    else {
+      res.status(HttpStatus.PARTIAL_CONTENT)
+      return { user_name: user.user_name === "", user_email: user.user_email === "", user_password: user.user_password === "", user_phone: user.user_phone === "" }
+    }
   }
+
 
   @ApiBearerAuth()
   @ApiOperation({
