@@ -21,8 +21,8 @@ import {
 import { Response } from 'express';
 import { User, UserType } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
+import * as bcrypt from 'bcrypt';
 const nthash = require('smbhash').nthash;
-const bcrypt = require('bcrypt');
 
 @ApiTags('user')
 @Controller('user')
@@ -58,9 +58,7 @@ export class UserController {
       )) as { user_email: string }[];
 
       if (name.length == 0 && email.length == 0) {
-        const saltRounds = 10;
-
-        bcrypt.hash(user.user_password, saltRounds, function (err: any, hash_password: string) {
+        bcrypt.hash(user.user_password, process.env.SALT_ROUND, function (err: any, hash_password: string) {
           Database.promisedQuery(
             'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
             [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hash_password, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, "user", user.user_is_gadz, 0]
@@ -73,7 +71,7 @@ export class UserController {
 
           RadiusDatabase.promisedQuery(
             'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
-            [user.user_name, "daloRADIUS-Disabled-Users", 0]
+            [user.user_name, "Disabled-Users", 0]
           );
 
           RadiusDatabase.promisedQuery(
