@@ -9,6 +9,9 @@ import { UserModule } from './user/user.module';
 import { HardwareModule } from './hardware/hardware.module';
 import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
+import { MailController } from './mail/mail.controller';
+import { MailService } from './mail/mail.service';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -17,13 +20,15 @@ import { AuthModule } from './auth/auth.module';
     HardwareModule,
     AccessModule,
     AuthModule,
+    MailModule,
   ],
   controllers: [
     AccessController,
     HardwareController,
     UserController,
     SettingsController,
+    MailController,
   ],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}
