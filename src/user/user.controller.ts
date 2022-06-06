@@ -27,8 +27,45 @@ const nthash = require('smbhash').nthash;
 @ApiTags('user')
 @Controller('user')
 export class UserController {
+  @ApiOperation({
+    summary: 'Create a user matching the provided informations',
+  })
+  @ApiResponse({ status: 200, description: 'A User is updated' })
+
+  @ApiConsumes('application/json')
+  @ApiBody({ type: UserType })
   @Put(':id')
-  update(): string {
+  async update(
+    @Res({ passthrough: true }) res: Response,
+    @Body() user: User,
+    @Param('id') id: number
+  ): Promise<any> {
+    const hashed_paswword = await bcrypt.hash(user.user_password, Number(process.env.SALT_ROUND));
+    const name = (await Database.promisedQuery(
+      'SELECT user_name FROM users WHERE user_id=?', [id]
+    )) as { user_name: string }[];
+
+    await Database.promisedQuery(
+      'UPDATE `users` SET `user_name`=?,`user_firstname`=?,`user_lastname`=?,`user_email`=?,`user_phone`=?,`user_password`=?,`user_bucque`=?,`user_fams`=?,`user_campus`=?,`user_proms`=?,`user_is_gadz`=? WHERE `user_id`=?',
+      [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hashed_paswword, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, user.user_is_gadz, id]
+    );
+
+    await RadiusDatabase.promisedQuery(
+      'UPDATE `userinfo` SET `username`= ?, `firstname`= ?, `lastname`= ?, `email`= ? WHERE username=?',
+      [user.user_name, user.user_firstname, user.user_lastname, user.user_email, name[0].user_name]
+    );
+
+    await RadiusDatabase.promisedQuery(
+      'UPDATE `radusergroup` SET `username`=? WHERE `username`=?',
+      [user.user_name, name[0].user_name]
+    );
+
+    await RadiusDatabase.promisedQuery(
+      'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
+      [user.user_name, nthash(user.user_password), name[0].user_name] 
+    );
+
+    res.status(HttpStatus.OK);
     return 'update a user by id';
   }
 
@@ -51,37 +88,36 @@ export class UserController {
     if (user.user_name !== "" && user.user_email !== "" && user.user_password !== "" && user.user_phone !== "") {
       const name = (await Database.promisedQuery(
         'SELECT user_id FROM users WHERE user_name=?', [user.user_name]
-      )) as { user_name: string }[];
+      )) as { user_id: string }[];
 
       const email = (await Database.promisedQuery(
         'SELECT user_id FROM users WHERE user_email=?', [user.user_email]
-      )) as { user_email: string }[];
+      )) as { user_id: string }[];
 
       if (name.length == 0 && email.length == 0) {
-        bcrypt.hash(user.user_password, process.env.SALT_ROUND, function (err: any, hash_password: string) {
-          Database.promisedQuery(
-            'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hash_password, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, "user", user.user_is_gadz, 0]
-          );
+        const hashed_paswword = await bcrypt.hash(user.user_password, Number(process.env.SALT_ROUND));
 
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?,?,?,?,?,?)',
-            [user.user_name, user.user_firstname, user.user_lastname, user.user_email, "API REST AMNet", "NOW()"]
-          );
+        await Database.promisedQuery(
+          'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+          [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hashed_paswword, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, "user", user.user_is_gadz, 0]
+        );
 
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
-            [user.user_name, "Disabled-Users", 0]
-          );
+        await RadiusDatabase.promisedQuery(
+          'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?, ?, ?, ?, ?, NOW())',
+          [user.user_name, user.user_firstname, user.user_lastname, user.user_email, "API REST AMNet"]
+        );
 
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-            [user.user_name, "NT-Password", ":=", nthash(user.user_password)]
-          );
+        await RadiusDatabase.promisedQuery(
+          'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
+          [user.user_name, "Disabled-Users", 0]
+        );
 
-          if (err) return err
-          return "User is created"
-        });
+        await RadiusDatabase.promisedQuery(
+          'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
+          [user.user_name, "NT-Password", ":=", nthash(user.user_password)]
+        );
+
+        return "User is created"
       }
       else {
         res.status(HttpStatus.CONFLICT)
@@ -93,7 +129,6 @@ export class UserController {
       return { user_name: user.user_name === "", user_email: user.user_email === "", user_password: user.user_password === "", user_phone: user.user_phone === "" }
     }
   }
-
 
   @ApiBearerAuth()
   @ApiOperation({
