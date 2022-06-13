@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Database } from 'src/utils/database';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
+import * as replace from 'stream-replace';
+import * as fs from 'fs';
+import { Transporter } from 'src/utils/mail';
+
 
 @ApiTags('mail')
 @Controller('mail')
@@ -10,25 +14,31 @@ export class MailController {
     @ApiOperation({
         summary: 'Create token to reset password and send it by mail',
     })
-    @ApiResponse({ status: 200, description: 'A User is created' })
+    @ApiResponse({ status: 200, description: 'A Token is created' })
     @ApiConsumes('application/json')
     @ApiBody({ type: "president@amnet.fr" })
-    @Post('password/reset')
+    @Post('password-reset')
     async add(
         @Res({ passthrough: true }) res: Response,
-        @Body() user_email: string
+        @Body() { user_email: email }
     ): Promise<string> {
-        const user_id = (await Database.promisedQuery(
-            'SELECT user_id FROM users WHERE user_eamil=?', [user_email]
-        )) as { user_id: string }[];
+        
+        const user = (await Database.promisedQuery(
+            'SELECT user_id, user_name FROM users WHERE user_email=?', [email]
+        )) as { user_id: string, user_name: string }[];
 
-        if (user_id.length === 1) {
+        if (user.length === 1) {
             const token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-            Database.promisedQuery(
-                'INSERT INTO `reset_token`(`token_user`, `token_value`) VALUES (?, ?)', [user_id, token_value]
-            );
-            //todo : envoyer le mail
+            await Database.promisedQuery('INSERT INTO `reset_token`(`token_user`, `token_value`) VALUES (?, ?)', [user[0].user_id, token_value]);
+
+
+            const reset_link = "http://amnet.fr/users/change_password/" + token_value;
+
+            const htmlstream = fs.createReadStream('./src/mail/templates/password.html').pipe(replace(/<LINK_HERE/g, reset_link)).pipe(replace("<ID_HERE>", user[0]['user_name']));
+
+            await Transporter.sendMail('Mot de passe ou Identifiant oublié ?', htmlstream, [email]);
+
             return "The token is created and sent by email";
         }
         else return "No users found linked to this email address";
@@ -94,6 +104,11 @@ export class MailController {
         summary: 'Send mail to Users',
     })
     @ApiResponse({ status: 200, description: 'A User is created' })
+    @ApiResponse({ status: 204, description: 'No mail send because no recipients' })
+    @ApiResponse({
+        status: 409,
+        description: 'No user is created because of email and/or name already used',
+    })
     @ApiConsumes('application/json')
     @Post('info')
     async send(
@@ -107,7 +122,9 @@ export class MailController {
             "Other": boolean,
             "AllSelect": boolean
         }
-    ): Promise<string> {
+    ): Promise<void> {
+        let email_users: { user_email: string }[];
+
         if (recipients.AllSelect || (
             recipients.Contribution &&
             recipients.NoContribution &&
@@ -116,43 +133,40 @@ export class MailController {
             recipients.NewPromotion &&
             recipients.Other)) {
 
-            const email_users = (await Database.promisedQuery(
-                'SELECT user_email FROM users WHERE 1'
-            )) as { user_email: string }[];
+            email_users = (await Database.promisedQuery('SELECT user_email FROM users WHERE `user_notification` = 1')) as { user_email: string }[];
         }
         else {
-            const active_promotion = (await Database.promisedQuery(
-                'SELECT `setting_value` FROM settings WHERE setting_name="active_proms"'
-            ))[0].setting_value as string;
+            if ((recipients.Contribution || recipients.NoContribution) && (recipients.OldPromotion || recipients.ActivePromotion || recipients.NewPromotion || recipients.Other)) {
+                const active_promotion = (await Database.promisedQuery('SELECT `setting_value` FROM settings WHERE setting_name = "active_proms"'))[0].setting_value as string;
+                const old_promotion = (Number(active_promotion) - 1).toString();
+                const new_promotion = (Number(active_promotion) + 1).toString();
+                const user_pay_status = recipients.Contribution ? recipients.NoContribution ? "1, 0" : "1" : "0"
+                let user_proms = (recipients.OldPromotion ? old_promotion + "," : "") + (recipients.ActivePromotion ? active_promotion + "," : "") + (recipients.NewPromotion ? new_promotion : "")
 
-            const old_promotion = (Number(active_promotion) - 1).toString();
-            const new_promotion = (Number(active_promotion) + 1).toString();
 
-            var condition = ""
-            const conditionPayStatus = !(recipients.Contribution && recipients.NoContribution)
-            const conditionPromotion = !(recipients.ActivePromotion && recipients.NewPromotion && recipients.OldPromotion && recipients.Other)
+                if (user_proms.charAt(user_proms.length - 1) === ',') {
+                    user_proms = user_proms.slice(0, -1)
+                }
 
-            if (conditionPayStatus) {
-                condition += ("user_pay_status= " + (recipients.Contribution ? "1" : recipients.NoContribution ? "0" : "-1"));
-            }
+                if (recipients.Other) {
+                    const other = old_promotion + "," + active_promotion + "," + new_promotion
 
-            if (conditionPromotion) {
-                condition += conditionPayStatus && (recipients.ActivePromotion || recipients.OldPromotion || recipients.NewPromotion || recipients.Other) ? " AND " : "";
-                condition += recipients.ActivePromotion ? "user_proms=" + active_promotion + " OR " : "";
-                condition += recipients.OldPromotion ? "user_proms=" + old_promotion + " OR " : "";
-                condition += recipients.NewPromotion ? "user_proms=" + new_promotion + " OR " : "";
-                condition += recipients.Other ? "user_proms NOT IN (" + new_promotion + ", " + active_promotion + ", " + old_promotion + ")" : "";
-
-                const lastC = condition.charAt(condition.length - 2)
-                if (lastC == 'R') {
-                    condition = condition.slice(0, -3)
+                    email_users = (await Database.promisedQuery(
+                        'SELECT user_email FROM users WHERE user_pay_status IN (?) AND user_proms IN (?) OR user_proms NOT IN (?) AND `user_notification` = 1', [user_pay_status, user_proms, other]
+                    )) as { user_email: string }[];
+                }
+                else {
+                    email_users = (await Database.promisedQuery(
+                        'SELECT user_email FROM users WHERE user_pay_status IN (?) AND `user_notification` = 1', [user_pay_status]
+                    )) as { user_email: string }[];
                 }
             }
-
-            const email_users = (await Database.promisedQuery(
-                'SELECT user_email FROM users WHERE ' + condition
-            )) as { user_email: string }[];
+            else {
+                res.status(HttpStatus.NO_CONTENT)
+            }
         }
-        return condition;
+
+
+        res.status(HttpStatus.OK)
     }
 }

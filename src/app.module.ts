@@ -10,7 +10,6 @@ import { HardwareModule } from './hardware/hardware.module';
 import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
 import { MailController } from './mail/mail.controller';
-import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 
 @Module({
@@ -29,6 +28,6 @@ import { MailModule } from './mail/mail.module';
     SettingsController,
     MailController,
   ],
-  providers: [AppService, MailService],
+  providers: [AppService],
 })
 export class AppModule {}
