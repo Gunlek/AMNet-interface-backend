@@ -62,7 +62,7 @@ export class UserController {
 
     await RadiusDatabase.promisedQuery(
       'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-      [user.user_name, nthash(user.user_password), name[0].user_name] 
+      [user.user_name, nthash(user.user_password), name[0].user_name]
     );
 
     res.status(HttpStatus.OK);
@@ -132,7 +132,7 @@ export class UserController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Demote the user matching the provided user id to user rank',
+    summary: 'Promote the user matching the provided user id to admin rank',
   })
   @ApiResponse({ status: 200, description: 'User promoted' })
   @Put('promote/:id')
@@ -172,13 +172,55 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number,
   ): Promise<void> {
+
+    const name = (await Database.promisedQuery(
+      'SELECT user_name FROM users WHERE user_id=?', [id]
+    ))[0].user_name as string;
+
     await Database.promisedQuery('DELETE FROM users WHERE user_id=?', [id]);
+    await Database.promisedQuery('DELETE FROM access WHERE access_user=?', [id])
+    await RadiusDatabase.promisedQuery('DELETE FROM `userinfo` WHERE username=?', [name]);
+    await RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [name]);
+    await RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE  `username`= ?', [name]);
+
     res.status(HttpStatus.OK);
   }
 
   @Get('pay/:id')
   pay(): string {
     return 'start payment for a user';
+  }
+
+  @ApiResponse({ status: 200, description: 'User disabled' })
+  @ApiResponse({ status: 404, description: 'No user exist with this id' })
+  @Get('unpay/:id')
+  async unpay(
+    @Res({ passthrough: true }) res: Response,
+    @Param('id') id: number
+  ): Promise<string> {
+    const name = (await Database.promisedQuery(
+      'SELECT user_name FROM users WHERE user_id=?', [id]
+    ))[0].user_name as string;
+
+    if (name.length !== 0) {
+      const mac_address = (await Database.promisedQuery(
+        'SELECT access_mac FROM access WHERE access_user=?', [id]
+      )) as { acess_mac: string }[];
+
+      await Database.promisedQuery('UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?', [id])
+      await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [name])
+
+      mac_address.forEach(async (access) => {
+        await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [access])
+      })
+
+      res.status(HttpStatus.OK);
+      return 'User disabled';
+    }
+    else {
+      res.status(HttpStatus.NOT_FOUND);
+      return 'No user exist with this id';
+    }
   }
 
   @ApiOperation({
