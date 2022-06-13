@@ -3,15 +3,17 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as dotenvConfig } from 'dotenv';
 import { AppModule } from './app.module';
 import { Database, RadiusDatabase } from './utils/database';
+import { Transporter } from './utils/mail';
 
 dotenvConfig();
 
 Database.getInstance();
 RadiusDatabase.getInstance();
+Transporter.getInstance();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
+  const app =  await NestFactory.create(AppModule, { cors: true });
+  
   const config = new DocumentBuilder()
     .setTitle('AMNet API')
     .setDescription('AMNet API documentation')
@@ -21,6 +23,7 @@ async function bootstrap() {
     .addTag('settings')
     .addTag('user')
     .addTag('auth')
+    .addTag('mail')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, document);
