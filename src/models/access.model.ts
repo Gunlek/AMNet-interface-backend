@@ -7,6 +7,7 @@ export type Access = {
   access_proof: string | File;
   access_user: number;
   access_state: string;
+  user_name?: string;
 };
 
 export class AccessType {
@@ -19,7 +20,7 @@ export class AccessType {
   @ApiProperty({ default: 'AABBCCDDEEFF' })
   access_mac: string;
 
-  @ApiProperty({ default: 'AABBCCDDEEFF' })
+  @ApiProperty({ default: 'photoProof-4710258.jpeg' })
   access_proof: string;
 
   @ApiProperty({ default: 102 })
@@ -27,4 +28,7 @@ export class AccessType {
 
   @ApiProperty({ default: 'pending' })
   access_state: string;
+
+  @ApiProperty({ default: 'Pseudo' })
+  user_name: string;
 }
