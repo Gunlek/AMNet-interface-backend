@@ -1,5 +1,4 @@
-import { Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Post, Req } from '@nestjs/common';
 import {
   ApiBody,
   ApiConsumes,
@@ -9,6 +8,11 @@ import {
 } from '@nestjs/swagger';
 import { AuthBody } from 'src/models/auth.model';
 import { AuthService } from './auth.service';
+
+export type UserType = {
+  name: string;
+  password: string;
+};
 
 @ApiTags('auth')
 @Controller('auth')
@@ -23,8 +27,9 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Authentication failed' })
   @ApiConsumes('application/json')
   @ApiBody({ type: AuthBody })
-  @UseGuards(AuthGuard('local'))
+  // @UseGuards(JwtAuthGuard)
   async auth(@Req() req) {
-    return this.authService.login(req.user);
+    const user: UserType = req.body.user;
+    return this.authService.login(user);
   }
 }
