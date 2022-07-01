@@ -11,6 +11,8 @@ import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { MailModule } from './mail/mail.module';
     AccessModule,
     AuthModule,
     MailModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [
     AccessController,
@@ -28,6 +31,6 @@ import { MailModule } from './mail/mail.module';
     SettingsController,
     MailController,
   ],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}
