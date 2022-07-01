@@ -15,6 +15,7 @@ export type User = {
   user_rank: 'admin' | 'user';
   user_is_gadz: 0 | 1;
   user_pay_status: 0 | 1;
+  jellyfin_id: string
 };
 
 export class UserType {
@@ -36,7 +37,7 @@ export class UserType {
   @ApiProperty({ default: '0658585858' })
   user_phone: string;
 
-  @ApiProperty({ default: 'md5 encrypted password' })
+  @ApiProperty({ default: 'bcrypt encrypted password' })
   user_password: string;
 
   @ApiProperty({ default: "HardWin's" })
@@ -59,4 +60,7 @@ export class UserType {
 
   @ApiProperty({ default: 0 })
   user_pay_status: 0 | 1;
+
+  @ApiProperty({ default: '9e3e8f0ce4b7453496ce8927cb0aac6f' })
+  jellyfin_id: string;
 }
