@@ -12,8 +12,8 @@ RadiusDatabase.getInstance();
 Transporter.getInstance();
 
 async function bootstrap() {
-  const app =  await NestFactory.create(AppModule, { cors: true });
-  
+  const app = await NestFactory.create(AppModule, { cors: true });
+
   const config = new DocumentBuilder()
     .setTitle('AMNet API')
     .setDescription('AMNet API documentation')

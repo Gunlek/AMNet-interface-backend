@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,7 +23,9 @@ import { Response } from 'express';
 import { User, UserType } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
-const nthash = require('smbhash').nthash;
+import { nthash } from 'smbhash';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -31,38 +34,60 @@ export class UserController {
     summary: 'Create a user matching the provided informations',
   })
   @ApiResponse({ status: 200, description: 'A User is updated' })
-
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
   @Put(':id')
   async update(
     @Res({ passthrough: true }) res: Response,
     @Body() user: User,
-    @Param('id') id: number
+    @Param('id') id: number,
   ): Promise<any> {
-    const hashed_paswword = await bcrypt.hash(user.user_password, Number(process.env.SALT_ROUND));
+    const hashed_paswword = await bcrypt.hash(
+      user.user_password,
+      Number(process.env.SALT_ROUND),
+    );
     const name = (await Database.promisedQuery(
-      'SELECT user_name FROM users WHERE user_id=?', [id]
+      'SELECT user_name FROM users WHERE user_id=?',
+      [id],
     )) as { user_name: string }[];
 
     await Database.promisedQuery(
       'UPDATE `users` SET `user_name`=?,`user_firstname`=?,`user_lastname`=?,`user_email`=?,`user_phone`=?,`user_password`=?,`user_bucque`=?,`user_fams`=?,`user_campus`=?,`user_proms`=?,`user_is_gadz`=? WHERE `user_id`=?',
-      [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hashed_paswword, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, user.user_is_gadz, id]
+      [
+        user.user_name,
+        user.user_firstname,
+        user.user_lastname,
+        user.user_email,
+        user.user_phone,
+        hashed_paswword,
+        user.user_bucque,
+        user.user_fams,
+        user.user_campus,
+        user.user_proms,
+        user.user_is_gadz,
+        id,
+      ],
     );
 
     await RadiusDatabase.promisedQuery(
       'UPDATE `userinfo` SET `username`= ?, `firstname`= ?, `lastname`= ?, `email`= ? WHERE username=?',
-      [user.user_name, user.user_firstname, user.user_lastname, user.user_email, name[0].user_name]
+      [
+        user.user_name,
+        user.user_firstname,
+        user.user_lastname,
+        user.user_email,
+        name[0].user_name,
+      ],
     );
 
     await RadiusDatabase.promisedQuery(
       'UPDATE `radusergroup` SET `username`=? WHERE `username`=?',
-      [user.user_name, name[0].user_name]
+      [user.user_name, name[0].user_name],
     );
 
     await RadiusDatabase.promisedQuery(
       'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-      [user.user_name, nthash(user.user_password), name[0].user_name]
+      [user.user_name, nthash(user.user_password), name[0].user_name],
     );
 
     res.status(HttpStatus.OK);
@@ -73,7 +98,10 @@ export class UserController {
     summary: 'Create a user matching the provided informations',
   })
   @ApiResponse({ status: 200, description: 'A User is created' })
-  @ApiResponse({ status: 206, description: 'No user is created because of a lack of information' })
+  @ApiResponse({
+    status: 206,
+    description: 'No user is created because of a lack of information',
+  })
   @ApiResponse({
     status: 409,
     description: 'No user is created because of email and/or name already used',
@@ -83,50 +111,83 @@ export class UserController {
   @Post('add')
   async add(
     @Res({ passthrough: true }) res: Response,
-    @Body() user: User
+    @Body() user: User,
   ): Promise<any> {
-    if (user.user_name !== "" && user.user_email !== "" && user.user_password !== "" && user.user_phone !== "") {
+    if (
+      user.user_name !== '' &&
+      user.user_email !== '' &&
+      user.user_password !== '' &&
+      user.user_phone !== ''
+    ) {
       const name = (await Database.promisedQuery(
-        'SELECT user_id FROM users WHERE user_name=?', [user.user_name]
+        'SELECT user_id FROM users WHERE user_name=?',
+        [user.user_name],
       )) as { user_id: string }[];
 
       const email = (await Database.promisedQuery(
-        'SELECT user_id FROM users WHERE user_email=?', [user.user_email]
+        'SELECT user_id FROM users WHERE user_email=?',
+        [user.user_email],
       )) as { user_id: string }[];
 
       if (name.length == 0 && email.length == 0) {
-        const hashed_paswword = await bcrypt.hash(user.user_password, Number(process.env.SALT_ROUND));
+        const hashed_paswword = await bcrypt.hash(
+          user.user_password,
+          Number(process.env.SALT_ROUND),
+        );
 
         await Database.promisedQuery(
           'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-          [user.user_name, user.user_firstname, user.user_lastname, user.user_email, user.user_phone, hashed_paswword, user.user_bucque, user.user_fams, user.user_campus, user.user_proms, "user", user.user_is_gadz, 0]
+          [
+            user.user_name,
+            user.user_firstname,
+            user.user_lastname,
+            user.user_email,
+            user.user_phone,
+            hashed_paswword,
+            user.user_bucque,
+            user.user_fams,
+            user.user_campus,
+            user.user_proms,
+            'user',
+            user.user_is_gadz,
+            0,
+          ],
         );
 
         await RadiusDatabase.promisedQuery(
           'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?, ?, ?, ?, ?, NOW())',
-          [user.user_name, user.user_firstname, user.user_lastname, user.user_email, "API REST AMNet"]
+          [
+            user.user_name,
+            user.user_firstname,
+            user.user_lastname,
+            user.user_email,
+            'API REST AMNet',
+          ],
         );
 
         await RadiusDatabase.promisedQuery(
           'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
-          [user.user_name, "Disabled-Users", 0]
+          [user.user_name, 'Disabled-Users', 0],
         );
 
         await RadiusDatabase.promisedQuery(
           'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-          [user.user_name, "NT-Password", ":=", nthash(user.user_password)]
+          [user.user_name, 'NT-Password', ':=', nthash(user.user_password)],
         );
 
-        return "User is created"
+        return 'User is created';
+      } else {
+        res.status(HttpStatus.CONFLICT);
+        return { user_name: name.length == 0, user_email: email.length == 0 };
       }
-      else {
-        res.status(HttpStatus.CONFLICT)
-        return { user_name: (name.length == 0), user_email: (email.length == 0) }
-      }
-    }
-    else {
-      res.status(HttpStatus.PARTIAL_CONTENT)
-      return { user_name: user.user_name === "", user_email: user.user_email === "", user_password: user.user_password === "", user_phone: user.user_phone === "" }
+    } else {
+      res.status(HttpStatus.PARTIAL_CONTENT);
+      return {
+        user_name: user.user_name === '',
+        user_email: user.user_email === '',
+        user_password: user.user_password === '',
+        user_phone: user.user_phone === '',
+      };
     }
   }
 
@@ -172,16 +233,29 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number,
   ): Promise<void> {
-
-    const name = (await Database.promisedQuery(
-      'SELECT user_name FROM users WHERE user_id=?', [id]
-    ))[0].user_name as string;
+    const name = (
+      await Database.promisedQuery(
+        'SELECT user_name FROM users WHERE user_id=?',
+        [id],
+      )
+    )[0].user_name as string;
 
     await Database.promisedQuery('DELETE FROM users WHERE user_id=?', [id]);
-    await Database.promisedQuery('DELETE FROM access WHERE access_user=?', [id])
-    await RadiusDatabase.promisedQuery('DELETE FROM `userinfo` WHERE username=?', [name]);
-    await RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [name]);
-    await RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE  `username`= ?', [name]);
+    await Database.promisedQuery('DELETE FROM access WHERE access_user=?', [
+      id,
+    ]);
+    await RadiusDatabase.promisedQuery(
+      'DELETE FROM `userinfo` WHERE username=?',
+      [name],
+    );
+    await RadiusDatabase.promisedQuery(
+      'DELETE FROM `radusergroup` WHERE `username`=?',
+      [name],
+    );
+    await RadiusDatabase.promisedQuery(
+      'DELETE FROM `radcheck` WHERE  `username`= ?',
+      [name],
+    );
 
     res.status(HttpStatus.OK);
   }
@@ -196,28 +270,40 @@ export class UserController {
   @Get('unpay/:id')
   async unpay(
     @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number
+    @Param('id') id: number,
   ): Promise<string> {
-    const name = (await Database.promisedQuery(
-      'SELECT user_name FROM users WHERE user_id=?', [id]
-    ))[0].user_name as string;
+    const name = (
+      await Database.promisedQuery(
+        'SELECT user_name FROM users WHERE user_id=?',
+        [id],
+      )
+    )[0].user_name as string;
 
     if (name.length !== 0) {
       const mac_address = (await Database.promisedQuery(
-        'SELECT access_mac FROM access WHERE access_user=?', [id]
+        'SELECT access_mac FROM access WHERE access_user=?',
+        [id],
       )) as { acess_mac: string }[];
 
-      await Database.promisedQuery('UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?', [id])
-      await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [name])
+      await Database.promisedQuery(
+        'UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?',
+        [id],
+      );
+      await RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
+        [name],
+      );
 
       mac_address.forEach(async (access) => {
-        await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [access])
-      })
+        await RadiusDatabase.promisedQuery(
+          'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
+          [access],
+        );
+      });
 
       res.status(HttpStatus.OK);
       return 'User disabled';
-    }
-    else {
+    } else {
       res.status(HttpStatus.NOT_FOUND);
       return 'No user exist with this id';
     }
@@ -229,6 +315,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiProduces('application/json')
   @Get()
+  @UseGuards(JwtAuthGuard)
   async list(): Promise<User[]> {
     return (await Database.promisedQuery('SELECT * FROM users')) as User[];
   }
