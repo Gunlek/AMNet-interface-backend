@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as dotenvConfig } from 'dotenv';
 import { AppModule } from './app.module';
 import { Database, RadiusDatabase } from './utils/database';
+import { Gadzflix } from './utils/jellyfin';
 import { Transporter } from './utils/mail';
 
 dotenvConfig();
@@ -10,6 +11,7 @@ dotenvConfig();
 Database.getInstance();
 RadiusDatabase.getInstance();
 Transporter.getInstance();
+Gadzflix.getConfig();
 
 async function bootstrap() {
   const app =  await NestFactory.create(AppModule, { cors: true });
