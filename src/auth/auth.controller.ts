@@ -1,4 +1,4 @@
-import { Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import {
   ApiBody,
   ApiConsumes,
@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthBody } from 'src/models/auth.model';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 
 export type UserType = {
   name: string;
@@ -17,7 +18,7 @@ export type UserType = {
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post()
   @ApiOperation({
@@ -28,8 +29,16 @@ export class AuthController {
   @ApiConsumes('application/json')
   @ApiBody({ type: AuthBody })
   // @UseGuards(JwtAuthGuard)
-  async auth(@Req() req) {
-    const user: UserType = req.body.user;
-    return this.authService.login(user);
+  async auth(@Res({ passthrough: true }) res: Response, @Body() user: UserType) {
+    const token = await this.authService.login(user)
+
+    if(token){
+      res.status(HttpStatus.CREATED);
+      return token
+    }
+    else {
+      res.status(HttpStatus.UNAUTHORIZED);
+      return null
+    }
   }
 }
