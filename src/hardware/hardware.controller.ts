@@ -1,9 +1,18 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Database } from 'src/utils/database';
+import { Response } from 'express';
 
 @ApiTags('hardware')
 @Controller('hardware')
 export class HardwareController {
+  @Get('quantity')
+  async GetQuantity(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<number> {
+    return (await Database.promisedQuery('SELECT `material_id` FROM `materials` WHERE `material_state`="pending"') as { material_id: number }[]).length;
+  }
+  
   @Post('add')
   add(): string {
     return 'create an hardware request';
