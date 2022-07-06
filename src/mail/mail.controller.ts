@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Database } from 'src/utils/database';
 import { Response } from 'express';
@@ -30,10 +30,10 @@ export class MailController {
         if (user.length === 1) {
             const token_value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             await Database.promisedQuery('INSERT INTO `reset_token`(`token_user`, `token_value`) VALUES (?, ?)', [user[0].user_id, token_value]);
-            
+
             const reset_link = process.env.HOSTNAME + "/homepage/lostpassword/" + token_value;
             const htmlstream = fs.createReadStream('./src/mail/templates/password.html').pipe(replace(/<LINK_HERE>/g, reset_link)).pipe(replace("<ID_HERE>", user[0]['user_name']));
-            
+
             await Transporter.sendMail('Mot de passe ou Identifiant oublié ?', htmlstream, [email]);
 
             res.status(HttpStatus.OK)
@@ -43,6 +43,22 @@ export class MailController {
             res.status(HttpStatus.NO_CONTENT);
             return "No users found linked to this email address";
         }
+    }
+
+    @ApiOperation({
+        summary: 'Reverse the setting to allow email notifications',
+    })
+    @ApiResponse({ status: 200, description: 'Successful Reverse' })
+    @ApiConsumes('application/json')
+    @Put('user/:id')
+    async unsubscribe(
+        @Res({ passthrough: true }) res: Response,
+        @Param('id') id: number,
+    ): Promise<string> {
+        await Database.promisedQuery('UPDATE `users` SET `user_notification`=NOT `user_notification` WHERE `user_id`=?', [id])
+        res.status(HttpStatus.OK)
+
+        return "Successful Reverse";
     }
 
     @ApiOperation({
