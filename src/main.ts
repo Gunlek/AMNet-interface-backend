@@ -5,7 +5,8 @@ import { AppModule } from './app.module';
 import { Database, RadiusDatabase } from './utils/database';
 import { Gadzflix } from './utils/jellyfin';
 import { Transporter } from './utils/mail';
-
+import * as express from 'express';
+import { join } from 'path';
 dotenvConfig();
 
 Database.getInstance();
@@ -15,7 +16,8 @@ Gadzflix.getConfig();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-
+  app.use(express.static(join(__dirname, '../src/access/proof')))
+  
   const config = new DocumentBuilder()
     .setTitle('AMNet API')
     .setDescription('AMNet API documentation')
