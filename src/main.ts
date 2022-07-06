@@ -1,18 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { config as dotenvConfig } from 'dotenv';
 import { AppModule } from './app.module';
-import { Database, RadiusDatabase } from './utils/database';
-import { Gadzflix } from './utils/jellyfin';
-import { Transporter } from './utils/mail';
 import * as express from 'express';
 import { join } from 'path';
-dotenvConfig();
+import { AppService } from './app.service';
 
-Database.getInstance();
-RadiusDatabase.getInstance();
-Transporter.getInstance();
-Gadzflix.getConfig();
+
+AppService.getInstance()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
