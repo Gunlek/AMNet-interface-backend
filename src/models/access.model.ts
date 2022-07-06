@@ -4,7 +4,7 @@ export type Access = {
   access_id: number;
   access_description: string;
   access_mac: string;
-  access_proof: string | File;
+  access_proof: string;
   access_user: number;
   access_state: string;
   user_name?: string;
