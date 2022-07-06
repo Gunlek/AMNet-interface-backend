@@ -13,6 +13,7 @@ import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './mail/mail.service';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -22,7 +23,10 @@ import { MailService } from './mail/mail.service';
     AccessModule,
     AuthModule,
     MailModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    MulterModule.register({
+      dest: './src/access/proof',
+    })
   ],
   controllers: [
     AccessController,
