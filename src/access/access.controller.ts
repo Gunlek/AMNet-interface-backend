@@ -7,9 +7,8 @@ import { MacAdressVerification } from 'src/utils/mac.verification';
 import * as replace from 'stream-replace';
 import * as fs from 'fs';
 import { Transporter } from 'src/utils/mail';
-import { FileInterceptor, MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from 'src/utils/file';
+import { FileInterceptor } from '@nestjs/platform-express';;
+import { optimizeImage } from 'src/utils/file';
 import { unlink } from 'node:fs';
 
 @ApiTags('access')
@@ -115,39 +114,29 @@ export class AccessController {
   })
   @ApiConsumes('application/json')
   @ApiBody({ type: AccessType })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './src/access/proof',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    })
-  )
+  @UseInterceptors(FileInterceptor('access_proof'))
   @Post()
   async add(
     @Res({ passthrough: true }) res: Response,
-    @Body() req: { body: string },
-    @UploadedFile() file: Express.Multer.File
-  ): Promise<any> {
-    const access = JSON.parse(req.body)
-
-    if (access.access_description && access.access_mac && file && access.access_user) {
-      const access_id = (await Database.promisedQuery(
-        'SELECT access_id FROM access WHERE access_mac =?', [access.access_mac]
-      )) as { access_id: string }[];
-
-      if (access_id.length === 0) {
-        const mac_address = MacAdressVerification(access.access_mac)
+    @Body() access: { access_description: string, access_mac: string, access_user: number },
+    @UploadedFile() access_proof: Express.Multer.File
+  ): Promise<string> {
+    const filename = await optimizeImage(access_proof)
     
-        if (mac_address !== "") {
+    if (access.access_description && access.access_mac && filename !== "" && access.access_user) {
+      const mac_address = MacAdressVerification(access.access_mac)
+      const access_id = (await Database.promisedQuery(
+        'SELECT access_id FROM access WHERE access_mac =?', [mac_address]
+      )) as { access_id: string }[];
+  
+      if (access_id.length === 0 && mac_address !== "") {
           await Promise.all([
             Database.promisedQuery(
               'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)',
               [
                 access.access_description,
                 mac_address,
-                file.filename,
+                filename,
                 access.access_user,
                 "pending"
               ]),
@@ -159,26 +148,16 @@ export class AccessController {
               [mac_address, "Auth-Type", ":=", "Accept"]
             )
           ])
-    
-          return "Access is created";
-        }
-        else {
-          unlink(`./src/access/proof/${file.filename}`, (err) => {if (err) throw err;});
-          res.status(HttpStatus.BAD_REQUEST)
-          return "Mac address invalid"
-        }
       }
       else {
-        unlink(`./src/access/proof/${file.filename}`, (err) => {if (err) throw err;});
         res.status(HttpStatus.CONFLICT)
-        return "Mac address already used"
+        return "Mac address already used or invalide"
       }
-      
+  
     }
     else {
-      unlink(`./src/access/proof/${file.filename}`, (err) => {if (err) throw err;});
       res.status(HttpStatus.PARTIAL_CONTENT)
-      return { access_description: typeof access.access_description === "undefined", access_mac: typeof access.access_mac === "undefined", access_proof: typeof access.access_proof === "undefined", access_user: typeof access.access_user === "undefined" }
+      return "Some information is missing"
     }
   }
 
@@ -187,12 +166,12 @@ export class AccessController {
   async delete(@Res({ passthrough: true }) res: Response,
     @Param('id') id: number): Promise<void> {
     const access_proof = await Database.promisedQuery(
-      'SELECT `access_proof` FROM `access` WHERE access_id=?', 
+      'SELECT `access_proof` FROM `access` WHERE access_id=?',
       [id]
     )[0].access_proof as string
-    
-    if(access_proof !== "") unlink(`./src/access/proof/${access_proof}`, (err) => {if (err) throw err;});
-    
+
+    if (access_proof !== "") unlink(`./src/access/proof/${access_proof}`, (err) => { if (err) throw err; });
+
     await Promise.all([
       Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]),
       RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id]),

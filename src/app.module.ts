@@ -14,6 +14,7 @@ import { MailModule } from './mail/mail.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './mail/mail.service';
 import { MulterModule } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { MulterModule } from '@nestjs/platform-express';
     MailModule,
     ScheduleModule.forRoot(),
     MulterModule.register({
-      dest: './src/access/proof',
+      storage: memoryStorage()
     })
   ],
   controllers: [
@@ -37,4 +38,4 @@ import { MulterModule } from '@nestjs/platform-express';
   ],
   providers: [AppService, MailService],
 })
-export class AppModule {}
+export class AppModule { }
