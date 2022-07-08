@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Database, RadiusDatabase } from './utils/database';
 import { Gadzflix } from './utils/jellyfin';
 import { Transporter } from './utils/mail';
-import { config as dotenvConfig } from 'dotenv';
+
 
 @Injectable()
 export class AppService {
@@ -11,6 +11,5 @@ export class AppService {
     RadiusDatabase.getInstance();
     Transporter.getInstance();
     Gadzflix.getConfig();
-    dotenvConfig();
   }
 }
