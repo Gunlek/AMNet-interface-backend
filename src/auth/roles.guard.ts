@@ -46,8 +46,6 @@ export class RolesGuard implements CanActivate {
 
     const lowestRole = getLowestRequiredRole(roles);
 
-    console.log(tokenData);
-
     return lowestRole <= EnumRoles[(tokenData.rank as string).toUpperCase()];
   }
 }
