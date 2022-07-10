@@ -7,7 +7,6 @@ import {
   Param,
   Post,
   Put,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -22,7 +21,7 @@ import {
 import { User, UserType } from 'src/models/user.model';
 import { Database } from 'src/utils/database';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Roles, RolesGuard } from 'src/auth/roles.guard';
+import { CurrentUserOnly, Roles, RolesGuard } from 'src/auth/roles.guard';
 import { UserService } from './user.service';
 
 @ApiTags('user')
@@ -130,6 +129,7 @@ export class UserController {
   })
   @ApiProduces('application/json')
   @Roles('admin')
+  @CurrentUserOnly('user')
   @Get(':id')
   async get(@Param('id') id: number): Promise<User | HttpStatus> {
     return (await this.userService.getUser(id))

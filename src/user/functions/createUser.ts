@@ -69,11 +69,11 @@ export const createUser = async (user: User): Promise<HttpStatus> => {
 
       return HttpStatus.OK;
     } else {
-      HttpStatus.CONFLICT;
+      return HttpStatus.CONFLICT;
       //   return { user_name: name.length == 0, user_email: email.length == 0 };
     }
   } else {
-    HttpStatus.PARTIAL_CONTENT;
+    return HttpStatus.PARTIAL_CONTENT;
     // return {
     //   user_name: user.user_name === '',
     //   user_email: user.user_email === '',
