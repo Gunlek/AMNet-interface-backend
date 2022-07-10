@@ -121,33 +121,41 @@ export class AccessController {
     @Body() access: { access_description: string, access_mac: string, access_user: number },
     @UploadedFile() access_proof: Express.Multer.File
   ): Promise<string> {
-    const filename = await optimizeImage(access_proof)
-    
-    if (access.access_description && access.access_mac && filename !== "" && access.access_user) {
+    if (
+      access.access_description &&
+      access.access_mac &&
+      access.access_user &&
+      access_proof.originalname.match(/\.(jpg|jpeg|png)$/i)
+    ) {
       const mac_address = MacAdressVerification(access.access_mac)
       const access_id = (await Database.promisedQuery(
         'SELECT access_id FROM access WHERE access_mac =?', [mac_address]
       )) as { access_id: string }[];
-  
+
       if (access_id.length === 0 && mac_address !== "") {
-          await Promise.all([
-            Database.promisedQuery(
-              'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)',
-              [
-                access.access_description,
-                mac_address,
-                filename,
-                access.access_user,
-                "pending"
-              ]),
-            RadiusDatabase.promisedQuery(
-              'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)', [mac_address, "Disabled-Users", 0]
-            ),
-            RadiusDatabase.promisedQuery(
-              'INSERT INTO `radcheck`(`username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-              [mac_address, "Auth-Type", ":=", "Accept"]
-            )
-          ])
+        const filename = await optimizeImage(access_proof)
+
+        await Promise.all([
+          Database.promisedQuery(
+            'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)',
+            [
+              access.access_description,
+              mac_address,
+              filename,
+              access.access_user,
+              "pending"
+            ]),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)', [mac_address, "Disabled-Users", 0]
+          ),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radcheck`(`username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
+            [mac_address, "Auth-Type", ":=", "Accept"]
+          )
+        ])
+
+        res.status(HttpStatus.OK)
+        return "Access created"
       }
       else {
         res.status(HttpStatus.CONFLICT)
@@ -165,18 +173,22 @@ export class AccessController {
   @Delete(':id')
   async delete(@Res({ passthrough: true }) res: Response,
     @Param('id') id: number): Promise<void> {
-    const access_proof = await Database.promisedQuery(
-      'SELECT `access_proof` FROM `access` WHERE access_id=?',
+    const req = await Database.promisedQuery(
+      'SELECT `access_proof`, `access_mac` FROM `access` WHERE access_id=?',
       [id]
-    )[0].access_proof as string
+    ) as { access_mac: string, access_proof: string }[];
 
-    if (access_proof !== "") unlink(`./src/access/proof/${access_proof}`, (err) => { if (err) throw err; });
+    if (req.length === 1) {
+      if (req[0].access_proof !== "") unlink(`./src/access/proof/${req[0].access_proof}`, (err) => { if (err) throw err; });
 
-    await Promise.all([
-      Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]),
-      RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id]),
-      RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [id])
-    ]);
+      await Promise.all([
+        Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]),
+        RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id]),
+        RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [id]),
+        res.status(HttpStatus.OK)
+      ]);
+    }
+    else res.status(HttpStatus.BAD_REQUEST)
   }
 
   @ApiOperation({
