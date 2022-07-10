@@ -24,8 +24,8 @@ import { User, UserType } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
 import { nthash } from 'smbhash';
-import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles, RolesGuard } from 'src/auth/roles.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -314,8 +314,10 @@ export class UserController {
   })
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiProduces('application/json')
-  @Get()
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @Get()
   async list(): Promise<User[]> {
     return (await Database.promisedQuery('SELECT * FROM users')) as User[];
   }

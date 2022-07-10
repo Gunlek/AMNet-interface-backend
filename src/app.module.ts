@@ -11,14 +11,16 @@ import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
+import { RolesGuard } from './auth/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    AuthModule,
     SettingsModule,
     UserModule,
     HardwareModule,
     AccessModule,
-    AuthModule,
     MailModule,
   ],
   controllers: [
@@ -28,6 +30,12 @@ import { MailModule } from './mail/mail.module';
     SettingsController,
     MailController,
   ],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -1,7 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as dotenvConfig } from 'dotenv';
 import { AppModule } from './app.module';
+import { RolesGuard } from './auth/roles.guard';
 import { Database, RadiusDatabase } from './utils/database';
 import { Transporter } from './utils/mail';
 
@@ -13,6 +14,7 @@ Transporter.getInstance();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.useGlobalGuards(new RolesGuard(new Reflector()));
 
   const config = new DocumentBuilder()
     .setTitle('AMNet API')
