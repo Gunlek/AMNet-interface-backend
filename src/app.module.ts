@@ -13,6 +13,10 @@ import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
 import { RolesGuard } from './auth/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailService } from './mail/mail.service';
+import { MulterModule } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { APP_GUARD } from '@nestjs/core';
     HardwareModule,
     AccessModule,
     MailModule,
+    ScheduleModule.forRoot(),
+    MulterModule.register({
+      storage: memoryStorage()
+    })
   ],
   controllers: [
     AccessController,
@@ -36,6 +44,8 @@ import { APP_GUARD } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    MailService
   ],
 })
-export class AppModule {}
+
+export class AppModule { }

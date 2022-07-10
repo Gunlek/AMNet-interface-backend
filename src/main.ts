@@ -1,20 +1,23 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { config as dotenvConfig } from 'dotenv';
 import { AppModule } from './app.module';
 import { RolesGuard } from './auth/roles.guard';
-import { Database, RadiusDatabase } from './utils/database';
-import { Transporter } from './utils/mail';
+import * as express from 'express';
+import * as favicon from 'serve-favicon';
+import { join } from 'path';
+import { AppService } from './app.service';
+import { config as dotenvConfig } from 'dotenv';
 
 dotenvConfig();
-
-Database.getInstance();
-RadiusDatabase.getInstance();
-Transporter.getInstance();
+AppService.getInstance()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  
   app.useGlobalGuards(new RolesGuard(new Reflector()));
+  app.use(express.static(join(__dirname, '../src/access/proof')));
+  app.use(express.static(join(__dirname, '../public')));
+  app.use(favicon(join(__dirname, '../public/favicon.ico')));
 
   const config = new DocumentBuilder()
     .setTitle('AMNet API')

@@ -28,9 +28,31 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+  
+  @Get('quantity')
+  async GetQuantity(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<number> {
+    return (
+      (await Database.promisedQuery(
+        'SELECT `user_id` FROM `users` WHERE 1',
+      )) as { user_id: number }[]
+    ).length;
+  }
+
+  @Get('quantity/paid')
+  async GetPaidQuantity(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<number> {
+    return (
+      (await Database.promisedQuery(
+        'SELECT `user_id` FROM `users` WHERE `user_pay_status`=1',
+      )) as { user_id: number }[]
+    ).length;
+  }
 
   @ApiOperation({
-    summary: 'Create a user matching the provided informations',
+    summary: 'Update an user',
   })
   @ApiResponse({ status: 200, description: 'A User is updated' })
   @ApiConsumes('application/json')
@@ -57,7 +79,7 @@ export class UserController {
   })
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
-  @Post('add')
+  @Post()
   async add(@Body() user: User): Promise<HttpStatus> {
     return this.userService.createUser(user);
   }
@@ -135,5 +157,66 @@ export class UserController {
     return (await this.userService.getUser(id))
       ? this.userService.getUser(id)
       : HttpStatus.NO_CONTENT;
+  }
+
+  @ApiOperation({
+    summary: 'Return pseudo linked to the token',
+  })
+  @ApiResponse({ status: 200, description: 'A User is created' })
+  @ApiConsumes('application/json')
+  @Get('password/:token')
+  async get(
+    @Res({ passthrough: true }) res: Response,
+    @Param('token') token: string,
+  ): Promise<string> {
+    const user_id = (await Database.promisedQuery(
+      'SELECT token_user FROM reset_token WHERE token_value=?',
+      [token],
+    )) as { token_user: string }[];
+
+    if (user_id.length === 1) {
+      const user_name = (await Database.promisedQuery(
+        'SELECT user_name FROM users WHERE user_id=?',
+        [user_id[0].token_user],
+      )) as { user_name: string }[];
+
+      return user_name[0].user_name;
+    } else return 'No users found linked to this token';
+  }
+
+  @ApiOperation({
+    summary: 'Update user password by tokken',
+  })
+  @ApiResponse({ status: 200, description: 'The password is upated' })
+  @ApiConsumes('application/json')
+  @Put('password/:token')
+  async reset_paswword(
+    @Res({ passthrough: true }) res: Response,
+    @Body() user: { password1: string; password2: string },
+    @Param('token') token: string,
+  ): Promise<string> {
+    const user_id = (await Database.promisedQuery(
+      'SELECT token_user FROM reset_token WHERE token_value=?',
+      [token],
+    )) as { token_user: string }[];
+
+    if (user_id.length === 1) {
+      if (user.password1 === user.password2) {
+        const hashed_paswword = await bcrypt.hash(
+          user.password1,
+          Number(process.env.SALT_ROUND),
+        );
+        await Database.promisedQuery(
+          'UPDATE `users` SET `user_password`=? WHERE user_id=?',
+          [hashed_paswword, user_id[0].token_user],
+        );
+        await Database.promisedQuery(
+          'DELETE FROM `reset_token` WHERE token_value=?',
+          [token],
+        );
+
+        return 'Password is upated';
+      } else return 'The 2 passwords are not the same';
+    } else return 'No user found linked to this token';
   }
 }

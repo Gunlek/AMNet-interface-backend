@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Access, AccessType } from 'src/models/access.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
@@ -7,11 +7,30 @@ import { MacAdressVerification } from 'src/utils/mac.verification';
 import * as replace from 'stream-replace';
 import * as fs from 'fs';
 import { Transporter } from 'src/utils/mail';
-
+import { FileInterceptor } from '@nestjs/platform-express';;
+import { optimizeImage } from 'src/utils/file';
+import { unlink } from 'node:fs';
 
 @ApiTags('access')
 @Controller('access')
 export class AccessController {
+  @Get('quantity')
+  async GetQuantity(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<number> {
+    return (await Database.promisedQuery('SELECT `access_id` FROM `access` WHERE `access_state`="pending"') as { access_id: number }[]).length;
+  }
+
+  @ApiOperation({
+    summary: 'Get the full list of registered access in database from an user',
+  })
+  @ApiResponse({ status: 200, description: 'List of access' })
+  @ApiProduces('application/json')
+  @Get('user/:id')
+  async userList(@Param('id') id: number,): Promise<Access[]> {
+    return (await Database.promisedQuery('SELECT * FROM `access` WHERE access_user=?', [id])) as Access[];
+  }
+
   @ApiOperation({
     summary: 'Get the full list of registered access in database',
   })
@@ -46,6 +65,41 @@ export class AccessController {
   }
 
   @ApiOperation({
+    summary: 'Update an Access from the specified acces id',
+  })
+  @ApiResponse({ status: 200, description: 'Mac address of this access has been updated' })
+  @ApiResponse({
+    status: 204,
+    description: 'No Access matching this id were found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Mac address of this access has not been updated because it has the wrong format',
+  })
+  @ApiProduces('application/json')
+  @Put(':id')
+  async put(
+    @Res({ passthrough: true }) res: Response,
+    @Param('id') id: number,
+    @Body() new_access: { access_mac: string }
+  ): Promise<void> {
+    const old_access = (await Database.promisedQuery('SELECT access_mac FROM access WHERE access_id=?', [id])) as { access_mac: string }[];
+
+    if (old_access.length !== 0) {
+      const mac_adrress = MacAdressVerification(new_access.access_mac)
+      if (mac_adrress !== "") {
+        await Database.promisedQuery('UPDATE `access` SET `access_mac`=? WHERE 1 WHERE access_id=?', [mac_adrress, id])
+        res.status(HttpStatus.OK);
+      }
+      else res.status(HttpStatus.BAD_REQUEST);
+    }
+    else {
+      res.status(HttpStatus.NO_CONTENT);
+    }
+
+  }
+
+  @ApiOperation({
     summary: 'Create an access matching the provided informations',
   })
   @ApiResponse({ status: 200, description: 'An Access is created' })
@@ -60,50 +114,81 @@ export class AccessController {
   })
   @ApiConsumes('application/json')
   @ApiBody({ type: AccessType })
+  @UseInterceptors(FileInterceptor('access_proof'))
   @Post()
   async add(
     @Res({ passthrough: true }) res: Response,
-    @Body() access: Access
-  ): Promise<string | { access_description: boolean, access_mac: boolean, access_proof: boolean, access_user: boolean }> {
-    if (access.access_description && access.access_mac && access.access_proof && access.access_user) {
+    @Body() access: { access_description: string, access_mac: string, access_user: number },
+    @UploadedFile() access_proof: Express.Multer.File
+  ): Promise<string> {
+    if (
+      access.access_description &&
+      access.access_mac &&
+      access.access_user &&
+      access_proof.originalname.match(/\.(jpg|jpeg|png)$/i)
+    ) {
+      const mac_address = MacAdressVerification(access.access_mac)
       const access_id = (await Database.promisedQuery(
-        'SELECT access_id FROM access WHERE access_mac =?', [access.access_mac]
+        'SELECT access_id FROM access WHERE access_mac =?', [mac_address]
       )) as { access_id: string }[];
 
-      if (access_id.length === 0) {
-        const mac_adrress = MacAdressVerification(access.access_mac)
+      if (access_id.length === 0 && mac_address !== "") {
+        const filename = await optimizeImage(access_proof)
 
-        if (mac_adrress !== "") {
-          await Database.promisedQuery(
-            'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)', [access.access_description, mac_adrress, access.access_proof, access.access_user, "pending"])
-          await RadiusDatabase.promisedQuery('INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)', [mac_adrress, "Disabled-Users", 0])
-          await RadiusDatabase.promisedQuery('INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES VALUES (?, ?, ?, ?)', [mac_adrress, "Auth-Type", ":=", "Accept"])
-          
-          return "Access is created";
-        }
-        else {
-          res.status(HttpStatus.BAD_REQUEST)
-          return "Mac address invalid"
-        }
+        await Promise.all([
+          Database.promisedQuery(
+            'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)',
+            [
+              access.access_description,
+              mac_address,
+              filename,
+              access.access_user,
+              "pending"
+            ]),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)', [mac_address, "Disabled-Users", 0]
+          ),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radcheck`(`username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
+            [mac_address, "Auth-Type", ":=", "Accept"]
+          )
+        ])
+
+        res.status(HttpStatus.OK)
+        return "Access created"
       }
       else {
         res.status(HttpStatus.CONFLICT)
-        return "Mac address already used"
+        return "Mac address already used or invalide"
       }
+  
     }
     else {
       res.status(HttpStatus.PARTIAL_CONTENT)
-      return { access_description: typeof access.access_description === "undefined", access_mac: typeof access.access_mac === "undefined", access_proof: typeof access.access_proof === "undefined", access_user: typeof access.access_user === "undefined" }
+      return "Some information is missing"
     }
   }
 
 
   @Delete(':id')
   async delete(@Res({ passthrough: true }) res: Response,
-  @Param('id') id: number): Promise<void> {
-    await Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]);
-    await RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id])
-    await RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [id])
+    @Param('id') id: number): Promise<void> {
+    const req = await Database.promisedQuery(
+      'SELECT `access_proof`, `access_mac` FROM `access` WHERE access_id=?',
+      [id]
+    ) as { access_mac: string, access_proof: string }[];
+
+    if (req.length === 1) {
+      if (req[0].access_proof !== "") unlink(`./src/access/proof/${req[0].access_proof}`, (err) => { if (err) throw err; });
+
+      await Promise.all([
+        Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]),
+        RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id]),
+        RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [id]),
+        res.status(HttpStatus.OK)
+      ]);
+    }
+    else res.status(HttpStatus.BAD_REQUEST)
   }
 
   @ApiOperation({
@@ -116,15 +201,23 @@ export class AccessController {
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number
   ): Promise<void> {
-    await Database.promisedQuery('UPDATE `access` SET `access_state`="active" WHERE access_id=?', [id]);
-    await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?', [id])
-    const access = await Database.promisedQuery('SELECT `access_description`, `access_user` FROM `access` WHERE 1 access_id=?', [id]) as {access_description: string, access_user: string}[];
+    const [access] = await Promise.all([
+      Database.promisedQuery('UPDATE `access` SET `access_state`="active" WHERE access_id=?', [id]),
+      RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?', [id]),
+      Database.promisedQuery('SELECT `access_description`, `access_user` FROM `access` WHERE 1 access_id=?', [id])
+    ])
 
-    const email = await Database.promisedQuery('SELECT `user_email` FROM `access` WHERE user_id=?', [access[0].access_user])[0].user_email as string;
+    const email = await Database.promisedQuery(
+      'SELECT `user_email` FROM `access` WHERE user_id=? AND user_notification=1',
+      [access[0].access_user]
+    ) as { user_email: string }[];
+
     const text = "Votre demande d'accès pour l'ojebt " + access[0].access_description + " a été acceptée. <br> Vous pouvez dès maintenant le connecter à AMNet WI-Fi IoT"
+
     const htmlstream = fs.createReadStream('./src/mail/templates/info.html').pipe(replace("<TEXT_HERE>", text))
 
-    await Transporter.sendMail('Votre demande a été aceptée', htmlstream, [email]);
+    if (email.length === 1)
+      await Transporter.sendMail('Votre demande a été aceptée', htmlstream, [email[0].user_email]);
   }
 
   @Put('disable/:id')
@@ -132,7 +225,9 @@ export class AccessController {
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number
   ): Promise<void> {
-    await Database.promisedQuery('UPDATE `access` SET `access_state`="declined" WHERE access_id=?', [id]);
-    await RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [id])
+    await Promise.all([
+      Database.promisedQuery('UPDATE `access` SET `access_state`="declined" WHERE access_id=?', [id]),
+      RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [id])
+    ]);
   }
 }
