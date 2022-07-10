@@ -7,7 +7,6 @@ import {
   Param,
   Post,
   Put,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,19 +18,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
 import { User, UserType } from 'src/models/user.model';
-import { Database, RadiusDatabase } from 'src/utils/database';
-import * as bcrypt from 'bcrypt';
-import { Gadzflix } from 'src/utils/jellyfin';
-const nthash = require('smbhash').nthash;
-import { nthash } from 'smbhash';
-import { AuthGuard } from '@nestjs/passport';
+import { Database } from 'src/utils/database';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CurrentUserOnly, Roles, RolesGuard } from 'src/auth/roles.guard';
+import { UserService } from './user.service';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
+  
   @Get('quantity')
   async GetQuantity(
     @Res({ passthrough: true }) res: Response,
@@ -62,111 +59,10 @@ export class UserController {
   @ApiBody({ type: UserType })
   @Put(':id')
   async update(
-    @Res({ passthrough: true }) res: Response,
     @Body() user: User,
     @Param('id') id: number,
-  ): Promise<any> {
-    const req = (await Database.promisedQuery(
-      'SELECT user_name FROM users WHERE user_id=?',
-      [id],
-    )) as { user_name: string }[];
-
-    if (req.length === 1) {
-      const name = req[0].user_name;
-
-      if (user.user_password !== '') {
-        const hashed_password = await bcrypt.hash(
-          user.user_password,
-          Number(process.env.SALT_ROUND),
-        );
-        const gadzflix_id = (await Database.promisedQuery(
-          'SELECT gadzflix_id FROM users WHERE user_id=?',
-          [id],
-        )[0]['gadzflix_id']) as string;
-
-        await Promise.all([
-          Database.promisedQuery(
-            'UPDATE `users` SET `user_name`=?,`user_firstname`=?,`user_lastname`=?,`user_email`=?,`user_phone`=?,`user_password`=?,`user_bucque`=?,`user_fams`=?,`user_campus`=?,`user_proms`=?,`user_is_gadz`=? WHERE `user_id`=?',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              user.user_phone,
-              hashed_password,
-              user.user_bucque,
-              user.user_fams,
-              user.user_campus,
-              user.user_proms,
-              user.user_is_gadz,
-              id,
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `userinfo` SET `username`= ?, `firstname`= ?, `lastname`= ?, `email`= ? WHERE username=?',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              name,
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `radusergroup` SET `username`=? WHERE `username`=?',
-            [user.user_name, name],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-            [user.user_name, nthash(user.user_password), name],
-          ),
-          Gadzflix.changePassword(gadzflix_id, user.user_password),
-        ]);
-      } else {
-        await Promise.all([
-          Database.promisedQuery(
-            'UPDATE `users` SET `user_name`=?,`user_firstname`=?,`user_lastname`=?,`user_email`=?,`user_phone`=?,`user_bucque`=?,`user_fams`=?,`user_campus`=?,`user_proms`=?,`user_is_gadz`=? WHERE `user_id`=?',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              user.user_phone,
-              user.user_bucque,
-              user.user_fams,
-              user.user_campus,
-              user.user_proms,
-              user.user_is_gadz,
-              id,
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `userinfo` SET `username`= ?, `firstname`= ?, `lastname`= ?, `email`= ? WHERE username=?',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              name,
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `radusergroup` SET `username`=? WHERE `username`=?',
-            [user.user_name, name],
-          ),
-          RadiusDatabase.promisedQuery(
-            'UPDATE `radcheck` SET  `username`= ? WHERE  `username`= ?',
-            [user.user_name, name],
-          ),
-        ]);
-      }
-
-      res.status(HttpStatus.OK);
-      return 'update a user by id';
-    } else {
-      res.status(HttpStatus.BAD_REQUEST);
-      return 'No user found with this id';
-    }
+  ): Promise<HttpStatus> {
+    return this.userService.updateUser(user, id);
   }
 
   @ApiOperation({
@@ -184,92 +80,8 @@ export class UserController {
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
   @Post()
-  async add(
-    @Res({ passthrough: true }) res: Response,
-    @Body() user: User,
-  ): Promise<any> {
-    if (
-      user.user_name !== '' &&
-      user.user_email !== '' &&
-      user.user_password !== '' &&
-      user.user_phone !== ''
-    ) {
-      const name = (await Database.promisedQuery(
-        'SELECT user_id FROM users WHERE user_name=?',
-        [user.user_name],
-      )) as { user_id: string }[];
-
-      const email = (await Database.promisedQuery(
-        'SELECT user_id FROM users WHERE user_email=?',
-        [user.user_email],
-      )) as { user_id: string }[];
-
-      if (name.length == 0 && email.length == 0) {
-        const hashed_paswword = await bcrypt.hash(
-          user.user_password,
-          Number(process.env.SALT_ROUND),
-        );
-        const gadzflix_id = await Gadzflix.createUser(
-          user.user_name,
-          user.user_password,
-        );
-
-        await Promise.all([
-          Database.promisedQuery(
-            'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_is_gadz`, gadzflix_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              user.user_phone,
-              hashed_paswword,
-              user.user_bucque,
-              user.user_fams,
-              user.user_campus,
-              user.user_proms,
-              user.user_is_gadz,
-              gadzflix_id,
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?, ?, ?, ?, ?, NOW())',
-            [
-              user.user_name,
-              user.user_firstname,
-              user.user_lastname,
-              user.user_email,
-              'API REST AMNet',
-            ],
-          ),
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
-            [user.user_name, 'Disabled-Users', 0],
-          ),
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-            [user.user_name, 'NT-Password', ':=', nthash(user.user_password)],
-          ),
-        ]);
-
-        res.status(HttpStatus.OK);
-        return 'User is created';
-      } else {
-        res.status(HttpStatus.CONFLICT);
-        return {
-          user_name: !(name.length == 0),
-          user_email: !(email.length == 0),
-        };
-      }
-    } else {
-      res.status(HttpStatus.PARTIAL_CONTENT);
-      return {
-        user_name: user.user_name === '',
-        user_email: user.user_email === '',
-        user_password: user.user_password === '',
-        user_phone: user.user_phone === '',
-      };
-    }
+  async add(@Body() user: User): Promise<HttpStatus> {
+    return this.userService.createUser(user);
   }
 
   @ApiBearerAuth()
@@ -277,77 +89,30 @@ export class UserController {
     summary: 'Promote the user matching the provided user id to admin rank',
   })
   @ApiResponse({ status: 200, description: 'User promoted' })
+  @Roles('admin')
   @Put('promote/:id')
-  async promote(
-    @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number,
-  ): Promise<void> {
-    await Database.promisedQuery(
-      'UPDATE users SET user_rank="admin" WHERE user_id=?',
-      [id],
-    );
-    res.status(HttpStatus.OK);
+  async promote(@Param('id') id: number): Promise<HttpStatus> {
+    return this.userService.promoteUser(id);
   }
 
   @ApiOperation({
     summary: 'Demote the user matching the provided user id to user rank',
   })
   @ApiResponse({ status: 200, description: 'User demoted' })
+  @Roles('admin')
   @Put('demote/:id')
-  async demote(
-    @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number,
-  ): Promise<void> {
-    await Database.promisedQuery(
-      'UPDATE users SET user_rank="user" WHERE user_id=?',
-      [id],
-    );
-    res.status(HttpStatus.OK);
+  async demote(@Param('id') id: number): Promise<HttpStatus> {
+    return this.userService.demoteUser(id);
   }
 
   @ApiOperation({
     summary: 'Delete the user matching the specified user id',
   })
   @ApiResponse({ status: 200, description: 'User deleted' })
-  @ApiResponse({ status: 400, description: 'No User found' })
+  @Roles('admin')
   @Delete(':id')
-  async delete(
-    @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number,
-  ): Promise<void> {
-    const req = (await Promise.all([
-      Database.promisedQuery('SELECT user_name FROM users WHERE user_id=?', [
-        id,
-      ]),
-      Database.promisedQuery('SELECT gadzflix_id FROM users WHERE user_id=?', [
-        id,
-      ]),
-    ])) as [{ user_name: string }[], { gadzflix_id: string }[]];
-
-    if (req) {
-      const name = req[0][0].user_name;
-      const gadzflix_id = req[1][0].gadzflix_id;
-
-      Promise.all([
-        Gadzflix.removeUser(gadzflix_id),
-        Database.promisedQuery('DELETE FROM users WHERE user_id=?', [id]),
-        Database.promisedQuery('DELETE FROM access WHERE access_user=?', [id]),
-        RadiusDatabase.promisedQuery(
-          'DELETE FROM `userinfo` WHERE username=?',
-          [name],
-        ),
-        RadiusDatabase.promisedQuery(
-          'DELETE FROM `radusergroup` WHERE `username`=?',
-          [name],
-        ),
-        RadiusDatabase.promisedQuery(
-          'DELETE FROM `radcheck` WHERE  `username`= ?',
-          [name],
-        ),
-      ]);
-
-      res.status(HttpStatus.OK);
-    } else res.status(HttpStatus.BAD_REQUEST);
+  async delete(@Param('id') id: number): Promise<HttpStatus> {
+    return this.userService.deleteUser(id);
   }
 
   @Get('pay/:id')
@@ -357,51 +122,10 @@ export class UserController {
 
   @ApiResponse({ status: 200, description: 'User disabled' })
   @ApiResponse({ status: 404, description: 'No user exist with this id' })
+  @Roles('admin')
   @Get('unpay/:id')
-  async unpay(
-    @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number,
-  ): Promise<string> {
-    const name = (
-      await Database.promisedQuery(
-        'SELECT user_name FROM users WHERE user_id=?',
-        [id],
-      )
-    )[0].user_name as string;
-
-    if (name.length !== 0) {
-      const mac_address = (await Database.promisedQuery(
-        'SELECT access_mac FROM access WHERE access_user=?',
-        [id],
-      )) as { acess_mac: string }[];
-      const gadzflix_id = (await Database.promisedQuery(
-        'SELECT gadzflix_id FROM users WHERE user_id=?',
-        [id],
-      )[0]['gadzflix_id']) as string;
-
-      await Gadzflix.setIsDisabled(gadzflix_id, true);
-      await Database.promisedQuery(
-        'UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?',
-        [id],
-      );
-      await RadiusDatabase.promisedQuery(
-        'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
-        [name],
-      );
-
-      mac_address.forEach(async (access) => {
-        await RadiusDatabase.promisedQuery(
-          'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
-          [access],
-        );
-      });
-
-      res.status(HttpStatus.OK);
-      return 'User disabled';
-    } else {
-      res.status(HttpStatus.NOT_FOUND);
-      return 'No user exist with this id';
-    }
+  async unpay(@Param('id') id: number): Promise<HttpStatus> {
+    return this.userService.unpayUser(id);
   }
 
   @ApiOperation({
@@ -409,8 +133,10 @@ export class UserController {
   })
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiProduces('application/json')
-  @Get()
   @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @Get()
   async list(): Promise<User[]> {
     return (await Database.promisedQuery('SELECT * FROM users')) as User[];
   }
@@ -424,18 +150,13 @@ export class UserController {
     description: 'No user matching this id were found',
   })
   @ApiProduces('application/json')
+  @Roles('admin')
+  @CurrentUserOnly('user')
   @Get(':id')
-  async getName(
-    @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number,
-  ): Promise<User | any> {
-    const user = (await Database.promisedQuery(
-      'SELECT * FROM users WHERE user_id=?',
-      [id],
-    )) as User[];
-
-    if (user.length == 0) res.status(HttpStatus.NO_CONTENT);
-    return user[0];
+  async get(@Param('id') id: number): Promise<User | HttpStatus> {
+    return (await this.userService.getUser(id))
+      ? this.userService.getUser(id)
+      : HttpStatus.NO_CONTENT;
   }
 
   @ApiOperation({

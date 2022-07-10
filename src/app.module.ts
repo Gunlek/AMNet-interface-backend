@@ -11,6 +11,8 @@ import { AccessModule } from './access/access.module';
 import { AuthModule } from './auth/auth.module';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
+import { RolesGuard } from './auth/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './mail/mail.service';
 import { MulterModule } from '@nestjs/platform-express';
@@ -18,11 +20,11 @@ import { memoryStorage } from 'multer';
 
 @Module({
   imports: [
+    AuthModule,
     SettingsModule,
     UserModule,
     HardwareModule,
     AccessModule,
-    AuthModule,
     MailModule,
     ScheduleModule.forRoot(),
     MulterModule.register({
@@ -36,6 +38,14 @@ import { memoryStorage } from 'multer';
     SettingsController,
     MailController,
   ],
-  providers: [AppService, MailService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    MailService
+  ],
 })
+
 export class AppModule { }
