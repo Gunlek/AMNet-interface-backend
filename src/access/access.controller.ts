@@ -1,233 +1,156 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UploadedFile, UseInterceptors, Headers, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Access, AccessType } from 'src/models/access.model';
-import { Database, RadiusDatabase } from 'src/utils/database';
 import { Response } from 'express';
-import { MacAdressVerification } from 'src/utils/mac.verification';
-import * as replace from 'stream-replace';
-import * as fs from 'fs';
-import { Transporter } from 'src/utils/mail';
-import { FileInterceptor } from '@nestjs/platform-express';;
-import { optimizeImage } from 'src/utils/file';
-import { unlink } from 'node:fs';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AccessService } from './access.service';
+import jwt_decode from 'jwt-decode';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 
 @ApiTags('access')
 @Controller('access')
 export class AccessController {
+  constructor(private accessService: AccessService) {};
+
+  @ApiOperation({ summary: 'Get the number of pending access', })
+  @ApiResponse({ status: 200, description: 'Number of pending access' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Get('quantity')
-  async GetQuantity(
+  async getNumberOfAccess(
     @Res({ passthrough: true }) res: Response,
   ): Promise<number> {
-    return (await Database.promisedQuery('SELECT `access_id` FROM `access` WHERE `access_state`="pending"') as { access_id: number }[]).length;
+    res.status(HttpStatus.OK)
+    return await this.accessService.getNumberOfAccess();
   }
 
-  @ApiOperation({
-    summary: 'Get the full list of registered access in database from an user',
-  })
+  @ApiOperation({ summary: 'Get the full list of registered access in database from an user' })
   @ApiResponse({ status: 200, description: 'List of access' })
   @ApiProduces('application/json')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @CurrentUserOnly('user')
   @Get('user/:id')
-  async userList(@Param('id') id: number,): Promise<Access[]> {
-    return (await Database.promisedQuery('SELECT * FROM `access` WHERE access_user=?', [id])) as Access[];
+  async accessList(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<Access[]> {
+    res.status(HttpStatus.OK)
+    return await this.accessService.listAccessOfUser(id);
   }
 
-  @ApiOperation({
-    summary: 'Get the full list of registered access in database',
-  })
+  @ApiOperation({ summary: 'Get the full list of registered access in database' })
   @ApiResponse({ status: 200, description: 'List of access' })
   @ApiProduces('application/json')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Get()
-  async list(): Promise<Access[]> {
-    return (await Database.promisedQuery('SELECT *, (SELECT `user_name` FROM `users` WHERE `user_id`=`access_user`) AS `user_name`, (SELECT `user_pay_status` FROM `users` WHERE `user_id`=`access_user`) AS `user_pay_status` FROM `access`  ')) as Access[];
+  async list(@Res({ passthrough: true }) res: Response): Promise<Access[]> {
+    res.status(HttpStatus.OK)
+    return await this.accessService.listAccess();
   }
 
-  @ApiOperation({
-    summary: 'Get a single Access from the specified acces id',
-  })
+  @ApiOperation({ summary: 'Get a single Access from the specified acces id' })
   @ApiResponse({ status: 200, description: 'An access is returned' })
-  @ApiResponse({
-    status: 204,
-    description: 'No Access matching this id were found',
-  })
+  @ApiResponse({ status: 204, description: 'No Access matching this id were found' })
   @ApiProduces('application/json')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Get(':id')
   async get(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number,
   ): Promise<Access> {
-    const access = (await Database.promisedQuery(
-      'SELECT * FROM access WHERE access_id=?',
-      [id],
-    )) as Access[];
+    const access = await this.accessService.getAccess(id);
 
-    if (access.length == 0) res.status(HttpStatus.NO_CONTENT);
-    return access[0];
+    if (access) {
+      res.status(HttpStatus.OK)
+      return access
+    }
+    else res.status(HttpStatus.NO_CONTENT)
   }
 
-  @ApiOperation({
-    summary: 'Update an Access from the specified acces id',
-  })
+  @ApiOperation({ summary: 'Update an Access from the specified acces id' })
   @ApiResponse({ status: 200, description: 'Mac address of this access has been updated' })
-  @ApiResponse({
-    status: 204,
-    description: 'No Access matching this id were found',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Mac address of this access has not been updated because it has the wrong format',
-  })
+  @ApiResponse({ status: 204, description: 'No Access matching this id were found' })
+  @ApiResponse({ status: 400, description: 'Mac address of this access has not been updated because it has the wrong format' })
   @ApiProduces('application/json')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Put(':id')
   async put(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number,
     @Body() new_access: { access_mac: string }
   ): Promise<void> {
-    const old_access = (await Database.promisedQuery('SELECT access_mac FROM access WHERE access_id=?', [id])) as { access_mac: string }[];
-
-    if (old_access.length !== 0) {
-      const mac_adrress = MacAdressVerification(new_access.access_mac)
-      if (mac_adrress !== "") {
-        await Database.promisedQuery('UPDATE `access` SET `access_mac`=? WHERE 1 WHERE access_id=?', [mac_adrress, id])
-        res.status(HttpStatus.OK);
-      }
-      else res.status(HttpStatus.BAD_REQUEST);
-    }
-    else {
-      res.status(HttpStatus.NO_CONTENT);
-    }
-
+    res.status(await this.accessService.updateMac(id, new_access.access_mac));
   }
 
-  @ApiOperation({
-    summary: 'Create an access matching the provided informations',
-  })
+  @ApiOperation({ summary: 'Create an access matching the provided informations' })
   @ApiResponse({ status: 200, description: 'An Access is created' })
   @ApiResponse({ status: 206, description: 'No Access is created because of a lack of information' })
-  @ApiResponse({
-    status: 409,
-    description: 'No Access is created because of MAC address already used',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'No Access is created because because the mac address has the wrong format',
-  })
+  @ApiResponse({ status: 409, description: 'No Access is created because of MAC address already used' })
   @ApiConsumes('application/json')
   @ApiBody({ type: AccessType })
   @UseInterceptors(FileInterceptor('access_proof'))
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('user')
   @Post()
   async add(
     @Res({ passthrough: true }) res: Response,
     @Body() access: { access_description: string, access_mac: string, access_user: number },
-    @UploadedFile() access_proof: Express.Multer.File
-  ): Promise<string> {
-    if (
-      access.access_description &&
-      access.access_mac &&
-      access.access_user &&
-      access_proof.originalname.match(/\.(jpg|jpeg|png)$/i)
-    ) {
-      const mac_address = MacAdressVerification(access.access_mac)
-      const access_id = (await Database.promisedQuery(
-        'SELECT access_id FROM access WHERE access_mac =?', [mac_address]
-      )) as { access_id: string }[];
-
-      if (access_id.length === 0 && mac_address !== "") {
-        const filename = await optimizeImage(access_proof)
-
-        await Promise.all([
-          Database.promisedQuery(
-            'INSERT INTO `access`(`access_description`, `access_mac`, `access_proof`, `access_user`, `access_state`) VALUES (?, ?, ?, ?, ?)',
-            [
-              access.access_description,
-              mac_address,
-              filename,
-              access.access_user,
-              "pending"
-            ]),
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)', [mac_address, "Disabled-Users", 0]
-          ),
-          RadiusDatabase.promisedQuery(
-            'INSERT INTO `radcheck`(`username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-            [mac_address, "Auth-Type", ":=", "Accept"]
-          )
-        ])
-
-        res.status(HttpStatus.OK)
-        return "Access created"
-      }
-      else {
-        res.status(HttpStatus.CONFLICT)
-        return "Mac address already used or invalide"
-      }
-  
-    }
-    else {
-      res.status(HttpStatus.PARTIAL_CONTENT)
-      return "Some information is missing"
-    }
+    @UploadedFile() access_proof: Express.Multer.File,
+    @Headers('authorization') jwtToken: string
+  ): Promise<void> {
+    const userId = (await jwt_decode(jwtToken.replace('Bearer ', '')))['id'];
+    res.status(await this.accessService.createAccess(access, access_proof, userId));
   }
 
-
-  @Delete(':id')
-  async delete(@Res({ passthrough: true }) res: Response,
-    @Param('id') id: number): Promise<void> {
-    const req = await Database.promisedQuery(
-      'SELECT `access_proof`, `access_mac` FROM `access` WHERE access_id=?',
-      [id]
-    ) as { access_mac: string, access_proof: string }[];
-
-    if (req.length === 1) {
-      if (req[0].access_proof !== "") unlink(`./src/access/proof/${req[0].access_proof}`, (err) => { if (err) throw err; });
-
-      await Promise.all([
-        Database.promisedQuery('DELETE FROM `access` WHERE access_id=?', [id]),
-        RadiusDatabase.promisedQuery('DELETE FROM `radcheck` WHERE `username`=?', [id]),
-        RadiusDatabase.promisedQuery('DELETE FROM `radusergroup` WHERE `username`=?', [id]),
-        res.status(HttpStatus.OK)
-      ]);
-    }
-    else res.status(HttpStatus.BAD_REQUEST)
-  }
-
-  @ApiOperation({
-    summary: 'Enable an access',
-  })
+  @ApiOperation({ summary: 'Delete an access' })
   @ApiResponse({ status: 200, description: 'Acces is enabled' })
-  @ApiResponse({ status: 206, description: 'No Access found with this id' })
+  @ApiResponse({ status: 400, description: 'No Access found with this id' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @Delete(':id')
+  async delete(
+    @Res({ passthrough: true }) res: Response,
+    @Headers('authorization') jwtToken: string,
+    @Param('id') id: number
+  ): Promise<void> {
+    const userId = (await jwt_decode(jwtToken.replace('Bearer ', '')))['id'];
+    res.status(await this.accessService.deleteAccess(id, userId))
+  }
+
+  @ApiOperation({ summary: 'Enable an access' })
+  @ApiResponse({ status: 200, description: 'Acces is enabled' })
+  @ApiResponse({ status: 400, description: 'No Access found with this id' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Put('enable/:id')
   async enable(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number
   ): Promise<void> {
-    const [access] = await Promise.all([
-      Database.promisedQuery('UPDATE `access` SET `access_state`="active" WHERE access_id=?', [id]),
-      RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?', [id]),
-      Database.promisedQuery('SELECT `access_description`, `access_user` FROM `access` WHERE 1 access_id=?', [id])
-    ])
-
-    const email = await Database.promisedQuery(
-      'SELECT `user_email` FROM `access` WHERE user_id=? AND user_notification=1',
-      [access[0].access_user]
-    ) as { user_email: string }[];
-
-    const text = "Votre demande d'accès pour l'ojebt " + access[0].access_description + " a été acceptée. <br> Vous pouvez dès maintenant le connecter à AMNet WI-Fi IoT"
-
-    const htmlstream = fs.createReadStream('./src/mail/templates/info.html').pipe(replace("<TEXT_HERE>", text))
-
-    if (email.length === 1)
-      await Transporter.sendMail('Votre demande a été aceptée', htmlstream, [email[0].user_email]);
+    res.status(await this.accessService.enableAccess(id));
   }
 
+  @ApiOperation({ summary: 'Disable an access' })
+  @ApiResponse({ status: 200, description: 'Acces is disabled' })
+  @ApiResponse({ status: 400, description: 'No Access found with this id' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Put('disable/:id')
   async disable(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number
   ): Promise<void> {
-    await Promise.all([
-      Database.promisedQuery('UPDATE `access` SET `access_state`="declined" WHERE access_id=?', [id]),
-      RadiusDatabase.promisedQuery('UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?', [id])
-    ]);
+    res.status(await this.accessService.disableAccess(id))
   }
 }
