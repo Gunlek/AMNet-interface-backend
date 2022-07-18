@@ -11,9 +11,9 @@ import { Cron } from '@nestjs/schedule';
 import { User } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
 import { Gadzflix } from 'src/utils/jellyfin';
-import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { getNameByToken } from './functions/getNameByToken';
+import { updatePasswordByToken } from './functions/updatePasswordByToken';
+import { getNumberOfUsers } from './functions/getNumberOfUsers';
 
 @Injectable()
 export class UserService {
@@ -21,7 +21,7 @@ export class UserService {
     return updateUser(user, id);
   }
 
-  createUser(user: User): Promise<HttpStatus> {
+  createUser(user: User): Promise<{ httpStatus: HttpStatus, error: any }> {
     return createUser(user);
   }
 
@@ -49,22 +49,38 @@ export class UserService {
     return getUser(id);
   }
 
+  getNameByToken(token: string): Promise<string> {
+    return getNameByToken(token);
+  }
+
+  updatePasswordByToken(token: string, user: { password1: string; password2: string }): Promise<HttpStatus> {
+    return updatePasswordByToken(token, user);
+  }
+
+  getNumberOfUsers(): Promise<number[]> {
+    return getNumberOfUsers();
+  }
+
   @Cron('47 3 * * *')
   async handleCron() {
-    const [users, gadzflix_users, radius_users] = await Promise.all([
-      Database.promisedQuery('SELECT * FROM users'),
-      Gadzflix.getUsers(),
-      RadiusDatabase.promisedQuery('SELECT * FROM `radusergroup`')
-    ]) as [User[], any, any]
+    const users = await Database.promisedQuery(
+      'SELECT `user_name`, `user_is_gadz`, `user_pay_status`, `gadzflix_id` FROM `users`'
+    ) as User[];
+    let promise = [];
 
-    users.forEach((user) =>{
-      if(user.user_pay_status === 1){
-        Database.promisedQuery('UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?', ['Enabled-Users', user.user_name])
-        Gadzflix.setIsDisabled(user.jellyfin_id, false)
-      }
-      else{
-        Database.promisedQuery('UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?', ['Disabled-Users', user.user_name])
-        Gadzflix.setIsDisabled(user.jellyfin_id, true)
-      }
+    users.forEach(async (user) => {
+      promise.push(RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
+        [
+          user.user_pay_status === 1 ? 'Enabled-Users' : 'Disabled-Users',
+          user.user_name
+        ]
+      ),
+        Gadzflix.setIsDisabled(user.gadzflix_id, !(user.user_pay_status === 1 && user.user_is_gadz === 1))
+      )
     })
+
+    await Promise.all(promise);
+    console.log("test synchro gadz")
+  }
 }
