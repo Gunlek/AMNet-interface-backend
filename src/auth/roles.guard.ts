@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { Observable } from 'rxjs';
 import jwt_decode from 'jwt-decode';
+import { Database } from 'src/utils/database';
 
 enum EnumRoles {
   USER = 0,
@@ -30,9 +30,9 @@ const getLowestRequiredRole = (roles: string[]) => {
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  canActivate(
+  async canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     let jwtToken = request.headers.authorization;
     if (!jwtToken) return true; // If no token, return true to allow JwtToken to do its job because RolesGuard is always used with JwtGuard
@@ -45,6 +45,12 @@ export class RolesGuard implements CanActivate {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
     if (!roles) return true;
 
+    const userId = tokenData.id;
+    const user_rank = (await Database.promisedQuery(
+      'SELECT  `user_rank` FROM `users` WHERE `user_id`=?',
+      [userId]
+    ))[0].user_rank as string
+
     const lowestRole = getLowestRequiredRole(roles);
 
     const minimumRole = this.reflector.get<string[]>(
@@ -53,18 +59,18 @@ export class RolesGuard implements CanActivate {
     );
     if (minimumRole && minimumRole.length == 1) {
       const targetId = request.params.id;
-      const userId = tokenData.id;
+      
       const currentUserCondition =
         targetId == userId &&
-        EnumRoles[(tokenData.rank as string).toUpperCase()] >=
+        EnumRoles[(user_rank as string).toUpperCase()] >=
           EnumRoles[minimumRole[0].toUpperCase()]; // User is user and trying to view its own data
 
       return (
-        lowestRole <= EnumRoles[(tokenData.rank as string).toUpperCase()] ||
+        lowestRole <= EnumRoles[(user_rank as string).toUpperCase()] ||
         currentUserCondition
       );
     } else
-      return lowestRole <= EnumRoles[(tokenData.rank as string).toUpperCase()];
+      return lowestRole <= EnumRoles[(user_rank as string).toUpperCase()];
   }
 }
 
