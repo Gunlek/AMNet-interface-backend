@@ -2,4 +2,4 @@ import { User } from 'src/models/user.model';
 import { Database } from 'src/utils/database';
 
 export const listUser = async (): Promise<User[]> =>
-  (await Database.promisedQuery('SELECT * FROM users')) as User[];
+  (await Database.promisedQuery('SELECT `user_id`, `user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_rank`, `user_is_gadz`, `user_pay_status`, `user_notification` FROM users')) as User[];
