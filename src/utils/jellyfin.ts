@@ -126,11 +126,6 @@ export class Gadzflix {
     }
 
     static async getUsers() {
-        return await axios.get(`${Gadzflix.URL}/Users`, Gadzflix.config)
-        .catch((reason: AxiosError) => {
-            if (reason.response.status !== 204) {
-                console.log(reason.message)
-            }
-        })
+        return await (await axios.get(`${Gadzflix.URL}/Users`, Gadzflix.config)).data
     }
 }
