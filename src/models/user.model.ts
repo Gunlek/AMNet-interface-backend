@@ -15,7 +15,7 @@ export type User = {
   user_rank: 'admin' | 'user';
   user_is_gadz: 0 | 1;
   user_pay_status: 0 | 1;
-  jellyfin_id: string
+  gadzflix_id: string
 };
 
 export class UserType {
