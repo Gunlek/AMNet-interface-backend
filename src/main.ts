@@ -15,7 +15,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   
   app.useGlobalGuards(new RolesGuard(new Reflector()));
-  app.use(express.static(join(__dirname, '../src/access/proof')));
+  app.use('/proof', express.static(join(__dirname, '../src/access/proof')));
   app.use(express.static(join(__dirname, '../public')));
   app.use(favicon(join(__dirname, '../public/favicon.ico')));
 
