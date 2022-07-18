@@ -1,40 +1,46 @@
 import { HttpStatus } from '@nestjs/common';
 import { Database, RadiusDatabase } from 'src/utils/database';
+import { Gadzflix } from 'src/utils/jellyfin';
 
 export const unpayUser = async (id: number): Promise<HttpStatus> => {
-  const name = (
-    await Database.promisedQuery(
-      'SELECT user_name FROM users WHERE user_id=?',
+  const [user, mac_address] = await Promise.all([
+    Database.promisedQuery(
+      'SELECT user_name, gadzflix_id FROM users WHERE user_id=?',
       [id],
-    )
-  )[0].user_name as string;
-
-  if (name.length !== 0) {
-    const mac_address = (await Database.promisedQuery(
+    ),
+    Database.promisedQuery(
       'SELECT access_mac FROM access WHERE access_user=?',
       [id],
-    )) as { acess_mac: string }[];
+    )
+  ]) as [{ user_name: string, gadzflix_id: string }[], { acess_mac: string }[]]
 
-    await Database.promisedQuery(
-      'UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?',
-      [id],
-    );
-    await RadiusDatabase.promisedQuery(
-      'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
-      [name],
-    );
+  if (user.length === 1) {
+    let promise = [];
 
     mac_address.forEach(async (access) => {
-      await RadiusDatabase.promisedQuery(
+      promise.push(RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
         [access],
-      );
+      ));
     });
 
+
+    promise.push(
+      Database.promisedQuery(
+        'UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?',
+        [id]
+      ),
+      RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
+        [user[0].user_name]
+      ),
+      Gadzflix.setIsDisabled(user[0].gadzflix_id, true)
+    );
+
+    Promise.all(promise);
+
     return HttpStatus.OK;
-    // return 'User disabled';
-  } else {
-    return HttpStatus.NOT_FOUND;
-    // return 'No user exist with this id';
   }
+
+  return HttpStatus.NOT_FOUND;
 };
