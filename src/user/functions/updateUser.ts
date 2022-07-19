@@ -5,7 +5,7 @@ import { nthash } from 'smbhash';
 import { HttpStatus } from '@nestjs/common';
 import { Gadzflix } from 'src/utils/jellyfin';
 
-export const updateUser = async (user: User, id: number) => {
+export const updateUser = async (user: User, id: number): Promise<HttpStatus> => {
   const name = (await Database.promisedQuery(
     'SELECT user_name FROM users WHERE user_id=?',
     [id],
