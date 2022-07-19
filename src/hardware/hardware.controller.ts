@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
-import { ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Database } from 'src/utils/database';
 import { Response } from 'express';
-import { Access } from 'src/models/access.model';
 
+@ApiBearerAuth()
 @ApiTags('hardware')
 @Controller('hardware')
 export class HardwareController {
