@@ -1,11 +1,12 @@
 import { Body, Controller, HttpStatus, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Database } from 'src/utils/database';
 import { Response } from 'express';
 import { MailService } from './mail.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 
+@ApiBearerAuth()
 @ApiTags('mail')
 @Controller('mail')
 export class MailController {
