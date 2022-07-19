@@ -23,8 +23,7 @@ export const unpayUser = async (id: number): Promise<HttpStatus> => {
         [access],
       ));
     });
-
-
+    
     promise.push(
       Database.promisedQuery(
         'UPDATE `users` SET `user_pay_status`= 0 WHERE  user_id=?',
@@ -37,7 +36,7 @@ export const unpayUser = async (id: number): Promise<HttpStatus> => {
       Gadzflix.setIsDisabled(user[0].gadzflix_id, true)
     );
 
-    Promise.all(promise);
+    await Promise.all(promise);
 
     return HttpStatus.OK;
   }
