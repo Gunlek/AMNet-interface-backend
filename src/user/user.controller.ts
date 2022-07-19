@@ -20,17 +20,20 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User, UserType } from 'src/models/user.model';
-import { Database } from 'src/utils/database';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUserOnly, Roles, RolesGuard } from 'src/auth/roles.guard';
 import { UserService } from './user.service';
 import { Response } from 'express';
 
+@ApiBearerAuth()
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) { }
 
+  @ApiOperation({summary: 'Update an user'})
+  @ApiResponse({ status: 200, description: 'A User is updated' })
+  @ApiConsumes('application/json')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('admin')
@@ -40,9 +43,7 @@ export class UserController {
     return await this.userService.getNumberOfUsers();
   }
 
-  @ApiOperation({
-    summary: 'Update an user',
-  })
+  @ApiOperation({summary: 'Update an user'})
   @ApiResponse({ status: 200, description: 'A User is updated' })
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
@@ -55,9 +56,7 @@ export class UserController {
     res.status(await this.userService.updateUser(user, id));
   }
 
-  @ApiOperation({
-    summary: 'Create a user matching the provided informations',
-  })
+  @ApiOperation({summary: 'Create a user matching the provided informations'})
   @ApiResponse({ status: 200, description: 'A User is created' })
   @ApiResponse({ status: 206, description: 'No user is created because of a lack of information' })
   @ApiResponse({ status: 409, description: 'No user is created because of email and/or name already used' })
@@ -70,10 +69,7 @@ export class UserController {
     return error;
   }
 
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Promote the user matching the provided user id to admin rank',
-  })
+  @ApiOperation({summary: 'Promote the user matching the provided user id to admin rank'})
   @ApiResponse({ status: 200, description: 'User promoted' })
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -83,9 +79,7 @@ export class UserController {
     res.status(await this.userService.promoteUser(id));
   }
 
-  @ApiOperation({
-    summary: 'Demote the user matching the provided user id to user rank',
-  })
+  @ApiOperation({summary: 'Demote the user matching the provided user id to user rank'})
   @ApiResponse({ status: 200, description: 'User demoted' })
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -95,9 +89,7 @@ export class UserController {
     res.status(await this.userService.demoteUser(id));
   }
 
-  @ApiOperation({
-    summary: 'Delete the user matching the specified user id',
-  })
+  @ApiOperation({summary: 'Delete the user matching the specified user id'})
   @ApiResponse({ status: 200, description: 'User deleted' })
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -107,24 +99,40 @@ export class UserController {
     res.status(await this.userService.deleteUser(id));
   }
 
-  @Get('pay/:id')
-  pay(): string {
-    return 'start payment for a user';
+  @ApiOperation({summary: 'Enable a user'})
+  @ApiResponse({ status: 200, description: 'User enabled' })
+  @ApiResponse({ status: 404, description: 'No user exist with this id' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @Put('pay/:id')
+  async pay(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
+    res.status(await this.userService.payUser(id));
   }
 
+  @ApiOperation({summary: 'Disable a user'})
   @ApiResponse({ status: 200, description: 'User disabled' })
   @ApiResponse({ status: 404, description: 'No user exist with this id' })
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('admin')
-  @Get('unpay/:id')
+  @Put('unpay/:id')
   async unpay(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
     res.status(await this.userService.unpayUser(id));
   }
 
-  @ApiOperation({
-    summary: 'Get the full list of registered users in database',
-  })
+  @ApiOperation({summary: 'Reverse the Gadz Statut'})
+  @ApiResponse({ status: 200, description: 'User disabled' })
+  @ApiResponse({ status: 404, description: 'No user exist with this id' })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @Put('statut/:id')
+  async updateStatut(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
+    res.status(await this.userService.updateStatut(id));
+  }
+
+  @ApiOperation({summary: 'Get the full list of registered users in database'})
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiProduces('application/json')
   @UseGuards(JwtAuthGuard)
@@ -132,7 +140,7 @@ export class UserController {
   @Roles('admin')
   @Get()
   async list(): Promise<User[]> {
-    return (await Database.promisedQuery('SELECT * FROM users')) as User[];
+    return await this.userService.listUser();
   }
 
   @ApiOperation({ summary: 'Get a single user from the specified user id' })
@@ -154,9 +162,7 @@ export class UserController {
     else res.status(HttpStatus.NO_CONTENT);
   }
 
-  @ApiOperation({
-    summary: 'Return pseudo linked to the token',
-  })
+  @ApiOperation({summary: 'Return pseudo linked to the token'})
   @ApiResponse({ status: 200, description: 'The pseudo linked to the token' })
   @ApiResponse({ status: 204, description: 'The token doesnt exist' })
   @ApiConsumes('application/json')
@@ -174,9 +180,7 @@ export class UserController {
     else res.status(HttpStatus.NO_CONTENT)
   }
 
-  @ApiOperation({
-    summary: 'Update user password by token',
-  })
+  @ApiOperation({summary: 'Update user password by token'})
   @ApiResponse({ status: 200, description: 'The password is upated' })
   @ApiResponse({ status: 204, description: 'The token doesnt exist' })
   @ApiResponse({ status: 409, description: 'The 2 passwords are not identical' })
