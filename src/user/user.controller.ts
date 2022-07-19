@@ -47,6 +47,10 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'A User is updated' })
   @ApiConsumes('application/json')
   @ApiBody({ type: UserType })
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @CurrentUserOnly('user')
   @Put(':id')
   async update(
     @Body() user: User,
