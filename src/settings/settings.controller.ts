@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpStatus, Param, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { docMulterOptions } from 'src/utils/file';
@@ -7,6 +7,7 @@ import { SettingsService } from './settings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles } from 'src/auth/roles.guard';
 
+@ApiBearerAuth()
 @ApiTags('settings')
 @Controller('settings')
 export class SettingsController {
