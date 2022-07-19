@@ -9,11 +9,12 @@ import { unpayUser } from './functions/unpayUser';
 import { updateUser } from './functions/updateUser';
 import { Cron } from '@nestjs/schedule';
 import { User } from 'src/models/user.model';
-import { Database, RadiusDatabase } from 'src/utils/database';
-import { Gadzflix } from 'src/utils/jellyfin';
 import { getNameByToken } from './functions/getNameByToken';
 import { updatePasswordByToken } from './functions/updatePasswordByToken';
 import { getNumberOfUsers } from './functions/getNumberOfUsers';
+import { payUser } from './functions/payUser';
+import { updateStatut } from './functions/updateStatut';
+import { synchroBDD } from './functions/synchro';
 
 @Injectable()
 export class UserService {
@@ -41,6 +42,10 @@ export class UserService {
     return unpayUser(id);
   }
 
+  payUser(id: number): Promise<HttpStatus> {
+    return payUser(id);
+  }
+
   listUser(): Promise<User[]> {
     return listUser();
   }
@@ -61,26 +66,12 @@ export class UserService {
     return getNumberOfUsers();
   }
 
-  @Cron('47 3 * * *')
+  updateStatut(id: number): Promise<HttpStatus> {
+    return updateStatut(id);
+  }
+
+  @Cron('18 5 * * *')
   async handleCron() {
-    const users = await Database.promisedQuery(
-      'SELECT `user_name`, `user_is_gadz`, `user_pay_status`, `gadzflix_id` FROM `users`'
-    ) as User[];
-    let promise = [];
-
-    users.forEach(async (user) => {
-      promise.push(RadiusDatabase.promisedQuery(
-        'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
-        [
-          user.user_pay_status === 1 ? 'Enabled-Users' : 'Disabled-Users',
-          user.user_name
-        ]
-      ),
-        Gadzflix.setIsDisabled(user.gadzflix_id, !(user.user_pay_status === 1 && user.user_is_gadz === 1))
-      )
-    })
-
-    await Promise.all(promise);
-    console.log("test synchro gadz")
+    synchroBDD()
   }
 }
