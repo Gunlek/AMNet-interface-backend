@@ -29,7 +29,9 @@ async function bootstrap() {
     .addTag('user')
     .addTag('auth')
     .addTag('mail')
+    .addBearerAuth()
     .build();
+    
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, document);
 
