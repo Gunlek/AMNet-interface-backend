@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UploadedFile, UseInterceptors, Headers, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Access, AccessType } from 'src/models/access.model';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -8,6 +8,7 @@ import jwt_decode from 'jwt-decode';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 
+@ApiBearerAuth()
 @ApiTags('access')
 @Controller('access')
 export class AccessController {
