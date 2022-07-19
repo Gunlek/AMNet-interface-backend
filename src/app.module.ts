@@ -17,6 +17,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './mail/mail.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { LydiaController } from './lydia/lydia.controller';
+import { LydiaService } from './lydia/lydia.service';
+import { LydiaModule } from './lydia/lydia.module';
 
 @Module({
   imports: [
@@ -29,7 +32,8 @@ import { memoryStorage } from 'multer';
     ScheduleModule.forRoot(),
     MulterModule.register({
       storage: memoryStorage()
-    })
+    }),
+    LydiaModule
   ],
   controllers: [
     AccessController,
@@ -37,6 +41,7 @@ import { memoryStorage } from 'multer';
     UserController,
     SettingsController,
     MailController,
+    LydiaController,
   ],
   providers: [
     AppService,
