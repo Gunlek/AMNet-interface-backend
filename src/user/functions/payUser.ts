@@ -20,7 +20,7 @@ export const payUser = async (id: number): Promise<HttpStatus> => {
     mac_address.forEach(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?',
-        [access]
+        [access.acess_mac]
       ));
     });
 
