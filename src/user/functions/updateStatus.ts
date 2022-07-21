@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { Database } from 'src/utils/database';
 import { Gadzflix } from 'src/utils/jellyfin';
 
-export const updateStatut = async (id: number): Promise<HttpStatus> => {
+export const updateStatus = async (id: number): Promise<HttpStatus> => {
     const user = await Database.promisedQuery(
         'SELECT user_name, user_is_gadz, gadzflix_id FROM users WHERE user_id=?',
         [id],
