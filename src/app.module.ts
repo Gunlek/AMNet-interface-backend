@@ -18,7 +18,6 @@ import { MailService } from './mail/mail.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { LydiaController } from './lydia/lydia.controller';
-import { LydiaService } from './lydia/lydia.service';
 import { LydiaModule } from './lydia/lydia.module';
 
 @Module({
