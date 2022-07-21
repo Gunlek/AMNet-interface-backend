@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
@@ -21,8 +21,10 @@ export class LydiaController {
     @Post('start/:id')
     async startPayment(
         @Param('id') user_id: number,
-        @Res({ passthrough: true }) res: Response): Promise<void> {
-        res.redirect(await this.lydiaService.startPayment(user_id));
+        @Res({ passthrough: true }) res: Response
+    ): Promise<string> {
+        res.status(HttpStatus.OK)
+        return await this.lydiaService.startPayment(user_id);
     };
 
     @ApiOperation({ summary: 'Handle the sucess of payment' })
