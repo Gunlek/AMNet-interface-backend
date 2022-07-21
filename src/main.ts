@@ -6,14 +6,21 @@ import * as express from 'express';
 import * as favicon from 'serve-favicon';
 import { join } from 'path';
 import { AppService } from './app.service';
-import { config as dotenvConfig } from 'dotenv';
+import * as fs from 'fs';
+import { existsSync } from "node:fs";
 
-dotenvConfig();
 AppService.getInstance()
+const key = './server.key';
+const cert = './server.cert'
+
+const httpsOptions = existsSync(key) && existsSync(cert) ? {
+  key: fs.readFileSync(key),
+  cert: fs.readFileSync(cert),
+} : null;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-  
+  const app = await NestFactory.create(AppModule, { cors: true, httpsOptions });
+
   app.useGlobalGuards(new RolesGuard(new Reflector()));
   app.use('/proof', express.static(join(__dirname, '../src/access/proof')));
   app.use(express.static(join(__dirname, '../public')));
@@ -29,9 +36,10 @@ async function bootstrap() {
     .addTag('user')
     .addTag('auth')
     .addTag('mail')
+    .addTag('lydia')
     .addBearerAuth()
     .build();
-    
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, document);
 
