@@ -133,7 +133,7 @@ export class UserController {
   @Roles('admin')
   @Put('statut/:id')
   async updateStatut(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
-    res.status(await this.userService.updateStatut(id));
+    res.status(await this.userService.updateStatus(id));
   }
 
   @ApiOperation({summary: 'Get the full list of registered users in database'})
