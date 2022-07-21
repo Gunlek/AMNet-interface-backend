@@ -13,7 +13,7 @@ import { getNameByToken } from './functions/getNameByToken';
 import { updatePasswordByToken } from './functions/updatePasswordByToken';
 import { getNumberOfUsers } from './functions/getNumberOfUsers';
 import { payUser } from './functions/payUser';
-import { updateStatut } from './functions/updateStatut';
+import { updateStatus } from './functions/updateStatus';
 import { synchroBDD } from './functions/synchro';
 
 @Injectable()
@@ -66,8 +66,8 @@ export class UserService {
     return getNumberOfUsers();
   }
 
-  updateStatut(id: number): Promise<HttpStatus> {
-    return updateStatut(id);
+  updateStatus(id: number): Promise<HttpStatus> {
+    return updateStatus(id);
   }
 
   @Cron('18 5 * * *')
