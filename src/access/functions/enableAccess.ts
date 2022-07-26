@@ -1,8 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { Database, RadiusDatabase } from "src/utils/database";
 import { Transporter } from "src/utils/mail";
-import * as replace from 'stream-replace';
-import * as fs from 'fs';
 import { createMailTemplate } from "src/utils/file";
 
 export const enableAccess = async (id: number): Promise<HttpStatus> => {
