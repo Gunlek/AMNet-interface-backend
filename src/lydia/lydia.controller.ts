@@ -5,12 +5,13 @@ import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 import { Response } from 'express';
 import { LydiaService } from './lydia.service';
 
-@ApiBearerAuth()
+
 @ApiTags('lydia')
 @Controller('lydia')
 export class LydiaController {
     constructor(private lydiaService: LydiaService) {};
 
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Start payement with Lydia' })
     @ApiResponse({ status: 200, description: 'redirect to Lydia' })
     @ApiConsumes('application/json')
@@ -27,13 +28,13 @@ export class LydiaController {
         return await this.lydiaService.startPayment(user_id);
     };
 
-    @ApiOperation({ summary: 'Handle the sucess of payment' })
-    @ApiResponse({ status: 200, description: 'A User is updated' })
-    @ApiResponse({ status: 400, description: 'No user found' })
+    @ApiOperation({ summary: 'Handle the payment cancel' })
+    @ApiResponse({ status: 200, description: 'A payment is cancelled' })
+    @ApiResponse({ status: 400, description: 'No payment found' })
     @ApiConsumes('application/json')
-    @Post('cancel/:id')
+    @Post('cancel/:token')
     async cancelPayment(
-        @Param('id') ticket_id: string,
+        @Param('token') ticket_id: string,
         @Res({ passthrough: true }) res: Response
     ): Promise<void> {
         res.status(await this.lydiaService.cancelPayment(ticket_id));
@@ -43,9 +44,9 @@ export class LydiaController {
     @ApiResponse({ status: 200, description: 'A User is updated' })
     @ApiResponse({ status: 400, description: 'No user found' })
     @ApiConsumes('application/json')
-    @Post('success/:id')
+    @Post('success/:token')
     async successPayment(
-        @Param('id') ticket_id: string,
+        @Param('token') ticket_id: string,
         @Res({ passthrough: true }) res: Response
     ): Promise<void> {
         res.status(await this.lydiaService.successPayment(ticket_id));
