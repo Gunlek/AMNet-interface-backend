@@ -21,6 +21,4 @@ export const synchroBDD = async (): Promise<void> => {
             .then(response => console.log(response))
             .catch(error => console.log(`Error in executing ${error}`));
     })
-
-
 };
