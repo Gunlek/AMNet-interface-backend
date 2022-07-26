@@ -1,6 +1,9 @@
 import * as sharp from 'sharp';
 import { diskStorage } from 'multer';
 import { Request } from 'express';
+import * as replace from 'stream-replace';
+import * as fs from 'fs';
+import DOMPurify from 'isomorphic-dompurify';
 
 export async function optimizeImage(image: Express.Multer.File) {
     const filename = `photoProof-${Date.now().toString()}.webp`;
@@ -35,3 +38,11 @@ export const docMulterOptions = {
         else cb(null, false)
     }
 }
+
+export function createMailTemplate(html: string) {
+    const htmlstream = fs.createReadStream('./src/mail/templates/info.html')
+        .pipe(replace('<TEXT_HERE>', DOMPurify.sanitize(html)))
+        .pipe(replace(/<HOSTNAME_HERE>/g, process.env.HOSTNAME));
+
+    return htmlstream
+};

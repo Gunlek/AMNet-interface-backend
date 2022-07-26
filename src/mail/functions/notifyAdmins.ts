@@ -2,6 +2,7 @@ import { Database } from "src/utils/database";
 import { Transporter } from "src/utils/mail";
 import * as replace from 'stream-replace';
 import * as fs from 'fs';
+import { createMailTemplate } from "src/utils/file";
 
 export const notifyAdmins = async (): Promise<void> => {
     const [access, material] = await Promise.all([
@@ -18,7 +19,7 @@ export const notifyAdmins = async (): Promise<void> => {
         const material_notification = `<a target="_blank" style="text-decoration: none; color:#096A09;" href="${process.env.HOSTNAME}/admin/material">Demandes de matériel: ${material.length} </a>`;
         const text = title + '<br>' + (existAccess ? acces_notification : "") + (existAccess && existMaterial ? '<br>' : "") + (existMaterial ? material_notification : "")
     
-        const htmlstream = fs.createReadStream('./src/mail/templates/info.html').pipe(replace("<TEXT_HERE>", text));
+        const htmlstream = createMailTemplate(text);
     
         await Transporter.sendMail('Des demandes en attente', htmlstream, ['contact@amnet.fr']);
     }

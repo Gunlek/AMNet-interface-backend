@@ -1,9 +1,7 @@
 import { Database } from "src/utils/database";
 import { Transporter } from "src/utils/mail";
-import * as replace from 'stream-replace';
-import * as fs from 'fs';
 import { HttpStatus } from "@nestjs/common";
-import DOMPurify from 'isomorphic-dompurify';
+import { createMailTemplate } from "src/utils/file";
 
 export const notifyUsers = async (body:
     {
@@ -88,8 +86,7 @@ export const notifyUsers = async (body:
         let emails = [] as string[];
 
         email_users.forEach((email) => { emails.push(email.user_email) })
-        const htmlstream = fs.createReadStream('./src/mail/templates/info.html')
-            .pipe(replace('<TEXT_HERE>', DOMPurify.sanitize(body.content)))
+        const htmlstream = createMailTemplate(body.content);
 
         await Transporter.sendMail(body.subject, htmlstream, ['contact@amnet.fr'], emails);
         return HttpStatus.OK;

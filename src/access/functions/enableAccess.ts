@@ -3,6 +3,7 @@ import { Database, RadiusDatabase } from "src/utils/database";
 import { Transporter } from "src/utils/mail";
 import * as replace from 'stream-replace';
 import * as fs from 'fs';
+import { createMailTemplate } from "src/utils/file";
 
 export const enableAccess = async (id: number): Promise<HttpStatus> => {
     const access = await Database.promisedQuery(
@@ -29,7 +30,7 @@ export const enableAccess = async (id: number): Promise<HttpStatus> => {
 
         if (email.length === 1) {
             const text = `<div style="text-align: center;">Votre demande d'accès pour l'objet <span style="color: #096a09; font-weight: bold;">` + access[0].access_description + `</span> a été acceptée. <br><br> Vous pouvez dès maintenant le connecter à <span style="color: #096a09; font-weight: bold;">AMNet WI-Fi IoT</span></div>`;
-            const htmlstream = fs.createReadStream('./src/mail/templates/info.html').pipe(replace("<TEXT_HERE>", text))
+            const htmlstream = createMailTemplate(text);
             await Transporter.sendMail('Votre demande a été aceptée', htmlstream, [email[0].user_email]);
         }
 
