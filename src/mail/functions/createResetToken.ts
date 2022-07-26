@@ -18,10 +18,12 @@ export const createResetToken = async (email: string): Promise<HttpStatus> => {
         );
 
         const reset_link = process.env.HOSTNAME + "/homepage/lostpassword/" + token_value;
+        
         const htmlstream = fs.createReadStream('./src/mail/templates/password.html')
             .pipe(replace(/<LINK_HERE>/g, reset_link))
-            .pipe(replace("<ID_HERE>", user[0]['user_name']));
-
+            .pipe(replace("<ID_HERE>", user[0]['user_name']))
+            .pipe(replace(/<HOSTNAME_HERE>/g, process.env.HOSTNAME));
+            
         await Transporter.sendMail('Mot de passe ou Identifiant oublié ?', htmlstream, [email]);
         return HttpStatus.OK
     }
