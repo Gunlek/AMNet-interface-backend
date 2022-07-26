@@ -4,15 +4,28 @@ import * as bcrypt from 'bcrypt';
 import { nthash } from 'smbhash';
 import { HttpStatus } from '@nestjs/common';
 import { Gadzflix } from 'src/utils/jellyfin';
+import { demoteUser } from './demoteUser';
+import { payUser } from './payUser';
+import { promoteUser } from './promoteUser';
+import { unpayUser } from './unpayUser';
 
-export const updateUser = async (user: User, id: number): Promise<HttpStatus> => {
-  const name = (await Database.promisedQuery(
-    'SELECT user_name FROM users WHERE user_id=?',
-    [id],
-  )) as { user_name: string }[];
+export const updateUser = async (user: User, id: number, userId: number): Promise<HttpStatus> => {
+  const [name, rank] = await Promise.all([
+    Database.promisedQuery(
+      'SELECT user_name FROM users WHERE user_id=?',
+      [id]),
+    Database.promisedQuery(
+      'SELECT user_rank FROM users WHERE user_id=?',
+      [userId])
+  ]) as [{ user_name: string }[], { user_rank: string }[]];
 
   if (name.length === 1) {
-    if (user.user_password !== '') {
+    if (rank[0].user_rank === "admin") {
+      user.user_pay_status ? payUser("several", [id]) : unpayUser("several", [id]);
+      user.user_rank === "admin" ? promoteUser(id) : demoteUser(id);
+    }
+
+    if (user.user_password && user.user_password !== '') {
       const [hashed_paswword, gadzflix_id] = await Promise.all([
         bcrypt.hash(
           user.user_password,

@@ -18,8 +18,8 @@ import { synchroBDD } from './functions/synchro';
 
 @Injectable()
 export class UserService {
-  updateUser(user: User, id: number): Promise<HttpStatus> {
-    return updateUser(user, id);
+  updateUser(user: User, id: number, userId: number): Promise<HttpStatus> {
+    return updateUser(user, id, userId);
   }
 
   createUser(user: User): Promise<{ httpStatus: HttpStatus, error: any }> {
@@ -38,12 +38,12 @@ export class UserService {
     return deleteUser(id);
   }
 
-  unpayUser(id: number): Promise<HttpStatus> {
-    return unpayUser(id);
+  unpayUser(type: "all" | "several", users?: number[]): Promise<HttpStatus> {
+    return unpayUser(type, users);
   }
 
-  payUser(id: number): Promise<HttpStatus> {
-    return payUser(id);
+  payUser(type: "all" | "several", users?: number[]): Promise<HttpStatus> {
+    return payUser(type, users);
   }
 
   listUser(): Promise<User[]> {
@@ -66,8 +66,8 @@ export class UserService {
     return getNumberOfUsers();
   }
 
-  updateStatus(id: number): Promise<HttpStatus> {
-    return updateStatus(id);
+  updateStatus(type: "all" | "several", users?: number[]): Promise<HttpStatus> {
+    return updateStatus(type, users);
   }
 
   @Cron('18 5 * * *')
