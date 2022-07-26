@@ -27,15 +27,15 @@ export const deleteUser = async (id: number): Promise<HttpStatus> => {
       ),
       RadiusDatabase.promisedQuery(
         'DELETE FROM `userinfo` WHERE username=?',
-        [name]
+        [name[0].user_name]
       ),
       RadiusDatabase.promisedQuery(
         'DELETE FROM `radusergroup` WHERE `username`=?',
-        [name]
+        [name[0].user_name]
       ),
       RadiusDatabase.promisedQuery(
-        'DELETE FROM `radcheck` WHERE  `username`= ?',
-        [name]
+        'DELETE FROM `radcheck` WHERE `username`= ?',
+        [name[0].user_name]
       ),
       Gadzflix.removeUser(name[0].gadzflix_id)
     );
