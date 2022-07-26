@@ -7,7 +7,7 @@ export async function optimizeImage(image: Express.Multer.File) {
 
     if (image.originalname.match(/\.(jpg|jpeg|png)$/i)) {
         await sharp(image.buffer)
-            .resize(800)
+            .resize({ width: 800 })
             .webp()
             .toFile(`./src/access/proof/${filename}`);
 
@@ -18,7 +18,7 @@ export async function optimizeImage(image: Express.Multer.File) {
 
 export async function optimizeTeamPicute(team_picture: Express.Multer.File) {
     sharp(team_picture.buffer)
-        .resize(1000)
+        .resize({ width: 1000 })
         .jpeg()
         .toFile(`./public/team.jpeg`)
 };
