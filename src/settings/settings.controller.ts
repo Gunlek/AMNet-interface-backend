@@ -7,7 +7,6 @@ import { SettingsService } from './settings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles } from 'src/auth/roles.guard';
 
-@ApiBearerAuth()
 @ApiTags('settings')
 @Controller('settings')
 export class SettingsController {
@@ -20,7 +19,8 @@ export class SettingsController {
   async list(): Promise<{ pseudo: string, id: string }[]> {
     return await this.settingsService.getAdminList();
   };
-
+  
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'List of admin updated' })
   @ApiProduces('application/json')
   @UseInterceptors(FileInterceptor('team_picture'))
@@ -30,9 +30,24 @@ export class SettingsController {
   @Put('admin-list')
   async updateList(
     @Res({ passthrough: true }) res: Response,
-    @Body() team: { pseudo: string, id: string }[],
+    @Body() body: { team: { pseudo: string, id: string }[] },
     @UploadedFile() team_picture: Express.Multer.File
   ): Promise<void> {
+    let team = [] as {
+      pseudo: string,
+      id: string
+    }[];
+
+    Object.entries(body).slice(0, -1).forEach(entry => {
+      const [key, value] = entry;
+      const index = key.split('.')[1];
+      const type = key.split('.')[2];
+
+      const newEntry = { pseudo: team[index] ? team[index].pseudo || "" : "", id: team[index] ? team[index].id || "" : "" };
+      newEntry[type] = value
+      team[index] = newEntry;
+    });
+
     res.status(await this.settingsService.updateAdminList(team, team_picture));
   };
 
@@ -54,6 +69,7 @@ export class SettingsController {
     else res.status(HttpStatus.NO_CONTENT);
   };
 
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Doc updated' })
   @ApiResponse({ status: 400, description: 'Doc is not pdf' })
   @ApiProduces('application/json')
@@ -70,6 +86,7 @@ export class SettingsController {
     else res.status(HttpStatus.BAD_REQUEST);
   };
 
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Setting updated' })
   @ApiResponse({ status: 400, description: 'Not setting with this name' })
   @ApiProduces('application/json')
