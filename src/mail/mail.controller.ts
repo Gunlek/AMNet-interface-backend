@@ -6,7 +6,6 @@ import { MailService } from './mail.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 
-@ApiBearerAuth()
 @ApiTags('mail')
 @Controller('mail')
 export class MailController {
@@ -25,6 +24,7 @@ export class MailController {
         res.status(await this.mailService.createResetToken(email));
     }
 
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Reverse the setting to allow email notifications' })
     @ApiResponse({ status: 200, description: 'Successful Reverse' })
     @ApiConsumes('application/json')
@@ -44,6 +44,7 @@ export class MailController {
         res.status(HttpStatus.OK);
     }
 
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Send mail to Users' })
     @ApiResponse({ status: 200, description: 'A User is created' })
     @ApiResponse({ status: 204, description: 'No mail send because no recipients' })
