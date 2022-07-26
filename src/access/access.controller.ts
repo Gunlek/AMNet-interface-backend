@@ -25,7 +25,7 @@ export class AccessController {
   ): Promise<number> {
     res.status(HttpStatus.OK)
     return await this.accessService.getNumberOfAccess();
-  }
+  };
 
   @ApiOperation({ summary: 'Get the full list of registered access in database from an user' })
   @ApiResponse({ status: 200, description: 'List of access' })
@@ -38,7 +38,7 @@ export class AccessController {
   async accessList(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<Access[]> {
     res.status(HttpStatus.OK)
     return await this.accessService.listAccessOfUser(id);
-  }
+  };
 
   @ApiOperation({ summary: 'Get the full list of registered access in database' })
   @ApiResponse({ status: 200, description: 'List of access' })
@@ -50,7 +50,7 @@ export class AccessController {
   async list(@Res({ passthrough: true }) res: Response): Promise<Access[]> {
     res.status(HttpStatus.OK)
     return await this.accessService.listAccess();
-  }
+  };
 
   @ApiOperation({ summary: 'Get a single Access from the specified acces id' })
   @ApiResponse({ status: 200, description: 'An access is returned' })
@@ -71,7 +71,7 @@ export class AccessController {
       return access
     }
     else res.status(HttpStatus.NO_CONTENT)
-  }
+  };
 
   @ApiOperation({ summary: 'Update an Access from the specified acces id' })
   @ApiResponse({ status: 200, description: 'Mac address of this access has been updated' })
@@ -88,7 +88,7 @@ export class AccessController {
     @Body() new_access: { access_mac: string }
   ): Promise<void> {
     res.status(await this.accessService.updateMac(id, new_access.access_mac));
-  }
+  };
 
   @ApiOperation({ summary: 'Create an access matching the provided informations' })
   @ApiResponse({ status: 200, description: 'An Access is created' })
@@ -109,7 +109,7 @@ export class AccessController {
   ): Promise<void> {
     const userId = (await jwt_decode(jwtToken.replace('Bearer ', '')))['id'];
     res.status(await this.accessService.createAccess(access, access_proof, userId));
-  }
+  };
 
   @ApiOperation({ summary: 'Delete an access' })
   @ApiResponse({ status: 200, description: 'Acces is enabled' })
@@ -125,7 +125,7 @@ export class AccessController {
   ): Promise<void> {
     const userId = (await jwt_decode(jwtToken.replace('Bearer ', '')))['id'];
     res.status(await this.accessService.deleteAccess(id, userId))
-  }
+  };
 
   @ApiOperation({ summary: 'Enable an access' })
   @ApiResponse({ status: 200, description: 'Acces is enabled' })
@@ -139,7 +139,7 @@ export class AccessController {
     @Param('id') id: number
   ): Promise<void> {
     res.status(await this.accessService.enableAccess(id));
-  }
+  };
 
   @ApiOperation({ summary: 'Disable an access' })
   @ApiResponse({ status: 200, description: 'Acces is disabled' })
@@ -153,5 +153,5 @@ export class AccessController {
     @Param('id') id: number
   ): Promise<void> {
     res.status(await this.accessService.disableAccess(id))
-  }
+  };
 }
