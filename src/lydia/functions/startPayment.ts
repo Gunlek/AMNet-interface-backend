@@ -28,6 +28,7 @@ export const startPayment = async (id: number): Promise<string> => {
         parameters.append("expire_url", `${process.env.REST_API}/lydia/cancel/${ticketId}`);
         parameters.append("browser_success_url", `${process.env.HOSTNAME}`);
         parameters.append("browser_fail_url ", `${process.env.HOSTNAME}?payment_err=1`);
+        parameters.append("display_confirmation", "no");
 
         const { request_id, request_uuid, mobile_url } = await (await axios.post(`${process.env.LYDIA_API_URL}/api/request/do.json`, parameters)).data;
 
