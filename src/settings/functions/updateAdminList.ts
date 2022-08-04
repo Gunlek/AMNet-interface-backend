@@ -6,7 +6,7 @@ import { optimizeTeamPicute } from "src/utils/file";
 export const updateAdminList = async (team: { pseudo: string, id: string }[], team_picture: Express.Multer.File): Promise<HttpStatus> => {
     let httpStatus: HttpStatus | PromiseLike<HttpStatus>
 
-    if (team_picture && team_picture.originalname.match(/\.(jpg|jpeg|png)$/i)) {
+    if (team_picture && team_picture.originalname.match(/\.(jpg|jpeg|png|webp)$/i)) {
         optimizeTeamPicute(team_picture)
         httpStatus = HttpStatus.OK
     }
@@ -35,6 +35,6 @@ export const updateAdminList = async (team: { pseudo: string, id: string }[], te
     }
 
     if (httpStatus) return httpStatus
-    else return HttpStatus.NO_CONTENT
+    else return HttpStatus.BAD_REQUEST
 }
 

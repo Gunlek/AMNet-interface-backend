@@ -8,7 +8,7 @@ import DOMPurify from 'isomorphic-dompurify';
 export async function optimizeImage(image: Express.Multer.File) {
     const filename = `photoProof-${Date.now().toString()}.webp`;
 
-    if (image.originalname.match(/\.(jpg|jpeg|png)$/i)) {
+    if (image.originalname.match(/\.(jpg|jpeg|png|webp)$/i)) {
         await sharp(image.buffer)
             .resize({ width: 800 })
             .webp()
