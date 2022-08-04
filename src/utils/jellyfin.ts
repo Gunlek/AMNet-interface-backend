@@ -17,12 +17,13 @@ export class Gadzflix {
                     "X-Emby-Authorization": AuthString
                 }
             }
+            Gadzflix.URL = process.env.GADZFLIX_HOSTNAME
         } else {
             return Gadzflix.config;
         }
     }
 
-    private static URL = "https://gadzflix.fr"
+    private static URL = null;
     private static policy = {
         "IsAdministrator": false,
         "IsHidden": true,
@@ -103,7 +104,7 @@ export class Gadzflix {
 
         const userid = await req['data']['Id']
 
-        await axios.post(`${Gadzflix.URL}/Users/${userid}/Policy`, Gadzflix.policy, Gadzflix.config)
+        axios.post(`${Gadzflix.URL}/Users/${userid}/Policy`, Gadzflix.policy, Gadzflix.config)
         .catch((reason: AxiosError) => {
             if (reason.response.status !== 204) {
                 console.log(reason.message)
@@ -114,8 +115,8 @@ export class Gadzflix {
     }
 
     static async setIsDisabled(userid: string, disabled: boolean) {
-        const newUserPolicy = { ...Gadzflix.policy }
-        newUserPolicy["IsDisabled"] = disabled
+        const newUserPolicy = { ...Gadzflix.policy };
+        newUserPolicy["IsDisabled"] = disabled;
 
         await axios.post(`${Gadzflix.URL}/Users/${userid}/Policy`, newUserPolicy, Gadzflix.config)
         .catch((reason: AxiosError) => {
