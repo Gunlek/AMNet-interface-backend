@@ -53,7 +53,7 @@ export class SettingsController {
 
   @ApiOperation({ summary: 'Get specific setting by id' })
   @ApiResponse({ status: 200, description: 'A setting is returned' })
-  @ApiResponse({ status: 204, description: 'No setting matching this id were found' })
+  @ApiResponse({ status: 404, description: 'No setting matching this id were found' })
   @ApiProduces('application/json')
   @Get(':name')
   async get(
@@ -66,7 +66,7 @@ export class SettingsController {
       res.status(HttpStatus.OK);
       return value;
     }
-    else res.status(HttpStatus.NO_CONTENT);
+    else res.status(HttpStatus.BAD_REQUEST);
   };
 
   @ApiBearerAuth()
@@ -88,7 +88,7 @@ export class SettingsController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Setting updated' })
-  @ApiResponse({ status: 400, description: 'Not setting with this name' })
+  @ApiResponse({ status: 400, description: 'No setting with this name' })
   @ApiProduces('application/json')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
