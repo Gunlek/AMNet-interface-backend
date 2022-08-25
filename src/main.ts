@@ -7,11 +7,11 @@ import * as favicon from 'serve-favicon';
 import { join } from 'path';
 import { AppService } from './app.service';
 import * as fs from 'fs';
-import { existsSync } from "node:fs";
+import { existsSync } from "fs";
 
 AppService.getInstance()
 const key = './server.key';
-const cert = './server.cert'
+const cert = './server.crt'
 
 const httpsOptions = existsSync(key) && existsSync(cert) ? {
   key: fs.readFileSync(key),
