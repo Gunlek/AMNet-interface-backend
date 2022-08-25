@@ -7,11 +7,11 @@ import * as favicon from 'serve-favicon';
 import { join } from 'path';
 import { AppService } from './app.service';
 import * as fs from 'fs';
-import { existsSync } from "node:fs";
+import { existsSync } from "fs";
 
 AppService.getInstance()
 const key = './server.key';
-const cert = './server.cert'
+const cert = './server.crt'
 
 const httpsOptions = existsSync(key) && existsSync(cert) ? {
   key: fs.readFileSync(key),
@@ -20,7 +20,9 @@ const httpsOptions = existsSync(key) && existsSync(cert) ? {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true, httpsOptions });
-
+  const path = './src/access/proof';
+  if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+  
   app.useGlobalGuards(new RolesGuard(new Reflector()));
   app.use('/proof', express.static(join(__dirname, '../src/access/proof')));
   app.use(express.static(join(__dirname, '../public')));

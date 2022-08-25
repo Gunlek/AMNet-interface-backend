@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { unlink, existsSync } from "node:fs";
+import { unlink, existsSync } from "fs";
 import { Database, RadiusDatabase } from "src/utils/database";
 
 export const deleteAccess = async (id: number, userId?: number): Promise<HttpStatus> => {
