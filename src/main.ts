@@ -20,7 +20,9 @@ const httpsOptions = existsSync(key) && existsSync(cert) ? {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true, httpsOptions });
-
+  const path = './src/access/proof';
+  if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+  
   app.useGlobalGuards(new RolesGuard(new Reflector()));
   app.use('/proof', express.static(join(__dirname, '../src/access/proof')));
   app.use(express.static(join(__dirname, '../public')));
