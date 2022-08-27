@@ -27,7 +27,7 @@ export const enableAccess = async (id: number): Promise<HttpStatus> => {
         ) as { user_email: string }[];
 
         if (email.length === 1) {
-            const text = `<div style="text-align: center;">Votre demande d'accès pour l'objet <span style="color: #096a09; font-weight: bold;">` + access[0].access_description + `</span> a été acceptée. <br><br> Vous pouvez dès maintenant le connecter à <span style="color: #096a09; font-weight: bold;">AMNet WI-Fi IoT</span></div>`;
+            const text = `<div style="text-align: center;">Votre demande d'accès pour l'objet <span style="color: #096a09; font-weight: bold;">` + access[0].access_description + `</span> a été acceptée. <br><br> Vous pouvez dès maintenant le connecter à <span style="color: #096a09; font-weight: bold;">AMNet IoT</span></div>`;
             const htmlstream = createMailTemplate(text);
             await Transporter.sendMail('Votre demande a été aceptée', htmlstream, [email[0].user_email]);
         }
