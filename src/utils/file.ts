@@ -7,7 +7,7 @@ import * as crypto from 'crypto';
 import * as DOMPurify from 'isomorphic-dompurify';
 
 export async function optimizeImage(image: Express.Multer.File) {
-    if (image.originalname.match(/\.(jpg|jpeg|png|webp)$/i)) {
+    if (image.originalname.match(/\.(jpg|jpeg|png|webp|svg)$/i)) {
         const imageId = crypto.randomBytes(64).toString('hex');
         const filename = `photoProof-${imageId}.webp`;
 
