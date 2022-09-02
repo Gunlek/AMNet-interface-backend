@@ -101,6 +101,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('admin')
+  @CurrentUserOnly('user')
   @Delete(':id')
   async delete(@Param('id') id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
     res.status(await this.userService.deleteUser(id));
