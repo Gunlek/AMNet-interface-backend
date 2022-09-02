@@ -40,7 +40,7 @@ export class HardwareController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('user')
-  @Post('add')
+  @Post()
   async add(
     @Res({ passthrough: true }) res: Response,
     @Headers('authorization') jwtToken: string,
