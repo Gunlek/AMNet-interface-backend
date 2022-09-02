@@ -1,8 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { Hardware } from "src/models/hardware.model";
-import { Database, RadiusDatabase } from "src/utils/database";
-import { optimizeImage } from "src/utils/file";
-import { MacAdressVerification } from "src/utils/mac.verification";
+import { Database } from "src/utils/database";
 
 export const createHardware = async (
     material: Hardware,
@@ -18,7 +16,7 @@ export const createHardware = async (
             'SELECT `user_rank` FROM `users` WHERE `user_id`=?', [userId]
         ) as { user_rank: string }[]
 
-        if (userId === material.material_user || user_rank[0].user_rank === 'admin') {
+        if (userId == material.material_user || user_rank[0].user_rank === 'admin') {
             Database.promisedQuery(
                 'INSERT INTO `materials`(`material_user`, `material_description`, `material_reason`,`material_state`) VALUES (?, ?, ?, ?)',
                 [
