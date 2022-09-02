@@ -18,7 +18,7 @@ export const createAccess = async (
         access.access_mac &&
         access.access_user &&
         userId &&
-        access_proof.originalname.match(/\.(jpg|jpeg|png)$/i)
+        access_proof.originalname.match(/\.(jpg|jpeg|png|svg|webp)$/i)
     ) {
         const mac_address = MacAdressVerification(access.access_mac)
         const [access_id, user_rank] = await Promise.all([
@@ -31,7 +31,7 @@ export const createAccess = async (
         ]) as [{ access_id: number }[], { user_rank: string }[]]
 
         if (access_id.length === 0 && mac_address !== "") {
-            if (userId === access.access_user || user_rank[0].user_rank === 'admin') {
+            if (userId == access.access_user || user_rank[0].user_rank === 'admin') {
                 const filename = await optimizeImage(access_proof)
 
                 await Promise.all([
@@ -41,7 +41,7 @@ export const createAccess = async (
                             access.access_description,
                             mac_address,
                             filename,
-                            userId,
+                            access.access_user,
                             "pending"
                         ]
                     ),

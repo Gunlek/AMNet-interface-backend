@@ -4,10 +4,10 @@ import { Request } from 'express';
 import * as replace from 'stream-replace';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import DOMPurify from 'isomorphic-dompurify';
+import * as DOMPurify from 'isomorphic-dompurify';
 
 export async function optimizeImage(image: Express.Multer.File) {
-    if (image.originalname.match(/\.(jpg|jpeg|png|webp)$/i)) {
+    if (image.originalname.match(/\.(jpg|jpeg|png|webp|svg)$/i)) {
         const imageId = crypto.randomBytes(64).toString('hex');
         const filename = `photoProof-${imageId}.webp`;
 
