@@ -19,7 +19,7 @@ export class SettingsController {
   async list(): Promise<{ pseudo: string, id: string }[]> {
     return await this.settingsService.getAdminList();
   };
-  
+
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'List of admin updated' })
   @ApiProduces('application/json')
@@ -38,14 +38,16 @@ export class SettingsController {
       id: string
     }[];
 
-    Object.entries(body).slice(0, -1).forEach(entry => {
+    Object.entries(body).forEach(entry => {
       const [key, value] = entry;
-      const index = key.split('.')[1];
-      const type = key.split('.')[2];
+      if (key != 'team_picture') {
+        const index = key.split('.')[1];
+        const type = key.split('.')[2];
 
-      const newEntry = { pseudo: team[index] ? team[index].pseudo || "" : "", id: team[index] ? team[index].id || "" : "" };
-      newEntry[type] = value
-      team[index] = newEntry;
+        const newEntry = { pseudo: team[index] ? team[index].pseudo || "" : "", id: team[index] ? team[index].id || "" : "" };
+        newEntry[type] = value
+        team[index] = newEntry;
+      }
     });
 
     res.status(await this.settingsService.updateAdminList(team, team_picture));
