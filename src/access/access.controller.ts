@@ -12,7 +12,7 @@ import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
 @ApiTags('access')
 @Controller('access')
 export class AccessController {
-  constructor(private accessService: AccessService) {};
+  constructor(private accessService: AccessService) { };
 
   @ApiOperation({ summary: 'Get the number of pending access', })
   @ApiResponse({ status: 200, description: 'Number of pending access' })
@@ -150,8 +150,9 @@ export class AccessController {
   @Put('disable/:id')
   async disable(
     @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number
+    @Param('id') id: number,
+    @Body() body: { reason: string }
   ): Promise<void> {
-    res.status(await this.accessService.disableAccess(id))
+    res.status(await this.accessService.disableAccess(id, body.reason))
   };
 }
