@@ -23,8 +23,8 @@ export class HardwareService {
         return deleteHardware(id, userId)
     }
 
-    disableHardware(id: number): Promise<HttpStatus> {
-        return disableHardware(id)
+    disableHardware(id: number, reason: string): Promise<HttpStatus> {
+        return disableHardware(id, reason)
     }
 
     getNumberOfHardware(): Promise<number> {
