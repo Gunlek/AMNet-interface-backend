@@ -1,13 +1,3 @@
-INSERT INTO documents (
-    document_title
-)
-VALUES (
-    "reglement_interieur"
-),
-(
-    "statuts"
-);
-
 INSERT INTO settings (
     setting_value,
     setting_name,
@@ -20,18 +10,8 @@ VALUES (
 ),
 (
     "",
-    "api_token",
-    "api"
-),
-(
-    "",
     "active_proms",
     "proms"
-),
-(
-    "",
-    "lydia_token",
-    "lydia"
 ),
 (
     "",
