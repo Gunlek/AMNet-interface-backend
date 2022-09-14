@@ -21,7 +21,14 @@ export const enableHardware = async (id: number): Promise<HttpStatus> => {
         ) as { user_email: string }[];
 
         if (email.length === 1) {
-            const text = `<div style="text-align: center;">Votre demande de matériel : <span style="color: #096a09; font-weight: bold;">${material[0].material_description}</span> a été acceptée <br><br> Nous vous contacterons bientôt pour vous le remettre</div>`;
+            const text = `
+                <div style="text-align: center;">
+                    <div style="margin-bottom: 15px;">
+                        Votre demande de matériel <br>
+                        <span style="color: #096a09; font-weight: bold;">${material[0].material_description}</span> a été acceptée 
+                    </div>
+                    <div>Nous vous contacterons bientôt pour vous le remettre</div>
+                </div>`;
             const htmlstream = createMailTemplate(text);
             await Transporter.sendMail('Votre demande de matériel a été acceptée', htmlstream, [email[0].user_email]);
         }

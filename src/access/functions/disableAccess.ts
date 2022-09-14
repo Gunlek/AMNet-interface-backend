@@ -27,8 +27,16 @@ export const disableAccess = async (id: number, reason: string): Promise<HttpSta
         ) as { user_email: string }[];
 
         if (email.length === 1) {
-            const reasonExist = typeof reason === 'string' && reason !== ''; 
-            const text = `<div style="text-align: center;">Votre demande d'accès pour l'objet <span style="color: #096a09; font-weight: bold;">${access[0].access_description}</span> a été refusée${reasonExist ? ` pour le motif suivant : <br> ${reason}` : ""}</div>`;
+            const reasonExist = typeof reason === 'string' && reason !== '';
+            const text = `
+                <div style="text-align: center;">
+                    <div>
+                        Votre demande d'accès pour l'objet <br>
+                        <span style="color: #096a09; font-weight: bold;">${access[0].access_description}</span> a été refusée
+                    </div>
+                    ${reasonExist ? `<div style="margin-top: 15px;">Pour le motif suivant : <br> ${reason}</div>` : ""}
+                </div>
+            `;
             const htmlstream = createMailTemplate(text);
             await Transporter.sendMail('Votre demande d\'accès été refusée', htmlstream, [email[0].user_email]);
         }
