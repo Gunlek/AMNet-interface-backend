@@ -33,8 +33,8 @@ export class AccessService {
         return deleteAccess(id, userId)
     }
 
-    disableAccess(id: number): Promise<HttpStatus> {
-        return disableAccess(id)
+    disableAccess(id: number, reason: string): Promise<HttpStatus> {
+        return disableAccess(id, reason)
     }
 
     updateMac(id: number, new_mac: string): Promise<HttpStatus>{

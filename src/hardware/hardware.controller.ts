@@ -87,7 +87,7 @@ export class HardwareController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('admin')
-  @Put('enabled/:id')
+  @Put('enable/:id')
   async enable(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: number
@@ -101,8 +101,9 @@ export class HardwareController {
   @Put('disable/:id')
   async disable(
     @Res({ passthrough: true }) res: Response,
-    @Param('id') id: number
+    @Param('id') id: number,
+    @Body() body: { reason: string }
   ): Promise<void> {
-    res.status(await this.hardwareService.disableHardware(id));
+    res.status(await this.hardwareService.disableHardware(id, body.reason));
   }
 }
