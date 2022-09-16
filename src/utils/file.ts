@@ -25,7 +25,7 @@ export async function optimizeTeamPicute(team_picture: Express.Multer.File) {
     sharp(team_picture.buffer)
         .resize({ width: 1000 })
         .webp()
-        .toFile(`./public/team.jpeg`)
+        .toFile(`./public/team.webp`)
 };
 
 export const docMulterOptions = {
