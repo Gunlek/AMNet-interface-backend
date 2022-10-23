@@ -45,9 +45,9 @@ export const notifyUsers = async (body:
             Database.promisedQuery(
                 'SELECT `setting_value` FROM settings WHERE setting_name = "usins_state"'
             )
-        ]) as [{ setting_value: string }[], { setting_value: string }[]]
+        ]) as [{ setting_value: string }[], { setting_value: string }[]];
 
-        const active_promotion = activePromotion[0].setting_value
+        const active_promotion = activePromotion[0].setting_value;
 
         const old_promotion = (Number(active_promotion) - 1).toString();
         const new_promotion = (Number(active_promotion) + Number(usins_state[0].setting_value) ? 1801 : 1).toString();
@@ -80,12 +80,10 @@ export const notifyUsers = async (body:
     }
 
     if (email_users) {
-        let emails = [] as string[];
-
-        email_users.forEach((email) => { emails.push(email.user_email) })
         const htmlstream = createMailTemplate(body.content);
+        Transporter.sendMail(body.subject, htmlstream, ['contact@amnet.fr']);
+        email_users.forEach((email) => { Transporter.sendMail(body.subject, htmlstream, [email.user_email]); })
 
-        await Transporter.sendMail(body.subject, htmlstream, ['contact@amnet.fr'], emails);
         return HttpStatus.OK;
     }
 
