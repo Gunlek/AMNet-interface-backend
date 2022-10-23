@@ -18,6 +18,7 @@ export class Transporter {
 
       Transporter.instance = nodemailer.createTransport({
         service: process.env.EMAIL_SERVICE,
+        pool: true,
         auth: {
           type: 'OAuth2',
           user: process.env.EMAIL_USER,
@@ -36,7 +37,6 @@ export class Transporter {
     subject: string,
     content: any,
     destination: string[],
-    bcc?: string[],
   ) {
     const mailOptions = {
       from: '"👩‍✈️ Team AMNet 🧑‍✈️" <no-reply@amnet.fr>',
@@ -44,7 +44,6 @@ export class Transporter {
       subject: subject,
       html: content,
       replyTo: 'contact@amnet.fr',
-      bcc: bcc,
     };
 
     await Transporter.instance.sendMail(
