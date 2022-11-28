@@ -13,12 +13,12 @@ export const deleteHardware = async (id: number, userId?: number): Promise<HttpS
     ]) as [{ material_user: number }[], { user_rank: string }[]]
 
     if (material.length === 1) {
-        if (userId === material[0].material_user || user_rank[0].user_rank === 'admin') {
+        if (userId == material[0].material_user || user_rank[0].user_rank === 'admin') {
             await Database.promisedQuery('DELETE FROM `materials` WHERE material_id=?', [id]);
 
             return HttpStatus.OK;
         }
-
+     
         return HttpStatus.UNAUTHORIZED
     }
 
