@@ -7,7 +7,7 @@ export const synchroBDD = async (): Promise<void> => {
         'SELECT `user_name`, `user_is_gadz`, `user_pay_status`, `gadzflix_id` FROM `users`'
     ) as User[];
 
-    users.forEach(async (user) => {
+    users.map(async (user) => {
         await Promise.all([
             RadiusDatabase.promisedQuery(
                 'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
