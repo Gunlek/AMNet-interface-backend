@@ -82,7 +82,7 @@ export const notifyUsers = async (body:
     if (email_users) {
         const htmlstream = createMailTemplate(body.content);
         Transporter.sendMail(body.subject, htmlstream, ['contact@amnet.fr']);
-        email_users.forEach((email) => { Transporter.sendMail(body.subject, htmlstream, [email.user_email]); })
+        email_users.map((email) => { Transporter.sendMail(body.subject, htmlstream, [email.user_email]); })
 
         return HttpStatus.OK;
     }
