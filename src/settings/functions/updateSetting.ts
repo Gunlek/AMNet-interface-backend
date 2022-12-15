@@ -35,21 +35,8 @@ export const updateSetting = async (name: string, value: string): Promise<HttpSt
       new_promotion.map((user) => {
         const text = `
           Sal&apos;ss ${user.user_firstname},<br><br>
-          Maintenant que tu es bapt&apos;ssé, tu débloques
-          le plein potentiel de l&apos;AMNet
-          <ul>
-              <li>
-                  L&apos;ajout de ta bucque/fam&apos;ss dans ton
-                  <b><a href="https://amnet.fr/profile"
-                          style="text-decoration: none; color:#096A09;">Profil</a></b>
-              </li>
-              <li>L&apos;accès au Netflix made in PG</li>
-          </ul>
-          Pour y accéder tu dois être connecté au rézal de
-          l&apos;AMNet : <a href="https://gadzflix.fr"
-              target="_blank" rel="noreferrer"
-              style="text-decoration: none; color:#096A09;">https://gadzflix.fr
-          </a> ou clique sur le logo !
+          Bienvenue dans la communauté gadz !<br><br>
+          Une fois que tu auras complété ta bucque et fam&apos;s dans ton <a style="text-decoration: none; color: #096a09; font-weight: bold;" href="<HOSTNAME_HERE>/profile" target="_blank" rel="noreferrer">Profil</a>, tu auras la possibilité d&apos;accéder à Gadzflix, depuis le portail de l&apos;AMNet ou en cliquant ci-dessous :
           <a href="https://gadzflix.fr" target="_blank" rel="noreferrer" style="text-align: center;">
               <img class="image_block" border="0"
                   src="<HOSTNAME_HERE>/static/images/template/gadzflix.png"
@@ -57,10 +44,8 @@ export const updateSetting = async (name: string, value: string): Promise<HttpSt
                   alt="Logo Gadzflix" 
                 />
           </a>
-          <div
-              style="text-align: center; margin-top: 15px;">
-              Ce mail est généré automatiquement
-          </div>
+          C&apos;est comme Netflix, et c&apos;est inclus dans ta cotisation de l&apos;AMNet. Seule condition pour y accéder : être connecté&middot;e au réseau de la résidence !<br><br>
+          <div style="text-align: right;">L&apos;équipe de l&apos;AMNet</div>
       `;
 
         const htmlstream = createMailTemplate(text);
