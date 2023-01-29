@@ -22,9 +22,9 @@ export const enableAccess = async (id: number): Promise<HttpStatus> => {
         ])
 
         const email = await Database.promisedQuery(
-            'SELECT `user_email` FROM `users` WHERE user_id=? AND user_notification=1',
+            'SELECT `user_email`, `gadzflix_id` FROM `users` WHERE user_id=? AND user_notification=1',
             [access[0].access_user]
-        ) as { user_email: string }[];
+        ) as { user_email: string, gadzflix_id: string }[];
 
         if (email.length === 1) {
             const text = `
@@ -39,7 +39,7 @@ export const enableAccess = async (id: number): Promise<HttpStatus> => {
                     </div>
                 </div>
             `;
-            const htmlstream = createMailTemplate(text);
+            const htmlstream = createMailTemplate(text, email[0].gadzflix_id);
             await Transporter.sendMail('Votre demande d\'accès a été aceptée', htmlstream, [email[0].user_email]);
         }
 

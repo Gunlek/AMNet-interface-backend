@@ -19,7 +19,7 @@ export const notifyUsers = async (body:
         subject: string;
     }
 ): Promise<HttpStatus> => {
-    let email_users: { user_email: string }[];
+    let email_users: { user_email: string, gadzflix_id: string }[];
     const atLeatOnePromotion = body.recipients.OldPromotion || body.recipients.ActivePromotion || body.recipients.NewPromotion;
 
     if (body.recipients.AllSelect || (
@@ -31,8 +31,8 @@ export const notifyUsers = async (body:
         body.recipients.Other)) {
 
         email_users = (await Database.promisedQuery(
-            'SELECT user_email FROM users WHERE `user_notification` = 1'
-        )) as { user_email: string }[];
+            'SELECT user_email, `gadzflix_id` FROM users WHERE `user_notification` = 1'
+        )) as { user_email: string, gadzflix_id: string }[];
     }
     else if (
         (body.recipients.Contribution || body.recipients.NoContribution) &&
@@ -61,28 +61,31 @@ export const notifyUsers = async (body:
 
         if (body.recipients.Other && atLeatOnePromotion) {
             email_users = (await Database.promisedQuery(
-                'SELECT user_email FROM users WHERE user_pay_status IN (?) AND (user_proms IN (?) OR user_proms NOT IN (?)) AND `user_notification` = 1',
+                'SELECT user_email, `gadzflix_id` FROM users WHERE user_pay_status IN (?) AND (user_proms IN (?) OR user_proms NOT IN (?)) AND `user_notification` = 1',
                 [user_pay_status, user_proms, other]
-            )) as { user_email: string }[];
+            )) as { user_email: string, gadzflix_id: string }[];
         }
         else if (atLeatOnePromotion) {
             email_users = (await Database.promisedQuery(
-                'SELECT user_email FROM users WHERE user_pay_status IN (?) AND user_proms IN (?) AND `user_notification` = 1',
+                'SELECT user_email, `gadzflix_id` FROM users WHERE user_pay_status IN (?) AND user_proms IN (?) AND `user_notification` = 1',
                 [user_pay_status, user_proms]
-            )) as { user_email: string }[];
+            )) as { user_email: string, gadzflix_id: string }[];
         }
         else {
             email_users = (await Database.promisedQuery(
-                'SELECT user_email FROM users WHERE user_pay_status IN (?) AND user_proms NOT IN (?) AND `user_notification` = 1',
+                'SELECT user_email, `gadzflix_id` FROM users WHERE user_pay_status IN (?) AND user_proms NOT IN (?) AND `user_notification` = 1',
                 [user_pay_status, other]
-            )) as { user_email: string }[];
+            )) as { user_email: string, gadzflix_id: string }[];
         }
     }
 
     if (email_users) {
-        const htmlstream = createMailTemplate(body.content);
-        Transporter.sendMail(body.subject, htmlstream, ['contact@amnet.fr']);
-        email_users.map((email) => { Transporter.sendMail(body.subject, htmlstream, [email.user_email]); })
+        const adminHtmlstream = createMailTemplate(body.content, '');
+        Transporter.sendMail(body.subject, adminHtmlstream, ['contact@amnet.fr']);
+        email_users.map((email) => { 
+            const htmlstream = createMailTemplate(body.content, email.gadzflix_id);
+            Transporter.sendMail(body.subject, htmlstream, [email.user_email]); 
+        })
 
         return HttpStatus.OK;
     }

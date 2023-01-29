@@ -1,10 +1,10 @@
-import { Body, Controller, HttpStatus, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Database } from 'src/utils/database';
 import { Response } from 'express';
 import { MailService } from './mail.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { RolesGuard, Roles, CurrentUserOnly } from 'src/auth/roles.guard';
+import { RolesGuard, Roles } from 'src/auth/roles.guard';
 
 @ApiTags('mail')
 @Controller('mail')
@@ -24,21 +24,33 @@ export class MailController {
         res.status(await this.mailService.createResetToken(email));
     }
 
-    @ApiBearerAuth()
     @ApiOperation({ summary: 'Reverse the setting to allow email notifications' })
     @ApiResponse({ status: 200, description: 'Successful Reverse' })
     @ApiConsumes('application/json')
-    @UseGuards(JwtAuthGuard)
-    @UseGuards(RolesGuard)
-    @Roles('admin')
-    @CurrentUserOnly('user')
+    @Get('user/:id')
+    async getUser(
+        @Res({ passthrough: true }) res: Response,
+        @Param('id') id: number,
+    ): Promise<void> {
+        const user = await Database.promisedQuery(
+            'SELECT `user_email`,`user_notification` FROM `users` WHERE `gadzflix_id`=?',
+            [id]
+        );
+        res.status(HttpStatus.OK);
+
+        return user[0]
+    }
+
+    @ApiOperation({ summary: 'Reverse the setting to allow email notifications' })
+    @ApiResponse({ status: 200, description: 'Successful Reverse' })
+    @ApiConsumes('application/json')
     @Put('user/:id')
     async unsubscribe(
         @Res({ passthrough: true }) res: Response,
         @Param('id') id: number,
     ): Promise<void> {
         await Database.promisedQuery(
-            'UPDATE `users` SET `user_notification`=NOT `user_notification` WHERE `user_id`=?',
+            'UPDATE `users` SET `user_notification`=NOT `user_notification` WHERE `gadzflix_id`=?',
             [id]
         );
         res.status(HttpStatus.OK);

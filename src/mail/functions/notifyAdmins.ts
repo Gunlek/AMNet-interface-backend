@@ -17,7 +17,7 @@ export const notifyAdmins = async (): Promise<void> => {
         const material_notification = `<a target="_blank" style="text-decoration: none; color:#096A09;" href="${process.env.HOSTNAME}/admin/material">Demandes de matériel: ${material.length} </a>`;
         const text = title + '<br>' + (existAccess ? acces_notification : "") + (existAccess && existMaterial ? '<br>' : "") + (existMaterial ? material_notification : "")
     
-        const htmlstream = createMailTemplate(text);
+        const htmlstream = createMailTemplate(text, '');
     
         await Transporter.sendMail('Des demandes en attente', htmlstream, ['contact@amnet.fr']);
     }

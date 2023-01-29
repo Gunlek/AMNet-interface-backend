@@ -28,9 +28,9 @@ export const updateSetting = async (name: string, value: string): Promise<HttpSt
       );
 
       const new_promotion = await Database.promisedQuery(
-        'SELECT `user_firstname`, `user_email` FROM `users` WHERE `user_notification` = 1 && `user_proms`="?"',
+        'SELECT `user_firstname`, `user_email`, `gadzflix_id` FROM `users` WHERE `user_notification` = 1 && `user_proms`="?"',
         [Number(active_proms) + 1]
-      ) as { user_firstname: string, user_email: string }[];
+      ) as { user_firstname: string, user_email: string, gadzflix_id: string }[];
 
       new_promotion.map((user) => {
         const text = `
@@ -48,7 +48,7 @@ export const updateSetting = async (name: string, value: string): Promise<HttpSt
           <div style="text-align: right;">L&apos;équipe de l&apos;AMNet</div>
       `;
 
-        const htmlstream = createMailTemplate(text);
+        const htmlstream = createMailTemplate(text, user.gadzflix_id);
         Transporter.sendMail("🎁 Nouveautés de l'AMNet 🎁", htmlstream, [user.user_email]);
       });
 

@@ -16,12 +16,12 @@ export const disableHardware = async (id: number, reason: string): Promise<HttpS
         );
 
         const email = await Database.promisedQuery(
-            'SELECT `user_email` FROM `users` WHERE user_id=? AND user_notification=1',
+            'SELECT `user_email`, `gadzflix_id` FROM `users` WHERE user_id=? AND user_notification=1',
             [material[0].material_user]
-        ) as { user_email: string }[];
+        ) as { user_email: string, gadzflix_id: string }[];
 
         if (email.length === 1) {
-            const reasonExist = typeof reason === 'string' && reason !== ''; 
+            const reasonExist = typeof reason === 'string' && reason !== '';
             const text = `
             <div style="text-align: center;">
                 <div>
@@ -30,7 +30,7 @@ export const disableHardware = async (id: number, reason: string): Promise<HttpS
                 </div>
                 ${reasonExist ? `<div style="margin-top: 15px;">Pour le motif suivant : <br> ${reason}</div>` : ""}
             </div>`;
-            const htmlstream = createMailTemplate(text);
+            const htmlstream = createMailTemplate(text, email[0].gadzflix_id);
             await Transporter.sendMail('Votre demande de matériel a été refusée', htmlstream, [email[0].user_email]);
         }
 
