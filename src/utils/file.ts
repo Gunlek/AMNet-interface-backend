@@ -41,10 +41,12 @@ export const docMulterOptions = {
     }
 }
 
-export function createMailTemplate(html: string) {
-    const htmlstream = fs.createReadStream('./src/mail/templates/info.html')
-        .pipe(replace('<TEXT_HERE>', DOMPurify.sanitize(html)))
-        .pipe(replace(/<HOSTNAME_HERE>/g, process.env.HOSTNAME));
+export function createMailTemplate(html: string, id: string) {
+    const file = fs.readFileSync('./src/mail/templates/info.html', 'utf8');
+    const template = file
+        .replace('<TEXT_HERE>', DOMPurify.sanitize(html))
+        .replace(/<HOSTNAME_HERE>/g, process.env.HOSTNAME)
+        .replace('<USER_ID_HERE>', id);
 
-    return htmlstream
-};
+    return template;
+}; 
