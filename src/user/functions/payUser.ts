@@ -6,21 +6,23 @@ export const payUser = async (type: "all" | "several", users?: number[]): Promis
   if (type == "all") {
     let promise = [];
 
-    const [user, mac_address] = await Promise.all([
+    const [user, admins, mac_address] = await Promise.all([
       Database.promisedQuery(
         'SELECT user_is_gadz, gadzflix_id FROM users'),
       Database.promisedQuery(
-        'SELECT access_mac FROM access')
-    ]) as [{ gadzflix_id: string, user_is_gadz: boolean }[], { access_mac: string }[]]
+        'SELECT user_name FROM users WHERE user_rank="admin"'),
+      Database.promisedQuery(
+        'SELECT access_mac, (SELECT `user_rank` FROM `users` WHERE `user_id`=`access_user`) AS `user_rank` FROM access')
+    ]) as [{ gadzflix_id: string, user_is_gadz: boolean }[], { user_name: string }[], { access_mac: string, user_rank: string }[]]
 
-    mac_address.forEach(async (access) => {
+    mac_address.map(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
-        'UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?',
-        [access.access_mac]
+        'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
+        [access.user_rank == "admin" ? "Admins" : "Enabled-Users", access.access_mac]
       ));
     });
 
-    user.forEach(async (user) => {
+    user.map(async (user) => {
       await Gadzflix.setIsDisabled(user.gadzflix_id, !user.user_is_gadz);
     });
 
@@ -34,31 +36,39 @@ export const payUser = async (type: "all" | "several", users?: number[]): Promis
     );
 
     await Promise.all(promise);
+    admins.map(async (admin) => {
+      await RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`="Admins" WHERE username=?', [admin.user_name]
+      )
+    })
+    
     return HttpStatus.OK;
   }
   else if (type == "several") {
     let promise = [];
     let user_names = [] as string[];
+    let admin_names = [] as string[];
 
     const [dbUsers, mac_address] = await Promise.all([
       Database.promisedQuery(
-        'SELECT user_name, user_is_gadz,gadzflix_id FROM users WHERE user_id IN (?)', [users]),
+        'SELECT user_name, user_is_gadz,gadzflix_id, user_rank FROM users WHERE user_id IN (?)', [users]),
       Database.promisedQuery(
-        'SELECT access_mac FROM access WHERE access_user IN (?)', [users])
-    ]) as [{ user_name: string, gadzflix_id: string, user_is_gadz: boolean }[], { access_mac: string }[]]
+        'SELECT access_mac, (SELECT `user_rank` FROM `users` WHERE `user_id`=`access_user`) AS `user_rank` FROM access WHERE access_user IN (?)', [users])
+    ]) as [{ user_name: string, gadzflix_id: string, user_is_gadz: boolean, user_rank: string }[], { access_mac: string, user_rank: string }[]]
 
-    mac_address.forEach(async (access) => {
+    mac_address.map(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
-        'UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE `username`=?',
-        [access.access_mac]
+        'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
+        [access.user_rank == "admin" ? "Admins" : "Enabled-Users", access.access_mac]
       ));
     });
 
-    dbUsers.forEach(async (user) => {
-      user_names.push(user.user_name);
+    dbUsers.map(async (user) => {
+      if (user.user_rank == "admin") admin_names.push(user.user_name);
+      else user_names.push(user.user_name);
     });
 
-    dbUsers.forEach(async (user) => {
+    dbUsers.map(async (user) => {
       await Gadzflix.setIsDisabled(user.gadzflix_id, !user.user_is_gadz);
     });
 
@@ -68,6 +78,9 @@ export const payUser = async (type: "all" | "several", users?: number[]): Promis
       ),
       RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE username IN (?)', [user_names]
+      ),
+      RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`="Admins" WHERE username IN (?)', [admin_names]
       )
     );
 
