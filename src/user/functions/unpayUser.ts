@@ -13,14 +13,14 @@ export const unpayUser = async (type: "all" | "several", users?: number[]): Prom
         'SELECT access_mac FROM access')
     ]) as [{ gadzflix_id: string }[], { access_mac: string }[]]
 
-    mac_address.forEach(async (access) => {
+    mac_address.map(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
         [access.access_mac]
       ));
     });
 
-    user.forEach(async (user) => {
+    user.map(async (user) => {
       await Gadzflix.setIsDisabled(user.gadzflix_id, true)
     });
 
@@ -47,18 +47,18 @@ export const unpayUser = async (type: "all" | "several", users?: number[]): Prom
         'SELECT access_mac FROM access WHERE access_user  IN (?)', [users])
     ]) as [{ user_name: string, gadzflix_id: string }[], { acess_mac: string }[]]
 
-    mac_address.forEach(async (access) => {
+    mac_address.map(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
         [access.acess_mac]
       ));
     });
 
-    dbUsers.forEach(async (user) => {
+    dbUsers.map(async (user) => {
       user_names.push(user.user_name);
     });
 
-    dbUsers.forEach(async (user) => {
+    dbUsers.map(async (user) => {
       await Gadzflix.setIsDisabled(user.gadzflix_id, true);
     });
 
