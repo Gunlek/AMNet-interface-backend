@@ -1,10 +1,26 @@
 import { HttpStatus } from '@nestjs/common';
-import { Database } from 'src/utils/database';
+import { Database, RadiusDatabase } from 'src/utils/database';
 
 export const demoteUser = async (id: number): Promise<HttpStatus> => {
-  await Database.promisedQuery(
-    'UPDATE users SET user_rank="user" WHERE user_id=?',
+  const name = await Database.promisedQuery(
+    'SELECT `user_name`, `user_pay_status FROM `users` WHERE user_id=?',
     [id],
-  );
-  return HttpStatus.OK;
+  ) as { user_name: string, user_pay_status: boolean }[];
+
+  if (name.length === 1) {
+    await Promise.all([
+      Database.promisedQuery(
+        'UPDATE users SET user_rank="user" WHERE user_id=?',
+        [id],
+      ),
+      RadiusDatabase.promisedQuery(
+        'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
+        [name[0].user_pay_status ? 'Enabled-Users' : 'Disabled-Users', name[0].user_name]
+      )
+    ])
+
+    return HttpStatus.OK;
+  }
+  
+  return HttpStatus.BAD_REQUEST;
 };
