@@ -1,6 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
 import { Database, RadiusDatabase } from 'src/utils/database';
-import { Gadzflix } from 'src/utils/jellyfin';
 
 export const unpayUser = async (type: "all" | "several", users?: number[]): Promise<HttpStatus> => {
   if (type == "all") {
@@ -18,10 +17,6 @@ export const unpayUser = async (type: "all" | "several", users?: number[]): Prom
         'UPDATE `radusergroup` SET `groupname`="Disabled-Users" WHERE `username`=?',
         [access.access_mac]
       ));
-    });
-
-    user.map(async (user) => {
-      await Gadzflix.setIsDisabled(user.gadzflix_id, true)
     });
 
     promise.push(
@@ -56,10 +51,6 @@ export const unpayUser = async (type: "all" | "several", users?: number[]): Prom
 
     dbUsers.map(async (user) => {
       user_names.push(user.user_name);
-    });
-
-    dbUsers.map(async (user) => {
-      await Gadzflix.setIsDisabled(user.gadzflix_id, true);
     });
 
     promise.push(

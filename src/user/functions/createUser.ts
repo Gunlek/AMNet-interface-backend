@@ -1,9 +1,9 @@
 import { User } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { HttpStatus } from '@nestjs/common';
 import { nthash } from 'smbhash';
-import { Gadzflix } from 'src/utils/jellyfin';
 
 export const createUser = async (user: User): Promise<{ httpStatus: HttpStatus, error: any }> => {
   let httpStatus: HttpStatus;
@@ -26,13 +26,11 @@ export const createUser = async (user: User): Promise<{ httpStatus: HttpStatus, 
     ]) as [{ user_id: string }[], { user_id: string }[]]
 
     if (name.length == 0 && email.length == 0) {
-      const [hashed_paswword, gadzflix_id] = await Promise.all([
-        bcrypt.hash(
-          user.user_password,
-          Number(process.env.SALT_ROUND),
-        ),
-        Gadzflix.createUser(user.user_name, user.user_password)
-      ])
+      const gadzflix_id = crypto.randomBytes(32).toString('hex');
+      const hashed_paswword = await bcrypt.hash(
+        user.user_password,
+        Number(process.env.SALT_ROUND),
+      )
 
       await Promise.all([
         Database.promisedQuery(
