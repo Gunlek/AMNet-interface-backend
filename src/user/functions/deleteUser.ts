@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { deleteAccess } from 'src/access/functions/deleteAccess';
 import { Database, RadiusDatabase } from 'src/utils/database';
-import { Gadzflix } from 'src/utils/jellyfin';
 
 export const deleteUser = async (id: number): Promise<HttpStatus> => {
   const [name, access] = await Promise.all([
@@ -37,7 +36,6 @@ export const deleteUser = async (id: number): Promise<HttpStatus> => {
         'DELETE FROM `radcheck` WHERE `username`= ?',
         [name[0].user_name]
       ),
-      Gadzflix.removeUser(name[0].gadzflix_id)
     );
 
     await Promise.all(promise)

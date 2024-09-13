@@ -8,11 +8,6 @@ export const updateStatus = async (type: "all" | "several", users?: number[]): P
             'SELECT user_is_gadz, `user_pay_status`, gadzflix_id FROM users'
         ) as { user_is_gadz: boolean, gadzflix_id: string, user_pay_status: boolean }[]
 
-
-        user.forEach(async (user) => {
-            await Gadzflix.setIsDisabled(user.gadzflix_id, !(user.user_pay_status && user.user_is_gadz));
-        });
-
         await Database.promisedQuery('UPDATE `users` SET `user_is_gadz`=NOT `user_is_gadz`');
         return HttpStatus.OK;
     }
@@ -20,10 +15,6 @@ export const updateStatus = async (type: "all" | "several", users?: number[]): P
         const dbUsers = await Database.promisedQuery(
             'SELECT user_is_gadz, gadzflix_id, `user_pay_status` FROM users WHERE user_id IN (?)', [users]
         ) as { user_is_gadz: boolean, gadzflix_id: string, user_pay_status: boolean }[];
-
-        dbUsers.forEach(async (user) => {
-            await Gadzflix.setIsDisabled(user.gadzflix_id, !(user.user_pay_status && user.user_is_gadz));
-        });
 
         await Database.promisedQuery('UPDATE `users` SET `user_is_gadz`=NOT `user_is_gadz` WHERE user_id IN (?)', [users]);
         return HttpStatus.OK;

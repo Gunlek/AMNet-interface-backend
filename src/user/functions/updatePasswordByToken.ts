@@ -33,8 +33,7 @@ export const updatePasswordByToken = async (token: string, password: { password1
             RadiusDatabase.promisedQuery(
                 'UPDATE `radcheck` SET  `value`= ? WHERE  `username`= ?',
                 [nthash(password.password1), user[0].user_name]
-            ),
-            Gadzflix.changePassword(user[0].gadzflix_id, password.password1)
+            )
         ])
 
         return HttpStatus.OK

@@ -3,7 +3,6 @@ import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
 import { nthash } from 'smbhash';
 import { HttpStatus } from '@nestjs/common';
-import { Gadzflix } from 'src/utils/jellyfin';
 import { demoteUser } from './demoteUser';
 import { payUser } from './payUser';
 import { promoteUser } from './promoteUser';
@@ -26,16 +25,10 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
     }
 
     if (user.user_password && user.user_password !== '') {
-      const [hashed_paswword, gadzflix_id] = await Promise.all([
-        bcrypt.hash(
-          user.user_password,
-          Number(process.env.SALT_ROUND),
-        ),
-        Database.promisedQuery(
-          'SELECT gadzflix_id FROM users WHERE user_id=?',
-          [id]
-        )
-      ]);
+      const hashed_paswword = await bcrypt.hash(
+        user.user_password,
+        Number(process.env.SALT_ROUND),
+      )
 
       await Promise.all([
         Database.promisedQuery(
@@ -73,7 +66,6 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
           'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
           [user.user_name, nthash(user.user_password), name[0].user_name],
         ),
-        Gadzflix.changePassword(gadzflix_id[0].gadzflix_id, user.user_password)
       ])
     }
     else {
