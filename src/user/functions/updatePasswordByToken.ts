@@ -22,7 +22,8 @@ export const updatePasswordByToken = async (
       const [hashed_password, user] = await Promise.all([
         bcrypt.hash(password.password1, Number(process.env.SALT_ROUND)),
         Database.promisedQuery(
-          'SELECT gadzflix_id, user_name FROM users WHERE user_id=?',
+            // Old: 'SELECT gadzflix_id, user_name FROM users WHERE user_id=?'
+          'SELECT user_name FROM users WHERE user_id=?',
           [user_id[0].token_user]
         )
       ]);
