@@ -31,11 +31,16 @@ export const startPayment = async (id: number): Promise<string> => {
         parameters.append("display_confirmation", "no");
 
         const { request_id, request_uuid, mobile_url } = await (await axios.post(`${process.env.LYDIA_API_URL}/api/request/do.json`, parameters)).data;
-
-        Database.promisedQuery(
-            'INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)',
-            [ticketId, request_id, request_uuid, lydia_cotiz[0].setting_value, id]
-        );
+        
+        try {
+            Database.promisedQuery(
+                'INSERT INTO lydia_transactions(request_ticket, request_id, request_uuid, request_amount, request_payer_id) VALUES(?, ?, ?, ?, ?)',
+                [ticketId, request_id, request_uuid, lydia_cotiz[0].setting_value, id]
+            );
+        }
+        catch (err) {
+            console.error('startPayment failed to insert transaction:', err);
+        }
 
         return mobile_url;
     }
