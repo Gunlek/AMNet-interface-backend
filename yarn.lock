@@ -1666,11 +1666,6 @@ bcrypt@^5.0.1:
     "@mapbox/node-pre-gyp" "^1.0.0"
     node-addon-api "^3.1.0"
 
-"bigdecimal@>= 0.6.0":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/bigdecimal/-/bigdecimal-0.6.1.tgz#18588d4b4f226b77310ed04574858c036a54485b"
-  integrity sha512-pFxbEwaZRK6XifePcw22DxJkCzCMw3YAossM884Tkvh9QpdWzFBLkgdnjx29yEickWBVYv1F9DdaDxDaF3dzkw==
-
 bignumber.js@^9.0.0:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.2.tgz#71c6c6bed38de64e24a65ebe16cfcf23ae693673"
@@ -3214,6 +3209,11 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+hash-wasm@^4.12.0:
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/hash-wasm/-/hash-wasm-4.12.0.tgz#f9f1a9f9121e027a9acbf6db5d59452ace1ef9bb"
+  integrity sha512-+/2B2rYLb48I/evdOIhP+K/DD2ca2fgBjp6O+GBEnCDk2e4rpeXIK8GvIyRPjTezgmWn9gmKwkQjjx6BtqDHVQ==
+
 hexoid@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/hexoid/-/hexoid-1.0.0.tgz"
@@ -4036,6 +4036,11 @@ jest@^27.0.6:
     "@jest/core" "^27.4.7"
     import-local "^3.0.2"
     jest-cli "^27.4.7"
+
+js-md4@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/js-md4/-/js-md4-0.3.2.tgz#cd3b3dc045b0c404556c81ddb5756c23e59d7cf5"
+  integrity sha512-/GDnfQYsltsjRswQhN9fhv3EMw2sCpUdrdxyWDOUK7eyD++r3gRhzgiQgc/x4MAv2i1iuQ4lxO5mvqM3vj4bwA==
 
 js-tokens@^4.0.0:
   version "4.0.0"
@@ -5598,13 +5603,6 @@ slice-ansi@^4.0.0:
     ansi-styles "^4.0.0"
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
-
-smbhash@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/smbhash/-/smbhash-0.0.1.tgz#3e0b73cfc6c02d4c0c19a993e84e52e11ff7a099"
-  integrity sha512-ljrKSV3nUvsax+5HHo4Q4O8GNi2Bni7ZRAaVh9bPVxP1UKRXtR/kLhmHY4onVglKkfY0C/J+zljhn1Q6k16zgQ==
-  dependencies:
-    bigdecimal ">= 0.6.0"
 
 source-map-support@0.5.21, source-map-support@^0.5.6, source-map-support@~0.5.20:
   version "0.5.21"

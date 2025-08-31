@@ -1,0 +1,25 @@
+services:
+  amnet-db:
+    image: mysql:8.0
+    container_name: amnet-sql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: amnet_birse
+      MYSQL_USER: amnet_birse
+      MYSQL_PASSWORD: AStrongPassword
+      MYSQL_ROOT_PASSWORD: rootPassword
+    volumes:
+      - ./data:/var/lib/mysql
+
+  amnet-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: amnet-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: amnet-db
+    ports:
+      - "8080:80"
+    depends_on:
+      - amnet-db
