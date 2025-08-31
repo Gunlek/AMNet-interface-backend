@@ -1,7 +1,7 @@
 import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
 import { HttpStatus } from '@nestjs/common';
-import { nthash } from 'smbhash';
+import { md4 } from 'hash-wasm';
 
 export const updatePasswordByToken = async (
   token: string,
@@ -44,7 +44,7 @@ export const updatePasswordByToken = async (
         ),
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET `value`=? WHERE `username`=?',
-          [nthash(password.password1), user[0].user_name]
+          [md4(password.password1), user[0].user_name]
         )
       ]);
 

@@ -1,12 +1,12 @@
 import { User } from 'src/models/user.model';
 import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
-import { nthash } from 'smbhash';
 import { HttpStatus } from '@nestjs/common';
 import { demoteUser } from './demoteUser';
 import { payUser } from './payUser';
 import { promoteUser } from './promoteUser';
 import { unpayUser } from './unpayUser';
+import { md4 } from 'hash-wasm';
 
 export const updateUser = async (user: User, id: number, userId: number): Promise<HttpStatus> => {
   const [name, rank] = await Promise.all([
@@ -64,7 +64,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
         ),
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-          [user.user_name, nthash(user.user_password), name[0].user_name],
+          [user.user_name, md4(user.user_password), name[0].user_name],
         ),
       ])
     }

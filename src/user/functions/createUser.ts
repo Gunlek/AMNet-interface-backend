@@ -3,7 +3,7 @@ import { Database, RadiusDatabase } from 'src/utils/database';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { HttpStatus } from '@nestjs/common';
-import { nthash } from 'smbhash';
+import { md4 } from 'hash-wasm';
 
 export const createUser = async (user: User): Promise<{ httpStatus: HttpStatus, error: any }> => {
   let httpStatus: HttpStatus;
@@ -32,43 +32,48 @@ export const createUser = async (user: User): Promise<{ httpStatus: HttpStatus, 
         Number(process.env.SALT_ROUND),
       )
 
-      await Promise.all([
-        Database.promisedQuery(
-          'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_is_gadz`, `gadzflix_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-          [
-            user.user_name,
-            user.user_firstname,
-            user.user_lastname,
-            user.user_email,
-            user.user_phone,
-            hashed_paswword,
-            user.user_bucque,
-            user.user_fams,
-            user.user_campus,
-            user.user_proms,
-            user.user_is_gadz,
-            gadzflix_id
-          ]
-        ),
-        RadiusDatabase.promisedQuery(
-          'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?, ?, ?, ?, ?, NOW())',
-          [
-            user.user_name,
-            user.user_firstname,
-            user.user_lastname,
-            user.user_email,
-            'API REST AMNet',
-          ]
-        ),
-        RadiusDatabase.promisedQuery(
-          'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
-          [user.user_name, 'Disabled-Users', 0]
-        ),
-        RadiusDatabase.promisedQuery(
-          'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-          [user.user_name, 'NT-Password', ':=', nthash(user.user_password)]
-        )
-      ])
+      try{
+        await Promise.all([
+          Database.promisedQuery(
+            'INSERT INTO `users`(`user_name`, `user_firstname`, `user_lastname`, `user_email`, `user_phone`, `user_password`, `user_bucque`, `user_fams`, `user_campus`, `user_proms`, `user_is_gadz`, `gadzflix_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+            [
+              user.user_name,
+              user.user_firstname,
+              user.user_lastname,
+              user.user_email,
+              user.user_phone,
+              hashed_paswword,
+              user.user_bucque,
+              user.user_fams,
+              user.user_campus,
+              user.user_proms,
+              user.user_is_gadz,
+              gadzflix_id
+            ]
+          ),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `userinfo`(`username`, `firstname`, `lastname`, `email`, `creationby`, `creationdate`) VALUES (?, ?, ?, ?, ?, NOW())',
+            [
+              user.user_name,
+              user.user_firstname,
+              user.user_lastname,
+              user.user_email,
+              'API REST AMNet',
+            ]
+          ),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radusergroup`(`username`, `groupname`, `priority`) VALUES (?, ?, ?)',
+            [user.user_name, 'Disabled-Users', 0]
+          ),
+          RadiusDatabase.promisedQuery(
+            'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
+            [user.user_name, 'NT-Password', ':=', md4(user.user_password)]
+          )
+        ]);
+      }
+      catch (err){
+        return {httpStatus: HttpStatus.INTERNAL_SERVER_ERROR, error: err};
+      }
 
       httpStatus = HttpStatus.OK;
       error = null;
