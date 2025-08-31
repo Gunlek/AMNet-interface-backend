@@ -67,7 +67,7 @@ export const createUser = async (user: User): Promise<{ httpStatus: HttpStatus, 
           ),
           RadiusDatabase.promisedQuery(
             'INSERT INTO `radcheck`( `username`, `attribute`, `op`, `value`) VALUES (?, ?, ?, ?)',
-            [user.user_name, 'NT-Password', ':=', md4(user.user_password)]
+            [user.user_name, 'NT-Password', ':=', await md4(user.user_password)]
           )
         ]);
       }

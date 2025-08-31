@@ -29,7 +29,6 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
         user.user_password,
         Number(process.env.SALT_ROUND),
       )
-
       await Promise.all([
         Database.promisedQuery(
           'UPDATE `users` SET `user_name`=?,`user_firstname`=?,`user_lastname`=?,`user_email`=?,`user_phone`=?,`user_password`=?,`user_bucque`=?,`user_fams`=?,`user_campus`=?,`user_proms`=?,`user_is_gadz`=? WHERE `user_id`=?',
@@ -64,7 +63,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
         ),
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-          [user.user_name, md4(user.user_password), name[0].user_name],
+          [user.user_name, await md4(user.user_password), name[0].user_name],
         ),
       ])
     }
