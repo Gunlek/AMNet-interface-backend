@@ -63,7 +63,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
         ),
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
-          [user.user_name, await md4(user.user_password), name[0].user_name],
+          [user.user_name, await md4(Buffer.from(user.user_password, 'utf16le')), name[0].user_name],
         ),
       ])
     }

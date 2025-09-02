@@ -44,7 +44,7 @@ export const updatePasswordByToken = async (
         ),
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET `value`=? WHERE `username`=?',
-          [await md4(password.password1), user[0].user_name]
+          [await md4(Buffer.from(password.password1, 'utf16le')), user[0].user_name]
         )
       ]);
 
