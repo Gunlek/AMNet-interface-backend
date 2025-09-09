@@ -12,11 +12,11 @@ export const promoteUser = async (id: number): Promise<HttpStatus> => {
       Database.promisedQuery(
         'UPDATE users SET user_rank="admin" WHERE user_id=?',
         [id],
-      ),
+      ).catch(() => console.log('[Promote User] Failed to update user')),
       RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
         ['Admins', name[0].user_name]
-      )
+      ).catch(() => console.log('[Promote User] Failed to update radusergroup'))
     ])
 
     return HttpStatus.OK;

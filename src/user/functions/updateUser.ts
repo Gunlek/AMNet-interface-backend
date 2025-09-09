@@ -46,7 +46,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
             user.user_is_gadz,
             id,
           ],
-        ),
+        ).catch((e) => console.log('Failed to update the user')),
         RadiusDatabase.promisedQuery(
           'UPDATE `userinfo` SET `username`= ?, `firstname`= ?, `lastname`= ?, `email`= ? WHERE username=?',
           [
@@ -56,7 +56,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
             user.user_email,
             name[0].user_name,
           ],
-        ),
+        ).catch(() => console.log('Failed to update userinfo')),
         RadiusDatabase.promisedQuery(
           'UPDATE `radusergroup` SET `username`=? WHERE `username`=?',
           [user.user_name, name[0].user_name],
@@ -64,7 +64,7 @@ export const updateUser = async (user: User, id: number, userId: number): Promis
         RadiusDatabase.promisedQuery(
           'UPDATE `radcheck` SET  `username`= ?, `value`= ? WHERE  `username`= ?',
           [user.user_name, await md4(Buffer.from(user.user_password, 'utf16le')), name[0].user_name],
-        ),
+        ).catch(() => console.log('Failed to user radcheck')),
       ])
     }
     else {
