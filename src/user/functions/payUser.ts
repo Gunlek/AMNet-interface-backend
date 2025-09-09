@@ -46,16 +46,18 @@ export const payUser = async (type: "all" | "several", users?: number[]): Promis
 
     const [dbUsers, mac_address] = await Promise.all([
       Database.promisedQuery(
-        'SELECT user_name, user_is_gadz,gadzflix_id, user_rank FROM users WHERE user_id IN (?)', [users]),
+        'SELECT user_name, user_is_gadz,gadzflix_id, user_rank FROM users WHERE user_id IN (?)', [users]
+      ).catch(e => console.log('Failed to get user')),
       Database.promisedQuery(
-        'SELECT access_mac, (SELECT `user_rank` FROM `users` WHERE `user_id`=`access_user`) AS `user_rank` FROM access WHERE access_user IN (?)', [users])
+        'SELECT access_mac, (SELECT `user_rank` FROM `users` WHERE `user_id`=`access_user`) AS `user_rank` FROM access WHERE access_user IN (?)', [users]
+      ).catch(e => console.log('Failed to get user\'s mac'))
     ]) as [{ user_name: string, gadzflix_id: string, user_is_gadz: boolean, user_rank: string }[], { access_mac: string, user_rank: string }[]]
 
     mac_address.map(async (access) => {
       promise.push(RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`=? WHERE `username`=?',
         [access.user_rank == "admin" ? "Admins" : "Enabled-Users", access.access_mac]
-      ));
+      ).catch(e => console.log('Failed to update groups')));
     });
 
     dbUsers.map(async (user) => {
@@ -66,13 +68,13 @@ export const payUser = async (type: "all" | "several", users?: number[]): Promis
     promise.push(
       Database.promisedQuery(
         'UPDATE `users` SET `user_pay_status`=1 WHERE user_id IN (?)', [users]
-      ),
+      ).catch(e => console.log('Failed to update user_pay_status=1')),
       RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Enabled-Users" WHERE username IN (?)', [user_names]
-      ),
+      ).catch(e => console.log('Failed to update Enabled-Users group')),
       RadiusDatabase.promisedQuery(
         'UPDATE `radusergroup` SET `groupname`="Admins" WHERE username IN (?)', [admin_names]
-      )
+      ).catch(e => console.log('Failed to update Admins group'))
     );
 
     await Promise.all(promise);
