@@ -8,7 +8,7 @@ export const createAccess = async (
         {
             access_description: string,
             access_mac: string,
-            access_user: number
+            access_user: number|string
         },
     access_proof: Express.Multer.File,
     userId: number

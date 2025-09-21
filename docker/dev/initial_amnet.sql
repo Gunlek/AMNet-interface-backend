@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : amnet-db
--- Généré le : dim. 31 août 2025 à 13:50
+-- Généré le : sam. 13 sep. 2025 à 19:51
 -- Version du serveur : 8.0.43
 -- Version de PHP : 8.2.27
 
@@ -32,8 +32,9 @@ CREATE TABLE `access` (
   `access_description` varchar(255) NOT NULL,
   `access_mac` varchar(255) NOT NULL,
   `access_proof` varchar(255) NOT NULL,
-  `access_user` int NOT NULL,
-  `access_state` varchar(255) NOT NULL DEFAULT 'pending'
+  `access_user` varchar(255) NOT NULL,
+  `access_state` varchar(255) NOT NULL DEFAULT 'pending',
+  `declined_reason` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -57,8 +58,8 @@ CREATE TABLE `admin_actions` (
 
 CREATE TABLE `documents` (
   `document_id` int NOT NULL,
-  `document_title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `document_path` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `document_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `document_path` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -77,10 +78,10 @@ INSERT INTO `documents` (`document_id`, `document_title`, `document_path`) VALUE
 
 CREATE TABLE `lydia_transactions` (
   `id` int NOT NULL,
-  `request_ticket` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `request_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `request_uuid` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `request_amount` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `request_ticket` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `request_uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `request_amount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `request_payer_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -106,7 +107,7 @@ CREATE TABLE `materials` (
 CREATE TABLE `reset_token` (
   `token_id` int NOT NULL,
   `token_user` int NOT NULL,
-  `token_value` varchar(256) COLLATE utf8mb4_general_ci NOT NULL
+  `token_value` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -132,7 +133,7 @@ INSERT INTO `settings` (`setting_id`, `setting_value`, `setting_name`, `setting_
 (4, '220', 'active_proms', 'proms'),
 (5, '5fd8dd2f8fd3c440503375', 'lydia_token', 'lydia'),
 (6, '35', 'lydia_cotiz', 'amount'),
-(7, '', 'usins_state', 'usins_state'),
+(7, '1', 'usins_state', 'usins_state'),
 (8, '1', 'guest_access', 'guest_access'),
 (9, 'Hard Win\'s;Mac Nhat\'s', 'admin_pseudos', 'names'),
 (10, '58;47-102', 'admin_nums', 'nums');
@@ -184,7 +185,9 @@ CREATE TABLE `users` (
   `user_proms` varchar(255) NOT NULL,
   `user_rank` varchar(255) NOT NULL DEFAULT 'user',
   `user_is_gadz` int NOT NULL DEFAULT '0',
-  `user_pay_status` int NOT NULL
+  `user_pay_status` int NOT NULL DEFAULT '0',
+  `gadzflix_id` varchar(255) NOT NULL,
+  `user_notification` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -313,7 +316,7 @@ ALTER TABLE `tickets_discuss`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=462;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

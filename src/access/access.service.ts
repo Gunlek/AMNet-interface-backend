@@ -21,7 +21,7 @@ export class AccessService {
             {
                 access_description: string,
                 access_mac: string,
-                access_user: number
+                access_user: number|string
             },
         acess_proof: Express.Multer.File,
         userId: number

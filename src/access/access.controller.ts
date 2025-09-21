@@ -103,7 +103,7 @@ export class AccessController {
   @Post()
   async add(
     @Res({ passthrough: true }) res: Response,
-    @Body() access: { access_description: string, access_mac: string, access_user: number },
+    @Body() access: { access_description: string, access_mac: string, access_user: number|string },
     @UploadedFile() access_proof: Express.Multer.File,
     @Headers('authorization') jwtToken: string
   ): Promise<void> {
