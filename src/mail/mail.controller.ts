@@ -50,7 +50,7 @@ export class MailController {
         @Param('id') id: number,
     ): Promise<void> {
         await Database.promisedQuery(
-            'UPDATE `users` SET `user_notification`=NOT `user_notification` WHERE `gadzflix_id`=?',
+            'UPDATE `users` SET `user_notification`=NOT `user_notification` WHERE `user_id`=?',
             [id]
         );
         res.status(HttpStatus.OK);
